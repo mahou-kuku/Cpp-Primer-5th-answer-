@@ -9,10 +9,19 @@
 在最后加上   %SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;  
 注意本来的“变量值”最后面有没有分号【;】没有加上分号再加上这段，复制，替换掉“变量值”栏里本来的内容，一路确定就可以用了。  
 ```
-##练习 1.2:  
-###改写程序，让它返回-1。返回值-1 通常被当作程序错误的标识。重新编译并运行你的程序，观察你的系统如何处理 main 返回的错误标识。   
+## 练习 1.2:  
+### 改写程序，让它返回-1。返回值-1 通常被当作程序错误的标识。重新编译并运行你的程序，观察你的系统如何处理 main 返回的错误标识。   
 答：  
+
+* 什么提示都没有  
+* 使用 echo %errorlevel% 后，显示 -1  
+## 练习1.3：  
+### 编写程序，在标准输出上打印Hello, World。  
 ```
-*什么提示都没有  
-*使用 echo %errorlevel% 后，显示 -1  
+#include<iostream>
+int main() 
+{
+	std::cout << "Hello， World。" << std::endl;
+	return 0;
+}
 ```
