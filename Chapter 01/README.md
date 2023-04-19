@@ -12,9 +12,8 @@
 ## 练习 1.2:  
 ### 改写程序，让它返回-1。返回值-1 通常被当作程序错误的标识。重新编译并运行你的程序，观察你的系统如何处理 main 返回的错误标识。   
 答：  
-
 * Windows7什么提示都没有  
-* 使用 echo %errorlevel% 后，显示 -1  
+* 使用 echo %errorlevel% 命令后，显示 -1  
 ## 练习1.3：  
 ### 编写程序，在标准输出上打印Hello, World。  
 ```
@@ -22,6 +21,20 @@
 int main() 
 {
 	std::cout << "Hello， World。" << std::endl;
+	return 0;
+}
+```
+## 练习 1.4：  
+### 我们的程序使用加法运算符+来将两个数相加。编写程序使用乘法运算符*，来打印两个数的积。  
+答：  
+```
+#include <iostream>
+int main()
+{
+	std::cout << "Enter two numbers:" << std::endl;
+	int valueOne = 0, valueTwo = 0;
+	std::cin >> valueOne >> valueTwo;
+	std::cout << "the product of " << valueOne << " and " << valueTwo << " is " << valueOne * valueTwo << std::endl;
 	return 0;
 }
 ```
