@@ -34,7 +34,7 @@ int main()
 	std::cout << "Enter two numbers:" << std::endl;
 	int valueOne = 0, valueTwo = 0;
 	std::cin >> valueOne >> valueTwo;
-	std::cout << "the product of " << valueOne << " and " << valueTwo << " is " << valueOne * valueTwo << std::endl;
+	std::cout << "The product of " << valueOne << " and " << valueTwo << " is " << valueOne * valueTwo << std::endl;
 	return 0;
 }
 ```
