@@ -78,7 +78,7 @@ std::cout << "The sum of " << v1
 ## 练习 1.7：  
 ### 编译一个包含不正确的嵌套注释的程序，观察编译器返回的错误信息。  
 答：  
-```ruby
+```
 /*Comment pair/*A comment pair appear inside another*/*/
 ```
 错误信息:  
@@ -88,7 +88,7 @@ prog1.cpp(4): error C2059: 语法错误:“/”
 ```
 ## 练习 1.8：  
 ### 指出下列哪些输出语句是合法的（如果有的话)：  
-```ruby
+```
 std::cout << "/*";
 std::cout << "*/";
 std::cout << /* "*/" */;
@@ -99,7 +99,7 @@ std::cout << /* "*/" /* "/*" */;
 * 第一句正确。输出为：/*  
 * 第二句正确。输出为：*/  
 * 第三句错误。以下为改正：  
-```ruby
+```
 std::cout << /* "*/" */";
 ```
 * 输出为：*/  
@@ -112,9 +112,10 @@ std::cout << /* "*/" */";
 int main()
 {
 	int sum = 0, val = 50;
+	// Keep executing the while as long as val is less than or equal to 100.
 	while (val <= 100) {
-		sum += val;	
-		++val;
+		sum += val;		// assigns sum + val to sum
+		++val;			// add 1 to val
 	}
 	std::cout << "Sum of 50 to 100 inclusive is " << sum << std::endl;
 	return 0;
