@@ -261,3 +261,34 @@ int main()
 	return 0;
 }
 ```
+## 练习 1.17：  
+### 如果输入的所有值都是相等的，本节的程序会输出什么？如果没有重复值，输出又会是怎样的？  
+答：  
+输入的所有值都是相等的则输出该值以及重复输入的次数。(需要在输入的结尾添加文件结束符)  
+如果没有重复值则依次输出输入的所有值，以及这些值的计次均为1次。(需要在输入的结尾添加文件结束符)  
+## 练习 1.18：  
+### 编译并运行本节的程序，给它输入全都相等的值。再次运行程序，输入没有重复的值。  
+答：  
+* 本节程序如下：  
+```
+#include <iostream>
+int main()
+{
+	int currVal = 0, val = 0;
+	if (std::cin >> currVal) {
+		int cnt = 1;
+		while (std::cin >> val) {
+			if (val == currVal)
+				++cnt;
+			else {
+				std::cout << currVal << " occurs " << cnt << " times " << std::endl;
+				currVal = val;
+				cnt = 1;
+			}
+		}
+		std::cout << currVal << " occurs " << cnt << " times " << std::endl;
+	}
+	return 0;
+}
+```
+* 输出结果同练习 1.17相同。  
