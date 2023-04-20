@@ -332,7 +332,7 @@ int main()
 ## 练习 1.21：  
 ### 编写程序，读取两个ISBN 相同的 Sales_item 对象，输出它们的和。  
 答： 
-* 这题问早了，让我纠结一个多小时。不过练习下面就开始讲成员函数了。  
+* 这题问早了，让我纠结一个小时。不过练习下面就开始讲成员函数了。  
 ```
 #include <iostream>
 #include "Sales_item.h"
@@ -411,4 +411,32 @@ int main()
 ```
 1-333-55555-X occurs 3 times
 1-331-55554-T occurs 1 times
+```
+## 练习1.25:  
+### 借助网站上的Sales_item.h头文件,编译并运行本节给出的书店程序。  
+答：  
+```
+#include <iostream>
+#include "Sales_item.h"
+int main()
+{
+	Sales_item total;
+	if (std::cin >> total) {
+		Sales_item trans;
+		while (std::cin >> trans) {
+			if (total.isbn() == trans.isbn())
+				total += trans;
+			else {
+				std::cout << total << std::endl;
+				total = trans;
+			}
+		}
+		std::cout << total << std::endl;
+	}
+	else {
+		std::cout << "No data?!" << std::endl;
+		return -1;
+	}
+	return 0;
+}
 ```
