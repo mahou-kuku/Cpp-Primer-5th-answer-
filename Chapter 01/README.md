@@ -16,7 +16,7 @@
 * 使用 echo %errorlevel% 命令后，显示 -1  
 ## 练习1.3：  
 ### 编写程序，在标准输出上打印Hello, World。  
-```ruby
+```
 #include <iostream>
 int main() 
 {
@@ -27,7 +27,7 @@ int main()
 ## 练习 1.4：  
 ### 我们的程序使用加法运算符+来将两个数相加。编写程序使用乘法运算符*，来打印两个数的积。  
 答：  
-```ruby
+```
 #include <iostream>
 int main()
 {
@@ -41,7 +41,7 @@ int main()
 ## 练习 1.5：  
 ### 我们将所有输出操作放在一条很长的语句中。重写程序，将每个运算对象的打印操作放在一条独立的语句中。  
 答：  
-```ruby
+```
 #include <iostream>
 int main()
 {
@@ -61,7 +61,7 @@ int main()
 ```
 ## 练习 1.6:  
 ### 解释下面程序片段是否合法。  
-```ruby
+```
 std::cout << "The sum of " << v1;
 << " and " << v2;
 << " is " << v1 + v2 << std::endl;
@@ -70,7 +70,7 @@ std::cout << "The sum of " << v1;
 答：  
 * 不合法，多了两个;或者少了两个std::cout  
 * 以下是一种修正方案。  
-```ruby
+```
 std::cout << "The sum of " << v1
 	<< " and " << v2
 	<< " is " << v1 + v2 << std::endl;
@@ -107,17 +107,18 @@ std::cout << /* "*/" */";
 ## 练习 1.9：  
 ### 编写程序，使用 while 循环将 50 到 100 的整数相加。  
 答：  
-```ruby
+```
 #include <iostream>
 int main()
 {
 	int sum = 0, val = 50;
-	// Keep executing the while as long as val is less than or equal to 100.
 	while (val <= 100) {
-		sum += val;		// assigns sum + val to sum
-		++val;			// add 1 to val
+		sum += val;	
+		++val;
 	}
-	std::cout << "Sum of 50 to 100 inclusive is " << sum << std::endl;
+	std::cout << "Sum of 50 to 100 inclusive is " << sum << 
+
+std::endl;
 	return 0;
 }
 ```
