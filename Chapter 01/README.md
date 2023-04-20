@@ -107,7 +107,7 @@ std::cout << /* "*/" */";
 ## 练习 1.9：  
 ### 编写程序，使用 while 循环将 50 到 100 的整数相加。  
 答：  
-```
+```ruby
 #include <iostream>
 int main()
 {
