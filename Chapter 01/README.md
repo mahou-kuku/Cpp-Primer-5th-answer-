@@ -75,3 +75,14 @@ std::cout << "The sum of " << v1
 	<< " and " << v2
 	<< " is " << v1 + v2 << std::endl;
 ```
+## 练习 1.7：  
+### 编译一个包含不正确的嵌套注释的程序，观察编译器返回的错误信息。  
+答：  
+```
+/*Comment pair/*A comment pair appear inside another*/*/
+```
+错误信息:  
+```
+prog1.cpp(4): warning C4138: 在注释外找到“*/”
+prog1.cpp(4): error C2059: 语法错误:“/”
+```
