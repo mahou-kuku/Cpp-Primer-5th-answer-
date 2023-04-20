@@ -152,3 +152,51 @@ int main()
 	return 0;
 }
 ```
+## 练习 1.12：  
+### 下面的 for 循环完成了什么功能？ sum 的终值是多少？  
+```
+int sum = 0;
+for (int i = -100; i <= 100; ++i)
+sum += i;
+```
+答：  
+* 将从-100到100的每个数相加，sum的终值是0。  
+## 练习1.13:  
+### 使用for循环重做1.4.1节中的所有练习(第11页)。  
+答：  
+* for练习 1.9  
+```
+#include <iostream>
+int main()
+{
+	int sum = 0;
+	for (int val = 50; val <= 100; ++val)
+		sum += val;
+	std::cout << "Sum of 50 to 100 inclusive is " << sum << std::endl;
+	return 0;
+}
+```
+* for练习 1.10  
+```
+#include <iostream>
+int main()
+{
+	int val = 9;
+	for (int val = 9; val >= 1; --val)
+		std::cout << "Countdown: " << val << std::endl;
+	return 0;
+}
+```
+* for练习 1.11  
+```
+#include <iostream>
+int main()
+{
+	std::cout << "Enter two numbers to specify putout range: " << std::endl;
+	int start = 0, end = 0;
+	std::cin >> start >> end;
+	for (; start <= end; ++start)
+		std::cout << "Putout: " << start << std::endl;
+	return 0;
+}
+```
