@@ -372,3 +372,43 @@ int main()
 	return 0;
 }
 ```
+## 练习 1.23：  
+### 编写程序，读取多条销售记录，并统计每个 ISBN（每本书）有几条销售记录。  
+答：  
+```
+#include <iostream>
+#include "Sales_item.h"
+int main()
+{
+	Sales_item currItem;
+	if (std::cin >> currItem) {
+		Sales_item item;
+		int cnt = 1;
+		while (std::cin >> item) {
+			if (item.isbn() == currItem.isbn())
+				++cnt;
+			else {
+				std::cout << currItem.isbn() << " occurs "
+					<< cnt << " times " << std::endl;
+				currItem = item;
+				cnt = 1;
+			}
+		}
+		std::cout << currItem.isbn() << " occurs "
+			<< cnt << " times " << std::endl;
+	}
+	return 0;
+}
+```
+## 练习1.24:  
+### 输入表示多个ISBN的多条销售记录来测试上一个程序，每个ISBN的记录应该聚在一起。  
+答：  
+* 输入如下：  
+```
+1-333-55555-X 8 8 1-333-55555-X 8 8 1-333-55555-X 8 7 1-331-55554-T 7 7
+```
+* 输出如下：  
+```
+1-333-55555-X occurs 3 times
+1-331-55554-T occurs 1 times
+```
