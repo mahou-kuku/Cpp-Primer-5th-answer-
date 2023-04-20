@@ -204,10 +204,11 @@ int main()
 ### 对比 for 循环和 while 循环，两种形式的优缺点各是什么？  
 答：  
 * for 循环通常更适合具有固定次数的循环，而 while 循环在循环次数不确定的情况下更加灵活。  
+
 * for 循环的优点：  
 1. 结构清晰：for 循环的初始化、条件检测和更新操作都在一个语句中，使得循环的逻辑更加明确。  
 2. 适用于有固定次数的循环：当知道循环需要执行的确切次数时，for 循环会更加简洁易懂。  
-3. 可以在语句里使用计数器：for 循环可以方便地使用循环变量，比如计数。  
+3. 可以在语句里使用计数器：for 循环可以方便地使用循环变量，比如用来计数。  
 * for 循环的缺点：  
 对于不确定次数的循环，for 循环可能不太适用，因为for 循环的语法结构可能无法清晰地表示循环条件。  
 * while 循环的优点：  
@@ -215,3 +216,48 @@ int main()
 2. 对于复杂的循环条件，while 循环可能更容易理解和实现。  
 * while 循环的缺点：  
 对于有固定次数的循环，while 循环可能比 for 循环更繁琐，需要在循环体内部手动更新循环条件。  
+## 练习 1.15：  
+### 编写程序，包含第 14 页“再探编译”中讨论的常见错误。熟悉编译器生成的错误信息。
+答：  
+* 语法错误(syntax error):  
+```
+#include <iostream>
+int main()
+{
+	std::cout<<"Hurry!"		//没有写; 分号
+	return 0;
+}
+```
+* 类型错误(type error):  
+```
+int main()
+{
+	int val = 0;
+	val = "Hello";		//给int类型变量赋值字符串字面值常量
+	return 0;
+}
+```
+* 声明错误（declaration error）：  
+```
+#include <iostream>
+int main()
+{
+	int val = 0;
+	std::cin >> va1;	//val写成了va1
+	return 0;
+}
+```
+## 练习 1.16：  
+### 编写程序，从 cin读取一组数，输出其和。  
+答：  
+```
+#include <iostream>
+int main()
+{
+	int sum = 0, value = 0;
+	while (std::cin >> value)
+		sum += value;
+	std::cout << "Sum is: " << sum << std::endl;
+	return 0;
+}
+```
