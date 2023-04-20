@@ -434,7 +434,7 @@ int main()
 		std::cout << total << std::endl;
 	}
 	else {
-		std::cout << "No data?!" << std::endl;
+		std::cerr << "No data?!" << std::endl;
 		return -1;
 	}
 	return 0;
