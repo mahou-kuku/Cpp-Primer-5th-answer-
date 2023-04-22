@@ -90,3 +90,23 @@ int month= 09, day= 07;
 (c)会产生编译错误。 后缀f只对浮点字面值有效。
 (d)输出 3.14 	long double 类型
 ```
+## 练习2.8:  
+### 请利用转义序列编写一段程序,要求先输出2M,然后转到新一行。修改程序使其先输出 2，然后输出制表符，再输出 M，最后转到新一行。  
+答：  
+```
+#include <iostream>
+int main()
+{
+	std::cout << "\x32\x4D\xA";
+	return 0;
+}
+```
+* 修改后：  
+```
+#include <iostream>
+int main()
+{
+	std::cout << "\x32\x9\x4D\xA";
+	return 0;
+}
+```
