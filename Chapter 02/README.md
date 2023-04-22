@@ -157,3 +157,14 @@ int main()
 * global_int 初始化为0。  
 * local_int 并未初始化，值是未定义的。  
 * local_str 默认初始化为空字符串。  
+## 练习 2.11:  
+### 指出下面的语句是声明还是定义:  
+```
+(a) extern int ix = 1024;
+(b) int iy;
+(c) extern int iz;
+```
+答：  
+* (a) 定义。
+* (b) 定义。
+* (c) 声明。
