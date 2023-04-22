@@ -141,3 +141,19 @@ double salary = wage;
 ```
 double i = 3.14;
 ```
+## 练习2.10:  
+### 下列变量的初值分别是什么?  
+```
+std::string global_str;
+int global_int;
+int main()
+{
+    int local_int;
+    std::string local_str;
+}
+```
+答：  
+* global_str 初始化为空字符串。  
+* global_int 初始化为0。  
+* local_int 并未初始化，值是未定义的。  
+* local_str 默认初始化为空字符串。  
