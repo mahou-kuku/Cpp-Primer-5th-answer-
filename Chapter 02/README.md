@@ -237,3 +237,16 @@ double d = 0, &r2 = d;
 ```
 答：  
 输出为：10 10
+## 练习2.18:  
+### 编写代码分别更改指针的值以及指针所指对象的值。  
+答：  
+```
+#include <iostream>
+int main()
+{
+	int valOne = 0, valTwo = 0,*pVal=&valOne;
+	pVal = &valTwo;		//Change pVal's value
+	*pVal = 2;		//Change valTwo's value
+	return 0;
+}
+```
