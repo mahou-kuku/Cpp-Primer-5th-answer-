@@ -350,7 +350,7 @@ if (*p) // 判断 p 指向的对象的值是不是0。
 (b)int *p1, *const p2;
 (c)const int ic, &r = ic;
 (d)const int *const p3;
-(e)
+(e)const int *p;
 ```
 答：  
 * (a)声明定义一个 int 类型变量 i 和一个 int 类型 常量指针cp。不合法，常量指针 cp 必须被初始化。
