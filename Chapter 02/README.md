@@ -389,4 +389,4 @@ if (*p) // 判断 p 指向的对象的值是不是0。
 	const int *p2 = &v2, *const p3 = &i, &r2 = v2;
 ```
 答：  
-* v2 是顶层 const，r1 是顶层 const，p2 是底层 const，p3 既是顶层 const 也是底层 const，r2 是底层 const。
+* v2 是顶层 const，r1 是顶层 const，p2 是底层 const，p3 既是顶层 const 也是底层 const，r2 既是顶层 const 也是底层 const。
