@@ -404,4 +404,4 @@ if (*p) // 判断 p 指向的对象的值是不是0。
 * p1 = p2; 非法，不允许将底层 const 的值拷贝给非底层 const。
 * p2 = p1; 合法，允许将非底层 const 的值拷贝给底层 const。
 * p1 = p3; 非法，不允许将底层 const 的值拷贝给非底层 const。
-* p2 = p3; 合法，允许将底层 const 的值拷贝给底层 const。 p3 同时是顶层 const，但它的值允许拷出。
+* p2 = p3; 合法，允许将底层 const 的值拷贝给底层 const。 p3 同时是顶层 const，顶层 const允许拷出。
