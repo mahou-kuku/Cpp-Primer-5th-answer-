@@ -326,3 +326,20 @@ if (*p) // 判断 p 指向的对象的值是不是0。
 * (b)合法。
 * (c)合法。
 * (d)不合法。不能给常量赋值。
+## 练习 2.27：  
+### 下面的哪些初始化是合法的？请说明原因。  
+```
+(a)int i = -1, &r = 0;
+(b)int *const p2 = &i2;
+(c)const int i = -1, &r = 0;
+(d)const int *const p3 = &i2;
+(e)const int *p1 = &i2;
+(f)const int &const r2;
+(g)const int i2 = i, &r = i;
+```
+答：  
+```
+(c)合法，r 是对常量的引用。
+(d)勉强可以判断为合法（如果 i2 是 int 类型或带 const 限定符的 int 类型），p3既可以指向 int 类型对象，也可以指向带 const 限定符的 int 类型对象。
+(e)勉强可以判断为合法（如果 i2 是 int 类型或带 const 限定符的 int 类型），p1既可以指向 int 类型对象，也可以指向带 const 限定符的 int 类型对象。
+(g)合法，r 既可以引用 int 类型对象，也可以引用带 const 限定符的 int 类型对象。
