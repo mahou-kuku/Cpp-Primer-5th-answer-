@@ -458,7 +458,7 @@ int null = 0, *p = nullptr;
 答：
 * a 是 int 值为：3 ，   b 是 int 值为：4 ，  c 是 int 值为：3 ，  d 是 int& 值为：3 。
 ## 练习 2.38：
-###说明由 decltype 指定类型和由 auto 指定类型有何区别。请举出一个例子, decltype指定的类型与 auto指定的类型一样;再举一个例子, decltype指定的类型与 auto 指定的类型不一样。
+### 说明由 decltype 指定类型和由 auto 指定类型有何区别。请举出一个例子, decltype指定的类型与 auto指定的类型一样;再举一个例子, decltype指定的类型与 auto 指定的类型不一样。
 答：  
 * decltype 会分析表达式并返回该表达式的类型，而不会执行表达式。decltype 更注重于保持类型信息的完整性，它可以推导出更精确的类型，包括引用和 const 限定符。
 * auto 会根据变量的初始化表达式推导出变量的类型。auto 会自动忽略顶层 const 限定符和引用，因此它推导出的类型可能与原始类型略有不同。
