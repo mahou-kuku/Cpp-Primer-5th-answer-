@@ -437,3 +437,41 @@ int null = 0, *p = nullptr;
 ```
 答：  
 * j 是一个int ， k 是一个 const& ， p 是一个const int* ， j2 是一个const int ， k2 是一个 const& 。
+## 练习2.36:  
+### 关于下面的代码,请指出每一个变量的类型以及程序结束时它们各自的值。  
+```
+	int a = 3, b = 4;
+	decltype(a) c = a;
+	decltype((b))d = a;
+	++c;
+	++d;
+```
+答：  
+* a 是 int 值为：4 ，   b 是 int 值为：4 ，  c 是 int 值为：4 ，  d 是 int& 值为：4 。
+## 练习 2.37：
+### 赋值是会产生引用的一类典型表达式，引用的类型就是左值的类型。也就是·说,如果i是int,则表达式i=x的类型是 int&。根据这一特点,请指出下面的代码中每一个变量的类型和值。
+```
+	int a = 3, b = 4;
+	decltype(a) c = a;
+	decltype(a = b)d = a;
+```
+答：
+* a 是 int 值为：3 ，   b 是 int 值为：4 ，  c 是 int 值为：3 ，  d 是 int& 值为：3 。
+## 练习 2.38：
+###说明由 decltype 指定类型和由 auto 指定类型有何区别。请举出一个例子, decltype指定的类型与 auto指定的类型一样;再举一个例子, decltype指定的类型与 auto 指定的类型不一样。
+答：  
+* decltype 会分析表达式并返回该表达式的类型，而不会执行表达式。decltype 更注重于保持类型信息的完整性，它可以推导出更精确的类型，包括引用和 const 限定符。
+* auto 会根据变量的初始化表达式推导出变量的类型。auto 会自动忽略顶层 const 限定符和引用，因此它推导出的类型可能与原始类型略有不同。
+* 例子1：decltype 和 auto 推导出相同的类型：
+```
+int a = 42;
+auto b = a; // b 的类型为 int
+decltype(a) c = a; // c 的类型为 int
+```
+* 例子2：decltype 和 auto 推导出不同的类型：
+```
+int x = 42;
+const int &y = x;
+auto z = y; // z 的类型为 int，因为 auto 会忽略 const 和引用
+decltype(y) w = y; // w 的类型为 const int&，因为 decltype 保留了 const 和引用
+```
