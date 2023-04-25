@@ -499,8 +499,147 @@ prog1.cpp(4): note: 无构造函数可以接受源类型，或构造函数重载
 struct Sales_data { 
 	std::string itemID; 
 	std::string itemName;
-	int qwantity{ 0 };
+	int quantity{ 0 };
 	double price{ 0.0 };
 	double income{ 0.0 };
 };
+```
+## 练习 2.41
+### 使用你自己的Sale_data类重写1.5.1节（第20页）、1.5.2节（第21页）和1.6节（第22页）的练习。眼下先把Sales_data类的定义和main函数放在一个文件里。
+答：  
+* 练习 1.20
+```
+#include <iostream>
+#include <string>
+struct Sales_data {
+	std::string itemID;
+	std::string itemName;
+	int quantity{ 0 };
+	double price{ 0.0 };
+	double income{ 0.0 };
+};
+int main()
+{
+	Sales_data data;
+	while (std::cin >> data.itemID >> data.quantity >> data.price)
+		std::cout << data.itemID << " "
+		<< data.quantity << " "
+		<< data.quantity*data.price << " "
+		<< (data.quantity*data.price) / data.quantity << std::endl;
+	return 0;
+}
+```
+* 练习 1.21
+```
+#include <iostream>
+#include <string>
+struct Sales_data {
+	std::string itemID;
+	std::string itemName;
+	int quantity{ 0 };
+	double price{ 0.0 };
+	double income{ 0.0 };
+};
+int main()
+{
+	std::cout << "Enter two sales records with the same ISBN: " << std::endl;
+	Sales_data dataOne, dataTwo;
+	int totalCnt = 0;
+	double totalIncome = 0.0;
+
+	if (std::cin >> dataOne.itemID >> dataOne.quantity >> dataOne.price
+		>> dataTwo.itemID >> dataTwo.quantity >> dataTwo.price) {
+		dataOne.income = dataOne.quantity*dataOne.price;
+		dataTwo.income = dataTwo.quantity*dataTwo.price;
+
+		if (dataOne.itemID == dataTwo.itemID) {
+			totalCnt = dataOne.quantity + dataTwo.quantity;
+			totalIncome = dataOne.income + dataTwo.income;
+			std::cout << "The total sales record is: " << dataOne.itemID << " "
+				<< totalCnt << " " << totalIncome << " ";
+			if (totalCnt != 0)
+				std::cout << totalIncome / totalCnt << std::endl;
+			else
+				std::cout << "(no sales)" << std::endl;
+			return 0;
+		}else
+			std::cerr << "These two sales records have different ISBN." << std::endl;
+		return -1;
+	}
+}
+```
+* 练习 1.22
+```
+#include <iostream>
+#include <string>
+struct Sales_data {
+	std::string itemID;
+	std::string itemName;
+	int quantity{ 0 };
+	double price{ 0.0 };
+	double income{ 0.0 };
+};
+int main()
+{
+	Sales_data dataTotal;
+	if (std::cin >> dataTotal.itemID >> dataTotal.quantity >> dataTotal.price) {
+		dataTotal.income = dataTotal.quantity*dataTotal.price;
+
+		Sales_data data;
+		while (std::cin >> data.itemID >> data.quantity >> data.price) {
+			data.income = data.quantity*data.price;
+			if (dataTotal.itemID == data.itemID) {
+				dataTotal.quantity += data.quantity;
+				dataTotal.income += data.income;
+			}
+			else {
+				std::cout << dataTotal.itemID << " " << dataTotal.quantity << " "
+					<< dataTotal.income << " " << dataTotal.income / dataTotal.quantity << std::endl;
+				dataTotal.itemID = data.itemID;
+				dataTotal.quantity = data.quantity;
+				dataTotal.income = data.income;
+			}
+		}
+		std::cout << dataTotal.itemID << " " << dataTotal.quantity << " "
+			<< dataTotal.income << " " << dataTotal.income / dataTotal.quantity << std::endl;
+	}
+	return 0;
+}
+```
+* 练习 1.23
+```
+#include <iostream>
+#include <string>
+struct Sales_data {
+	std::string itemID;
+	std::string itemName;
+	int quantity{ 0 };
+	double price{ 0.0 };
+	double income{ 0.0 };
+};
+int main()
+{
+	Sales_data currData;
+	if (std::cin >> currData.itemID >> currData.quantity >> currData.price) {
+		currData.income = currData.quantity*currData.price;
+
+		Sales_data data;
+		int cnt = 1;
+		while (std::cin >> data.itemID >> data.quantity >> data.price) {
+			data.income = data.quantity*data.price;
+			if (currData.itemID == data.itemID)
+				++cnt;
+			else {
+				std::cout << currData.itemID << " occurs "
+					<< cnt << " times " << std::endl;
+				currData.itemID = data.itemID;
+				cnt = 1;			
+			}
+		}
+		std::cout << currData.itemID << " occurs "
+			<< cnt << " times " << std::endl;
+		currData.itemID = data.itemID;
+	}
+	return 0;
+}
 ```
