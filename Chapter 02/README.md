@@ -475,3 +475,32 @@ const int &y = x;
 auto z = y; // z 的类型为 int，因为 auto 会忽略 const 和引用
 decltype(y) w = y; // w 的类型为 const int&，因为 decltype 保留了 const 和引用
 ```
+## 练习 2.39： 
+### 编译下面的程序观察其运行结果，注意，如果忘记写类定义体后面的分号会发生什么情况？记录下相关信息，以后可能会有用。
+```
+struct Foo{/* 此处为空 */} //注意： 没有分号
+int main()
+{
+	return 0;
+}
+```
+答：  
+* 相关报错如下：
+```
+prog1.cpp(2): error C2628: “Foo”后面接“int”是非法的(是否忘记了“;”?)
+prog1.cpp(3): error C3874: “main”的返回类型应为“int”而非“Foo”
+prog1.cpp(4): error C2440: “return”: 无法从“int”转换为“Foo”
+prog1.cpp(4): note: 无构造函数可以接受源类型，或构造函数重载决策不明确
+```
+## 练习 2.40：
+### 根据自己的理解写出 sales_data类，最好与书中的例子有所区别。
+答：
+```
+struct Sales_data { 
+	std::string itemID; 
+	std::string itemName;
+	int qwantity{ 0 };
+	double price{ 0.0 };
+	double income{ 0.0 };
+};
+```
