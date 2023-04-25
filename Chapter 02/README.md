@@ -505,7 +505,7 @@ struct Sales_data {
 };
 ```
 ## 练习 2.41
-### 使用你自己的Sale_data类重写1.5.1节（第20页）、1.5.2节（第21页）和1.6节（第22页）的练习。眼下先把Sales_data类的定义和main函数放在一个文件里。
+### 使用你自己的Sale_data类重写 1.20~1.25 的练习。眼下先把Sales_data类的定义和main函数放在一个文件里。
 答：  
 * 练习 1.20
 ```
@@ -643,3 +643,56 @@ int main()
 	return 0;
 }
 ```
+* 练习 1.24
+```
+输入如下：
+1-333-55555-X 8 8 1-333-55555-X 8 8 1-333-55555-X 8 7 1-331-55554-T 7 7
+输出如下：
+1-333-55555-X occurs 3 times
+1-331-55554-T occurs 1 times
+```
+* 练习 1.25
+```
+#include <iostream>
+#include <string>
+struct Sales_data {
+	std::string itemID;
+	std::string itemName;
+	int quantity{ 0 };
+	double price{ 0.0 };
+	double income{ 0.0 };
+};
+int main()
+{
+	Sales_data dataTotal;
+	if (std::cin >> dataTotal.itemID >> dataTotal.quantity >> dataTotal.price) {
+		dataTotal.income = dataTotal.quantity*dataTotal.price;
+
+		Sales_data data;
+		while (std::cin >> data.itemID >> data.quantity >> data.price) {
+			data.income = data.quantity*data.price;
+			if (dataTotal.itemID == data.itemID) {
+				dataTotal.quantity += data.quantity;
+				dataTotal.income += data.income;
+			}
+			else {
+				std::cout << dataTotal.itemID << " " << dataTotal.quantity << " "
+					<< dataTotal.income << " " << dataTotal.income / dataTotal.quantity << std::endl;
+				dataTotal.itemID = data.itemID;
+				dataTotal.quantity = data.quantity;
+				dataTotal.income = data.income;
+			}
+		}
+		std::cout << dataTotal.itemID << " " << dataTotal.quantity << " "
+			<< dataTotal.income << " " << dataTotal.income / dataTotal.quantity << std::endl;
+	}
+	else {
+		std::cerr << "No data?!" << std::endl;
+		return -1;
+	}
+	return 0;
+}
+```
+## 练习2.42:
+### 根据你自己的理解重写一个sales_data.h头文件,并以此为基础重做练习 2.41。
+答：  
