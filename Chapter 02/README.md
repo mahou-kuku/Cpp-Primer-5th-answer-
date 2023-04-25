@@ -428,3 +428,12 @@ int null = 0, *p = nullptr;
 ### 基于上一个练习中的变量和语句编写一段程序，输出赋值前后变量的内容，你刚才的推断正确吗？如果不对，请反复研读本节的示例直到你明白错在何处为止。  
 答：
 * 正确。
+## 练习 2.35：  
+### 判断下列定义推断出的类型是什么，然后编写程序进行验证。  
+```
+	const int i = 42;
+	auto j = i; const auto &k = i; auto *p = &i;
+	const auto j2 = i, &k2 = i;
+```
+答：  
+* j 是一个int ， k 是一个 const& ， p 是一个const int* ， j2 是一个const int ， k2 是一个 const& 。
