@@ -126,3 +126,73 @@ int main()
 * 当使用输入运算符（>>）从输入流读取数据到string对象时，它会自动忽略前导空白字符（如空格、制表符和换行符）。然后，它会继续读取字符，直到遇到下一个空白字符为止。遇到空白字符后，输入运算符会停止读取，这意味着空白字符不会包含在结果字符串中。
 * getline函数：
 * getline函数的行为与输入运算符（>>）不同。当使用getline从输入流读取数据到string对象时，它会读取所有字符，包括空白字符，直到遇到换行符（默认情况下）为止。换行符不会包含在结果字符串中。
+## 练习 3.4：
+### 编写一段程序读入两个字符串，比较其是否相等并输出结果。如果不相等，输出较大的那个字符串。改写上述程序,比较输入的两个字符串是否等长,如果不等长，输出长度较大的那个字符串。
+答：  
+```
+#include <iostream>
+#include <string>
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+using std::getline;
+int main()
+{
+	string strOne, strTwo;
+	//output the larger 
+	getline(cin, strOne);
+	getline(cin, strTwo);
+	if (strOne == strTwo)
+		cout << "They're the same string." << endl;
+	else if (strOne > strTwo)
+		cout << "The larger: " << strOne << endl;
+	else
+		cout << "The larger: " << strTwo << endl;
+
+	//output the longer
+	getline(cin, strOne);
+	getline(cin, strTwo);
+	if (strOne.size() == strTwo.size())
+		cout << "They're the same length." << endl;
+	else if (strOne.size() > strTwo.size())
+		cout << "The longer: " << strOne << endl;
+	else
+		cout << "The longer: " << strTwo << endl;
+
+	return 0;
+}
+```
+## 练习 3.5:
+### 编写一段程序从标准输入中读入多个字符串并将它们连接在一起,输出连接,成的大字符串。然后修改上述程序,用空格把输入的多个字符串分隔开来。
+答：  
+```
+#include <iostream>
+#include <string>
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+using std::getline;
+int main()
+{
+	string strTotal,str;
+
+	//link strings
+	while (getline(cin, str))
+		strTotal += str;
+	cout << strTotal << endl;
+
+	cin.clear();	//clear EOF
+	strTotal = "\x0";
+	//link strings with spaces
+	while (getline(cin, str)) {
+		if (!strTotal.empty())
+			strTotal += " ";
+		strTotal += str;
+	}
+		cout << strTotal << endl;
+
+	return 0;
+}
+···
