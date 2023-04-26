@@ -50,7 +50,6 @@ using std::string;
 
 struct Sales_data {
 	string itemID;
-	string itemName;
 	int quantity{ 0 };
 	double price{ 0.0 };
 	double income{ 0.0 };
@@ -65,6 +64,7 @@ int main()
 		int cnt = 1;
 		while (cin >> data.itemID >> data.quantity >> data.price) {
 			data.income = data.quantity*data.price;
+
 			if (dataTotal.itemID == data.itemID) {
 				dataTotal.quantity += data.quantity;
 				dataTotal.income += data.income;
@@ -74,12 +74,15 @@ int main()
 				cout << dataTotal.itemID << " " << dataTotal.quantity << " "
 					<< dataTotal.income << " "
 					<< dataTotal.income / dataTotal.quantity << " " << cnt << endl;
+
 				dataTotal.itemID = data.itemID;
 				dataTotal.quantity = data.quantity;
 				dataTotal.income = data.income;
 				cnt = 1;
 			}
 		}
+
+		// 输出最后一条记录
 		cout << dataTotal.itemID << " " << dataTotal.quantity << " "
 			<< dataTotal.income << " "
 			<< dataTotal.income / dataTotal.quantity << " " << cnt << endl;
