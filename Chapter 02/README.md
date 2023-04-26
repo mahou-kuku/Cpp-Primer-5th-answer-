@@ -696,3 +696,17 @@ int main()
 ## 练习2.42:
 ### 根据你自己的理解重写一个sales_data.h头文件,并以此为基础重做练习 2.41。
 答：  
+* 头文件内容如下，练习包含头文件，删除源文件内Sales_data类，其他内容同上。
+```
+#ifndef SALES_DATA_H
+#define SALES_DATA_H
+#include <string>
+struct Sales_data {
+	std::string itemID;
+	std::string itemName;
+	int quantity{ 0 };
+	double price{ 0.0 };
+	double income{ 0.0 };
+};
+#endif
+```
