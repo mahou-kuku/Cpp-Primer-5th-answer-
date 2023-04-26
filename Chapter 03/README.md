@@ -94,3 +94,35 @@ int main()
 	return 0;
 }
 ```
+## 练习3.2:
+### 编写一段程序从标准输入中一次读入一整行,然后修改该程序使其一次读入一个词。
+答：  
+```
+#include <iostream>
+#include <string>
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+using std::getline;
+int main()
+{
+	string str;
+	//一次读入一整行
+	getline(cin, str);
+	cout << str << endl;
+
+	//一次输入一个词
+	cin >> str;
+	cout << str << endl;
+
+	return 0;
+}
+```
+## 练习3.3:
+### 请说明 string类的输入运算符和 getline函数分别是如何处理空白字符的。
+答：  
+* string类的输入运算符（>>）：
+* 当使用输入运算符（>>）从输入流读取数据到string对象时，它会自动忽略前导空白字符（如空格、制表符和换行符）。然后，它会继续读取字符，直到遇到下一个空白字符为止。遇到空白字符后，输入运算符会停止读取，这意味着空白字符不会包含在结果字符串中。
+* getline函数：
+* getline函数的行为与输入运算符（>>）不同。当使用getline从输入流读取数据到string对象时，它会读取所有字符，包括空白字符，直到遇到换行符（默认情况下）为止。换行符不会包含在结果字符串中。
