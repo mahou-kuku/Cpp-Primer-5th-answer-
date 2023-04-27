@@ -196,3 +196,104 @@ int main()
 	return 0;
 }
 ···
+## 练习 3.6：
+### 编写一段程序，使用范围 for 语句将字符串内的所有字符用 x 代替。
+答：  
+```
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+using std::getline;
+
+int main()
+{
+	string str;
+	getline(cin, str);
+	for (auto &c : str)
+		c = 'X';
+	cout << str << endl;
+	return 0;
+}
+```
+## 练习3.7:
+### 就上一题完成的程序而言,如果将循环控制变量的类型设为char将发生什么？先估计一下结果，然后实际编程进行验证。
+答：  
+* 如果将循环变量的类型设置为 char， c将会是字符串中字符的拷贝，对它进行的修改不会影响原始字符串。
+## 练习 3.8：
+### 分别用 while 循环和传统的 for 循环重写第一题的程序，你觉得哪种形式更好呢？为什么？
+答：  
+* 对于这个例子，我个人更倾向于使用 for 循环，因为代码更紧凑，将循环变量的声明、初始化、更新和条件检查都放在一行。这种写法在简单的情况下，如此例，可读性较好。
+```
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+using std::getline;
+
+int main()
+{
+	string str;
+	//using wihle
+	getline(cin, str);
+	decltype(str.size()) index = 0;
+	while (index < str.size()) {
+		str[index] = 'X';
+		++index;
+	}
+
+	cout << str << endl;
+
+	//using for
+	getline(cin, str);
+	for (decltype(str.size()) index = 0; index < str.size(); ++index)
+		str[index] = 'X';
+
+	cout << str << endl;
+	return 0;
+}
+```
+## 练习 3.9：
+### 下面的程序有何作用？它合法吗？如果不合法，为什么？
+```
+	string s;
+	cout << s[0] << endl;
+```
+答：  
+* 这个程序试图输出字符串s的第一个字符。但是s是一个空字符串。在尝试访问空字符串的任何字符时，会产生未定义行为。所以，程序是不合法的。
+## 练习 3.10：
+### 编写一段程序，读入一个包含标点符号的字符串，将标点符号去除后输出字符串剩余的部分。
+答：  
+```
+#include <iostream>
+#include <string>
+#include <cctype>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+using std::getline;
+using std::ispunct;
+
+int main()
+{
+	string str="Hello,World!!!";
+	for (auto c : str)
+		if (!ispunct(c))
+			cout << c;
+
+	cout << endl;
+	return 0;
+}
+```
+## 练习 3.11：
+### 下面的范围 for 语句合法吗?如果合法，c 的类型是什么?
+答：  
+* 合法，c 的类型是 const char& 。
