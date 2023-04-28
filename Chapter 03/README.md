@@ -301,3 +301,24 @@ int main()
 ```
 答：  
 * 合法，c 的类型是 const char& 。
+## 练习 3.12：
+### 下列 vector 对象的定义有不正确的吗？如果有，请指出来。对于正确的，描述其执行结果；对于不正确的,说明其错误的原因。
+```
+	(a) vector<vector<int>> ivec;
+	(b) vector<string> svec = ivec;
+	(c) vector<string> svec(10, "null");
+```
+答：  
+* (a)在C++11标准是正确的。ivec 是一个空的二维int向量。
+* (b)是不正确的。vector<vector<int>> 和 vector<string> 是不兼容的类型，所以这个定义是错误的。
+* (c)是正确的。这里定义了一个名为 svec 的字符串向量，其包含 10 个元素，每个元素的初始值都是字符串 "null"。
+## 练习3.13:
+### 下列的vector对象各包含多少个元素?这些元素的值分别是多少?
+```
+	(a) vector<int> v1;		(b) vector<int> v2(10);
+	(c) vector<int> v3(10, 42);	(d) vector<int> v4{ 10 };
+	(e) vector<int> v5{ 10,42 };	(f) vector<string> v6{ 10 };
+	(g) vector<string> v7{ 10,"hi" };
+```
+答：  
+* (a)空的int向量 (b)10个0 (c)10个42 (d)1个10 (e)2个元素，10和42 (f)10个默认初始化string (g)10个字符串 "hi"
