@@ -489,3 +489,104 @@ int main() {
 ## 练习 3.17：
 ### 从 cin 读入一组词并把它们存入一个 vector 对象，然后设法把所有词都改写为大写形式。输出改变后的结果，每个词占一行。
 答：  
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cctype>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::vector;
+using std::string;
+
+int main() {
+	vector<string> words;
+	string word;
+
+	//从 cin 读入一组词并把它们存入一个 vector 对象
+	while (cin >> word) {
+		words.push_back(word);
+	}
+
+	//把所有词都改写为大写形式
+	for (auto &w : words) {
+		for (auto &c : w) {
+			c = toupper(c);
+		}
+	}
+
+	//输出改变后的结果，每个词占一行
+	for (const auto &w : words) {
+		cout << w << endl;
+	}
+	return 0;
+}
+```
+## 练习 3.18:
+### 下面的程序合法吗?如果不合法,你准备如何修改?
+```
+	vector<int> ivec;
+	ivec[0] = 42;
+```
+答：  
+* 不合法，以下为修改：
+```
+vector<int> ivec{ 42 };
+```
+## 练习3.19:
+### 如果想定义一个含有10个元素的vector对象,所有元素的值都是42,请列举出三种不同的实现方法。哪种方法更好呢？为什么？
+答：  
+```
+	//方法1
+	vector<int> vec_1(10, 42);
+	//方法2
+	vector<int> vec_2{ 42,42,42,42,42,42,42,42,42,42 };
+	//方法3
+	vector<int> vec_3;
+	for (int i = 0; i < 10; ++i) {
+		vec_3.push_back(42);
+	}
+```
+* 方法1更好，方法1在一行代码中简洁明了地完成了任务，可读性较高。而且一开始就分配了足够的内存，避免了可能的内存重新分配，因此在性能上可能更优。
+## 练习 3.20:
+### 读入一组整数并把它们存入一个 vector 对象，将每对相邻整数的和输出出来。改写你的程序，这次要求先输出第 1 个和最后 1 个元素的和，接着输出第 2 个和倒数第2个元素的和,以此类推。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::vector;
+
+int main() {
+	int number;
+	vector<int> numbers;
+
+	// 读入整数并存入vector对象
+	while (cin >> number) {
+		numbers.push_back(number);
+	}
+
+	//输出每对相邻整数的和
+	cout << "Sum of adjacent elements:" << endl;
+	for (size_t i = 1; i < numbers.size(); ++i) {
+		cout << numbers[i - 1] + numbers[i] << endl;
+	}
+
+	//输出首尾对应整数的和
+	cout << "Sum of first and last elements and so on:" << endl;
+	for (size_t i = 0, j = numbers.size() - 1; i <= j; ++i, --j) {
+		if (i == j) {
+			cout << numbers[i] << endl;
+		} else {
+			cout << numbers[i] + numbers[j] << endl;
+		}
+	}
+
+	return 0;
+}
+```
