@@ -442,3 +442,50 @@ int main()
 	return 0;
 }
 ```
+## 练习 3.16：
+### 编写一段程序，把练习 3.13 中 vector 对象的容量和具体内容输出出来。检验你之前的回答是否正确，如果不对，回过头重新学习 3.3.1 节（第87页)直到弄明白错在何处为止。
+答：  
+```
+#include <iostream>
+#include <vector>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
+
+int main() {
+	vector<int> v1;
+	vector<int> v2(10);
+	vector<int> v3(10, 42);
+	vector<int> v4{ 10 };
+	vector<int> v5{ 10,42 };
+	vector<string> v6{ 10 };
+	vector<string> v7{ 10,"hi" };
+
+	vector<vector<int>> intVecs{ v1,v2,v3,v4,v5 };
+	vector<vector<string>>strVecs{ v6,v7 };
+
+	for (const auto& intVec : intVecs) {
+		cout << "Size: " << intVec.size() << ", Content: { ";
+		for (const auto& elem : intVec) {
+			cout << elem << ' ';
+		}
+		cout << "}" << endl;
+	}
+
+	for (const auto& strVec : strVecs) {
+		cout << "Size: " << strVec.size() << ", Content: { ";
+		for (const auto& elem : strVec) {
+			cout << elem << ' ';
+		}
+		cout << "}" << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 3.17：
+### 从 cin 读入一组词并把它们存入一个 vector 对象，然后设法把所有词都改写为大写形式。输出改变后的结果，每个词占一行。
+答：  
