@@ -100,11 +100,13 @@ int main()
 ```
 #include <iostream>
 #include <string>
+
 using std::cout;
 using std::endl;
 using std::cin;
 using std::string;
 using std::getline;
+
 int main()
 {
 	string str;
@@ -112,7 +114,23 @@ int main()
 	getline(cin, str);
 	cout << str << endl;
 
-	//一次输入一个词
+	return 0;
+}
+```
+* 修改后：
+```
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+
+int main()
+{
+	string str;
+	//一次读入一个词
 	cin >> str;
 	cout << str << endl;
 
@@ -132,11 +150,13 @@ int main()
 ```
 #include <iostream>
 #include <string>
+
 using std::cout;
 using std::endl;
 using std::cin;
 using std::string;
 using std::getline;
+
 int main()
 {
 	string strOne, strTwo;
@@ -150,7 +170,24 @@ int main()
 	else
 		cout << "The larger: " << strTwo << endl;
 
-	//output the longer
+	return 0;
+}
+```
+* 改写后：
+```
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+using std::getline;
+
+int main()
+{
+	string strOne, strTwo;
+	//Output the longer
 	getline(cin, strOne);
 	getline(cin, strTwo);
 	if (strOne.size() == strTwo.size())
@@ -169,29 +206,46 @@ int main()
 ```
 #include <iostream>
 #include <string>
+
 using std::cout;
 using std::endl;
 using std::cin;
 using std::string;
 using std::getline;
+
 int main()
 {
-	string strTotal,str;
+	string strTotal, str;
 
-	//link strings
+	//Link strings
 	while (getline(cin, str))
 		strTotal += str;
 	cout << strTotal << endl;
 
-	cin.clear();	//clear EOF
-	strTotal = "\x0";
-	//link strings with spaces
+	return 0;
+}
+```
+* 修改后：
+```
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::string;
+using std::getline;
+
+int main()
+{
+	string strTotal, str;
+	//Link strings with spaces
 	while (getline(cin, str)) {
 		if (!strTotal.empty())
 			strTotal += " ";
 		strTotal += str;
 	}
-		cout << strTotal << endl;
+	cout << strTotal << endl;
 
 	return 0;
 }
@@ -322,3 +376,69 @@ int main()
 ```
 答：  
 * (a)空的int向量 (b)10个0 (c)10个42 (d)1个10 (e)2个元素，10和42 (f)10个默认初始化string (g)10个字符串 "hi"
+## 练习3.14:
+## 编写一段程序，用cin读入一组整数并把它们存入一个vector对象。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::vector;
+
+int main()
+{
+
+	vector<int>digits;
+
+	//Input loop
+	{
+		for (int number = 0; cin >> number;)
+			digits.push_back(number);
+	}
+
+	//Output loop
+	{
+		for (auto i : digits)
+			cout << i << endl;
+	}
+
+	return 0;
+}
+```
+## 练习3.15：
+### 改写上题的程序,不过这次读入的是字符串。
+答：  
+```
+#include <iostream>
+#include <vector>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::vector;
+using std::string;
+
+int main()
+{
+
+	vector<string>text;
+
+	//Input loop
+	{
+		for (string word; cin >> word;)
+			text.push_back(word);
+	}
+
+	//Output loop
+	{
+		for (auto i : text)
+			cout << i << endl;
+	}
+
+	return 0;
+}
+```
