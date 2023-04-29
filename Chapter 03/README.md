@@ -590,3 +590,106 @@ int main() {
 	return 0;
 }
 ```
+## 练习 3.21：
+### 请使用迭代器重做 3.3.3 节（第 94 页）的第一个练习。
+答：  
+```
+#include <iostream>
+#include <vector>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
+
+int main() {
+	vector<int> v1;
+	vector<int> v2(10);
+	vector<int> v3(10, 42);
+	vector<int> v4{ 10 };
+	vector<int> v5{ 10,42 };
+	vector<string> v6{ 10 };
+	vector<string> v7{ 10,"hi" };
+
+	vector<vector<int>> intVecs{ v1,v2,v3,v4,v5 };
+	vector<vector<string>>strVecs{ v6,v7 };
+
+	for (auto intVec = intVecs.cbegin(); intVec != intVecs.cend(); ++intVec) {
+		cout << "Size: " << intVec->size() << ", Content: { ";
+		for (const auto& elem : *intVec) {
+			cout << elem << ' ';
+		}
+		cout << "}" << endl;
+	}
+
+	for (auto strVec = strVecs.cbegin(); strVec != strVecs.cend(); ++strVec) {
+		cout << "Size: " << strVec->size() << ", Content: { ";
+		for (auto elem = strVec->cbegin(); elem != strVec->cend(); ++elem) {
+			cout << *elem << ' ';
+		}
+		cout << "}" << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 3.22:
+### 修改之前那个输出 text第一段的程序,首先把 text 的第一段全都改成大写形式，然后再输出它。
+答：  
+```
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cctype>
+
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
+using std::toupper;
+int main() {
+	string s;
+	string y{ "These words will not be output." };
+	vector<string>text(10, "some ");
+	text.push_back(s);
+	text.push_back(y);
+
+	//输出全都修改成大写形式的 text 第一段。
+	for (auto it = text.begin();
+	it != text.end() && !it->empty(); ++it) {
+		for (auto &c : *it) {
+			c = toupper(c);
+		}
+		cout << *it << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 3.23：
+### 编写一段程序，创建一个含有 10 个整数的 vector 对象，然后使用迭代器将所有元素的值都变成原来的两倍。输出vector对象的内容,检验程序是否正确。
+```
+#include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::vector;
+
+int main() {
+	vector<int> numbers = { 1,2,3,4,5,6,7,8,9,10 };
+
+	for (auto it = numbers.begin(); it != numbers.end(); ++it) {
+		*it *= 2;
+	}
+
+	//输出修改后的元素
+	for (const auto &num : numbers) {
+		cout << num << " ";
+	}
+	cout << endl;
+
+	return 0;
+}
+```
