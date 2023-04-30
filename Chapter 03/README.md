@@ -693,3 +693,80 @@ int main() {
 	return 0;
 }
 ```
+## 练习 3.24：
+### 请使用迭代器重做 3.3.3 节（第 94 页）的最后一个练习。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::vector;
+
+int main() {
+	int number;
+	vector<int> numbers;
+
+	// 读入整数并存入vector对象
+	while (cin >> number) {
+		numbers.push_back(number);
+	}
+
+	//输出每对相邻整数的和
+	cout << "Sum of adjacent elements:" << endl;
+
+	for (auto i = numbers.cbegin()+1; i != numbers.cend(); ++i) {
+		cout << *(i - 1) + *i << endl;
+	}
+
+	//输出首尾对应整数的和
+	cout << "Sum of first and last elements and so on:" << endl;
+	for (auto i = numbers.cbegin(), j = numbers.cend() - 1; i < j; ++i, --j) {
+		if (i == j) {
+			cout << *i << endl;
+		}
+		else {
+			cout << *i + *j << endl;
+		}
+	}
+
+	return 0;
+}
+```
+## 练习 3.25:
+### 3.3.3 节(第 93 页)划分分数段的程序是使用下标运算符实现的，请利用迭代器改写该程序并实现完全相同的功能。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::cin;
+using std::vector;
+
+int main() {
+	vector<unsigned> scores(11, 0);
+	unsigned grade;
+	while (cin >> grade) {
+		if (grade <= 100) {
+			auto it = scores.begin() + (grade / 10);
+			++(*it);
+		}
+	}
+
+	//输出结果
+	for (const auto &score : scores) {
+		cout << score << " ";
+	}
+	cout << endl;
+
+	return 0;
+}
+```
+## 练习 3.26：
+### 在 100 页的二分搜索程序中，为什么用的是 mid = beg +(end - beg） /2，而非 mid = (beg + end) /2;？
+答：  
+* 迭代器之间不能执行加法运算，会导致编译错误。
