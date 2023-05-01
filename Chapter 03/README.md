@@ -800,3 +800,72 @@ int main() {
 * 固定大小：数组的大小在声明时就确定了，无法在运行时动态改变。而vector可以自动调整大小以适应数据的增长。
 * 少量的成员函数：数组提供的操作有限，而vector作为一个类，提供了丰富的成员函数以方便地操作数据。
 * 不易传递给函数：将数组作为参数传递给函数时，传递的是指向数组首元素的指针，丢失了数组大小信息。vector可以通过传递引用或const引用轻松地保留其大小信息。
+## 练习 3.30：
+### 指出下面代码中的索引错误。
+```
+	constexpr size_t array_size = 10;
+	int ia[array_size];
+	for (size_t ix = 1; ix <= array_size; ++ix)
+		ia[ix] = ix;
+```
+答：  
+*  ia 的有效索引范围是 0 到 array_size - 1。然而，循环条件是 ix <= array_size，这意味着当 ix == array_size 时，依然会执行循环体。这将导致数组越界，访问非法的内存区域。
+## 练习 3.31：
+### 编写一段程序，定义一个含有 10 个 int 的数组，令每个元素的值就是其下标值。
+答：  
+```
+#include <iostream>
+
+int main() {
+	constexpr size_t array_size = 10;
+	int arr[array_size];
+
+	for (size_t i = 0; i < array_size; ++i) {
+		arr[i] = i;
+	}
+
+	return 0;
+}
+```
+## 练习3.32:
+### 将上一题刚刚创建的数组拷贝给另外一个数组。利用vector重写程序,实现类似的功能。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+using std::vector;
+
+int main() {
+	//使用数组实现
+	constexpr size_t array_size = 10;
+	int arr1[array_size];
+	int arr2[array_size];
+
+	for (size_t i = 0; i < array_size; ++i) {
+		arr1[i] = i;
+	}
+
+	for (size_t i = 0; i < array_size; ++i) {
+		arr2[i] = arr1[i];
+	}
+
+	//使用vector实现
+	vector<int> vec1;
+	for (int i = 0; i < array_size; ++i) {
+		vec1.push_back(i);
+	}
+
+	vector<int>vec2(array_size);
+
+	for (size_t i = 0; i < array_size; ++i) {
+		vec2[i] = vec1[i];
+	}
+
+	return 0;
+}
+```
+## 练习3.33:
+### 对于104页的程序来说，如果不初始化 scores将发生什么？
+答：  
+*如果不初始化scores数组，它将包含未定义的值，这些值取决于内存中的原始内容。当根据输入的grade值递增scores数组中相应的元素时，这些值将被累加，导致统计结果不正确。
