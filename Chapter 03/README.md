@@ -869,3 +869,84 @@ int main() {
 ### 对于104页的程序来说，如果不初始化 scores将发生什么？
 答：  
 * 如果不初始化scores数组，它将包含未定义的值，这些值取决于内存中的原始内容。当根据输入的grade值递增scores数组中相应的元素时，这些值将被累加，导致统计结果不正确。
+## 练习 3.34：
+### 假定 p1 和 p2 指向同一个数组中的元素，则下面程序的功能是什么？什么情况下该程序是非法的？
+```
+p1 += p2 - p1;
+```
+答：  
+* 该程序的功能实际上是使指针 p1 指向与 p2 相同的数组元素。如果指针 p1 和 p2 能保证指向同一个数组中的元素，则不必担心产生错误。
+## 习 3.35：
+### 编写一段程序，利用指针将数组中的元素置为0。
+答：  
+```
+#include <iostream>
+
+using std::cout;
+
+int main() {
+	int arr[] = { 1, 2, 3, 4, 5 }; // 初始化数组
+	int length = sizeof(arr) / sizeof(arr[0]); // 计算数组长度
+
+	// 使用指针遍历数组并将元素置为0
+	for (int *p = arr; p < arr + length; ++p) {
+		*p = 0;
+	}
+
+	// 输出修改后的数组
+	for (int i = 0; i < length; ++i) {
+		cout << arr[i] << " ";
+	}
+
+	return 0;
+}
+```
+## 练习 3.36：
+### 编写一段程序，比较两个数组是否相等。再写一段程序，比较两个 vector对象是否相等。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::vector;
+
+int main() {
+	//比较两个数组是否相等
+	int arr1[] = { 1, 2, 3, 4, 5 };
+	int arr2[] = { 1, 2, 3, 4, 5 };
+	int length1 = sizeof(arr1) / sizeof(arr1[0]);
+	int length2 = sizeof(arr2) / sizeof(arr2[0]);
+	bool arrays_are_equal = true;
+
+	if (length1 != length2) {
+		arrays_are_equal = false;
+	}else {
+		for (int i = 0; i < length1; ++i) {
+			if (arr1[i] != arr2[i]) {
+				arrays_are_equal = false;
+				break;
+			}
+		}
+	}
+
+	if (arrays_are_equal) {
+		std::cout << "The arrays are equal." << std::endl;
+	}else {
+		std::cout << "The arrays are not equal." << std::endl;
+	}
+
+	//比较两个vector对象是否相等
+	std::vector<int> vec1 = { 1, 2, 3, 4, 5 };
+	std::vector<int> vec2 = { 1, 2, 3, 4, 5 };
+
+	if (vec1 == vec2) {
+		std::cout << "The vectors are equal." << std::endl;
+	}else {
+		std::cout << "The vectors are not equal." << std::endl;
+	}
+
+	return 0;
+}
+```
