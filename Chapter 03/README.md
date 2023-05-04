@@ -363,7 +363,7 @@ int main()
 	(c) vector<string> svec(10, "null");
 ```
 答：  
-* (a)在C++11标准是正确的。ivec 是一个空的二维int向量。
+* (a)在C++11标准是正确的。ivec 是一个空的二维int向量。  
 * (b)是不正确的。vector<vector<int>> 和 vector<string> 是不兼容的类型，所以这个定义是错误的。
 * (c)是正确的。这里定义了一个名为 svec 的字符串向量，其包含 10 个元素，每个元素的初始值都是字符串 "null"。
 ## 练习3.13:
@@ -922,7 +922,7 @@ int main() {
 
 	if (length1 != length2) {
 		arrays_are_equal = false;
-	}else {
+	} else {
 		for (int i = 0; i < length1; ++i) {
 			if (arr1[i] != arr2[i]) {
 				arrays_are_equal = false;
@@ -933,7 +933,7 @@ int main() {
 
 	if (arrays_are_equal) {
 		std::cout << "The arrays are equal." << std::endl;
-	}else {
+	} else {
 		std::cout << "The arrays are not equal." << std::endl;
 	}
 
@@ -943,9 +943,103 @@ int main() {
 
 	if (vec1 == vec2) {
 		std::cout << "The vectors are equal." << std::endl;
-	}else {
+	} else {
 		std::cout << "The vectors are not equal." << std::endl;
 	}
+
+	return 0;
+}
+```
+## 练习 3.37：
+### 下面的程序是何含义，程序的输出结果是什么？
+```
+	const char ca[] = { 'h','e','l','l','o' };
+	const char *cp = ca;
+	while (*cp) {
+		cout << *cp << endl;
+		++cp;
+	}
+```
+答：  
+* 这个程序循环输出ca数组内的字符，直到遇到'\0'字符。
+* 然而，这个程序有一个问题：ca数组没有显式地包含一个空字符（'\0'）。因此，当cp递增到数组ca之外时程序可能会继续输出字符，直到在内存中碰巧遇到一个空字符为止。
+## 练习 3.38:
+### 在本节中我们提到,将两个指针相加不但是非法的,而且也没什么意义。请问为什么两个指针相加没什么意义？
+答：  
+* 两个指针相加没有意义，原因在于指针的本质。指针是用来存储内存地址的变量，它表示某个对象在内存中的位置。当对两个指针进行加法运算时，实际上是在尝试将两个内存地址相加，这在逻辑上是不合理的。
+## 练习 3.39：
+### 编写一段程序，比较两个 string 对象。再编写一段程序，比较两个 C 风格字符串的内容。
+答：  
+```
+#include <iostream>
+#include <string>
+#include <cstring>
+
+using std::cout;
+using std::endl;
+using std::string;
+using std::strcmp;
+
+int main() {
+	//比较两个string对象
+	string str1 = "hello";
+	string str2 = "world";
+
+	if (str1 == str2) {
+		cout << "string objects are equal" << endl;
+	}
+	else {
+		cout << "string objects are not equal" << endl;
+	}
+
+	//比较两个C风格字符串的内容
+	const char * cstr1 = "hello";
+	const char * cstr2 = "world";
+
+	if (strcmp(cstr1, cstr2) == 0) {
+		cout << "C-style strings are equal" << endl;
+	}
+	else {
+		std::cout << "C-style strings are not rqual" << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 3.40：
+### 编写一段程序，定义两个字符数组并用字符串字面值初始化它们；接着再定义一个字符数组存放前两个数组连接后的结果。使用 strcpy 和 strcat把前两个数组的内容拷贝到第三个数组中。
+答：  
+```
+#define _CRT_SECURE_NO_WARNINGS	//Visual Studio编译器可能会因使用strcpy、strcat而报错
+#include <iostream>
+#include <cstring>
+
+using std::cout;
+using std::endl;
+using std::strlen;
+using std::strcpy;
+using std::strcat;
+
+int main() {
+	//定义两个字符数组并用字符串字面值初始化它们
+	char arr1[] = "Hello";
+	char arr2[] = "World";
+
+	//计算arr1和arr2的长度，包括空字符
+	constexpr size_t arr1_length = sizeof(arr1) / sizeof(arr1[0]);
+	constexpr size_t arr2_length = sizeof(arr2) / sizeof(arr2[0]);
+
+	//定义第三个字符数组，长度等于arr1和arr2的长度之和减去一个空字符
+	char arr3[arr1_length + arr2_length - 1];
+
+	//使用 strcpy 将 arr1 的内容包括空字符拷贝到 arr3 中
+	strcpy(arr3, arr1);
+
+	//使用 strcat 将 arr2 的内容从 arr3 的空字符处开始追加
+	strcat(arr3, arr2);
+
+	//输出结果
+	cout << "Combined string:" << arr3 << endl;
 
 	return 0;
 }
