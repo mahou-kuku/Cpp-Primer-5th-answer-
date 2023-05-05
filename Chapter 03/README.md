@@ -1092,3 +1092,147 @@ int main() {
 	return 0;
 }
 ```
+## 练习3.43:
+### 编写3个不同版本的程序,令其均能输出ia的元素。版本1使用范围for语句管理迭代过程；版本 2 和版本 3 都使用普通的 for 语句，其中版本 2 要求用下标运算符，版本 3 要求用指针。此外，在所有 3 个版本的程序中都要直接写出数据类型，而不能使用类型别名、auto 关键字或 decltype 关键字。
+答：  
+```
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+int main() {
+	constexpr size_t rowCnt = 3, colCnt = 4;
+	int ia[rowCnt][colCnt] = {
+		{ 0, 1, 2, 3 },
+		{ 4, 5, 6, 7 },
+		{ 8, 9, 10, 11 }
+	};
+
+	//用范围for循环输出ia的元素
+	for (const int(&row)[colCnt] : ia) {
+		for (int col : row) {
+			cout << col << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	//用下标for循环输出ia的元素
+	for (size_t i = 0; i != rowCnt; ++i) {
+		for (size_t j = 0; j != colCnt; ++j) {
+			cout << ia[i][j] << ' ' ;
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	//用指针for循环输出ia的元素
+	for (const int(*p)[colCnt] = ia; p != ia + rowCnt; ++p) {
+		for (const int *q = *p; q < *p + colCnt; ++q) {
+			cout << *q << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	return 0;
+}
+```
+## 练习3.44:
+### 改写上一个练习中的程序,使用类型别名来代替循环控制变量的类型。
+答：  
+```
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+int main() {
+	constexpr size_t rowCnt = 3, colCnt = 4;
+	int ia[rowCnt][colCnt] = {
+		{ 0, 1, 2, 3 },
+		{ 4, 5, 6, 7 },
+		{ 8, 9, 10, 11 }
+	};
+
+	//定义类型别名
+	using int_array = const int[colCnt];
+
+	//用范围for循环输出ia的元素
+	for (int_array &row : ia) {
+		for (int col : row) {
+			cout << col << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	//用下标for循环输出ia的元素
+	for (size_t i = 0; i != rowCnt; ++i) {
+		for (size_t j = 0; j != colCnt; ++j) {
+			cout << ia[i][j] << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	//用指针for循环输出ia的元素
+	for (int_array *p = ia; p != ia + rowCnt; ++p) {
+		for (const int *q = *p; q < *p + colCnt; ++q) {
+			cout << *q << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	return 0;
+}
+```
+## 练习3.45:
+### 再一次改写程序,这次使用auto关键字。
+答：  
+```
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+int main() {
+	constexpr size_t rowCnt = 3, colCnt = 4;
+	int ia[rowCnt][colCnt] = {
+		{ 0, 1, 2, 3 },
+		{ 4, 5, 6, 7 },
+		{ 8, 9, 10, 11 }
+	};
+
+	//用范围for循环输出ia的元素
+	for (auto &row : ia) {
+		for (int col : row) {
+			cout << col << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	//用下标for循环输出ia的元素
+	for (size_t i = 0; i != rowCnt; ++i) {
+		for (size_t j = 0; j != colCnt; ++j) {
+			cout << ia[i][j] << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	//用指针for循环输出ia的元素
+	for (auto p = ia; p != ia + rowCnt; ++p) {
+		for (const int *q = *p; q < *p + colCnt; ++q) {
+			cout << *q << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	return 0;
+}
+```
