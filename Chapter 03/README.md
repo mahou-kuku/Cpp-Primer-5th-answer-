@@ -669,6 +669,7 @@ int main() {
 ```
 ## 练习 3.23：
 ### 编写一段程序，创建一个含有 10 个整数的 vector 对象，然后使用迭代器将所有元素的值都变成原来的两倍。输出vector对象的内容,检验程序是否正确。
+答：  
 ```
 #include <iostream>
 #include <vector>
@@ -1040,6 +1041,53 @@ int main() {
 
 	//输出结果
 	cout << "Combined string:" << arr3 << endl;
+
+	return 0;
+}
+```
+## 练习 3.41：
+### 编写一段程序，用整型数组初始化一个 vector 对象。
+答：  
+```
+#include <iostream>
+#include <vector>
+#include <iterator>
+
+int main() {
+	int int_arr[] = { 0,1,2,3,4,5 };
+
+	// 用整型数组初始化 vector 对象
+	std::vector<int> ivec(std::begin(int_arr), std::end(int_arr));
+
+	// 输出 vector 对象的内容
+	for (auto i : ivec) {
+		std::cout << i << " ";
+	}
+
+	return 0;
+}
+```
+## 练习 3.42：
+### 编写一段程序，将含有整数元素的vector对象拷贝给一个整型数组。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+int main() {
+	std::vector<int> vec = { 1, 2, 3, 4, 5 };
+	const size_t vec_size = 5;  // 提前知道 vector 的大小
+	int arr[vec_size];
+
+	// 使用循环将vector的元素拷贝到数组中
+	for (size_t i = 0; i < vec.size(); ++i) {
+		arr[i] = vec[i];
+	}
+
+	// 输出数组的内容
+	for (size_t i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
+		std::cout << "arr[" << i << "] = " << arr[i] << std::endl;
+	}
 
 	return 0;
 }
