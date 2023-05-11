@@ -176,3 +176,16 @@ if (i == 1024)
 bool result = vec[ival] <= vec[ival+1];
 ++ival;
 ```
+## 练习 4.20:
+### 假设 iter 的类型是 vector\<string>::iterator，说明下面的表达式是否合法。如果合法，表达式的含义是什么？如果不合法，错在何处？
+```
+(a) *iter++;		(b) (*iter)++;	(c) *iter.empty();
+(d) iter->empty();	(e) ++*iter;	(f) iter++->empty();
+```
+答：  
+* (a) 合法。这个表达式首先创建iter当前值的副本，然后iter自增指向下一个元素。最后将迭代器iter原始值的副本解引用，返回指向的string对象。
+* (b) 不合法。\*iter 表示迭代器iter指向的string对象，string对象不能被递增。
+* (c) 不合法。这个表达式试图调用iter的empty()成员函数，然后对返回值进行解引用。但是，iter是一个vector\<string>::iterator，它没有empty()成员函数。
+* (d) 合法。这个表达式等价于(\*iter).empty();，它检查iter指向的string对象是否为空。
+* (e) 不合法。这个表达式试图递增iter指向的string对象，这是不允许的。这个表达式等价于++(*iter);。
+* (f) 合法。这个表达式调用iter指向的string对象的empty()成员函数,并将迭代器移动到下一个元素。
