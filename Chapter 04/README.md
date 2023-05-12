@@ -187,7 +187,7 @@ bool result = vec[ival] <= vec[ival+1];
 * (b) 不合法。\*iter 表示迭代器iter指向的string对象，string对象不能被递增。
 * (c) 不合法。这个表达式试图调用iter的empty()成员函数，然后对返回值进行解引用。但是，iter是一个vector\<string>::iterator，它没有empty()成员函数。
 * (d) 合法。这个表达式等价于(\*iter).empty();，它检查iter指向的string对象是否为空。
-* (e) 不合法。这个表达式试图递增iter指向的string对象，这是不允许的。这个表达式等价于++(*iter);。
+* (e) 不合法。这个表达式试图递增iter指向的string对象，string对象不能被递增。这个表达式等价于++(*iter);。
 * (f) 合法。这个表达式调用iter指向的string对象的empty()成员函数,并将迭代器移动到下一个元素。
 ## 练习 4.21：
 ### 编写一段程序，使用条件运算符从vector\<int>中找到哪些元素的值是奇数，然后将这些奇数值翻倍。
@@ -231,7 +231,7 @@ int main() {
 		: (grade >= 60) ? "low pass" : "fail";
 	std::cout << finalgrade << std::endl;
 
-	//是用if语句版本
+	//使用if语句版本
 	std::cin >> grade;
 	if (grade >= 90) {
 		finalgrade = "high pass";
@@ -247,3 +247,22 @@ int main() {
 	return 0;
 }
 ```
+## 练习 4.23：
+### 因为运算符的优先级问题，下面这条表达式无法通过编译。根据 4.12 节中的表（第 147 页）指出它的问题在哪里？应该如何修改？
+```
+string s = "word";
+string p1 = s + s[s.size() - 1] == 's' ? "" : "s";
+```
+答：  
+* 该表达式实际上是这样被解析的：
+```
+string p1 = ((s + s[s.size() - 1]) == 's') ? "" : "s";
+```
+* s + s\[s.size() - 1]会首先执行，然后结果会与's'进行比较。而将一个string与一个char进行比较是不合法的。修改如下：
+```
+string p1 = s + (s[s.size() - 1] == 's' ? "" : "s");
+```
+## 练习 4.24:
+### 本节的示例程序将成绩划分成high pass、 pass和fail三种,它的依据是条件运算符满足右结合律。假如条件运算符满足的是左结合律，求值过程将是怎样的？
+答：  
+* 如果条件运算符满足的是左结合律，那么求值过程会发生改变。左结合性意味着我们首先计算 (grade > 90) ? "high pass" : (grade < 60)，这将返回 "high pass" 或者(grade < 60)的布尔值（这取决于grade的值是否大于90）。于是只有grade大于等于60小于等于90时才返回pass，其他情况都返回fail。这将是一个逻辑上的错误。
