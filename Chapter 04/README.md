@@ -189,3 +189,61 @@ bool result = vec[ival] <= vec[ival+1];
 * (d) 合法。这个表达式等价于(\*iter).empty();，它检查iter指向的string对象是否为空。
 * (e) 不合法。这个表达式试图递增iter指向的string对象，这是不允许的。这个表达式等价于++(*iter);。
 * (f) 合法。这个表达式调用iter指向的string对象的empty()成员函数,并将迭代器移动到下一个元素。
+## 练习 4.21：
+### 编写一段程序，使用条件运算符从vector\<int>中找到哪些元素的值是奇数，然后将这些奇数值翻倍。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+int main() {
+	std::vector<int> vec = { 1,2,3,4,5,6,7,8,9,10 };
+
+	//找出奇数并翻倍
+	for (auto&i : vec) {
+		i = (i % 2 != 0) ? i * 2 : i;
+	}
+
+	//输出修改后的vector
+	for (const auto &i : vec) {
+		std::cout << i << " ";
+	}
+
+	return 0;
+}
+```
+## 练习 4.22：
+### 本节的示例程序将成绩划分成 high pass、pass 和fail 三种，扩展该程序使其进一步将 60 分到 75 分之间的成绩设定为 low pass。要求程序包含两个版本：一个版本只使用条件运算符；另外一个版本使用 1 个或多个 if 语句。哪个版本的程序更容易理解呢？为什么？
+答：  
+* 一般来说， if 语句版本可能更容易理解一些。程序如下：
+```
+#include <iostream>
+#include <string>
+
+int main() {
+	std::string finalgrade;
+	unsigned grade;
+
+	//使用条件运算符版本
+	std::cin >> grade;
+	finalgrade = (grade >= 90) ? "high pass"
+		: (grade >= 75) ? "pass"
+		: (grade >= 60) ? "low pass" : "fail";
+	std::cout << finalgrade << std::endl;
+
+	//是用if语句版本
+	std::cin >> grade;
+	if (grade >= 90) {
+		finalgrade = "high pass";
+	} else if (grade >= 75) {
+		finalgrade = "pass";
+	} else if (grade >= 60) {
+		finalgrade = "low pass";
+	} else {
+		finalgrade = "fail";
+	}
+	std::cout << finalgrade << std::endl;
+
+	return 0;
+}
+```
