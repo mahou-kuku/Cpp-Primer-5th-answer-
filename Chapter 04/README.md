@@ -283,3 +283,58 @@ unsigned long ul1 = 3, ul2 = 7;
 ```
 答：  
 * (a) 3	 (b) 7 	(c) true  (d) true
+## 练习4.28:
+### 编写一段程序，输出每一种内置类型所占空间的大小。
+答：  
+```
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+int main() {
+	cout << "char: " << sizeof(char) << "bytes" << endl;
+	cout << "short: " << sizeof(short) << "bytes" << endl;
+	cout << "int: " << sizeof(int) << "bytes" << endl;
+	cout << "long: " << sizeof(long) << "bytes" << endl;
+	cout << "long long: " << sizeof(long long) << "bytes" << endl;
+	cout << "float: " << sizeof(float) << "bytes" << endl;
+	cout << "double: " << sizeof(double) << "bytes" << endl;
+	cout << "long double: " << sizeof(long double) << "bytes" << endl;
+	cout << "bool: " << sizeof(bool) << "bytes" << endl;
+
+	return 0;
+}
+```
+* 本人电脑输出如下：
+```
+char: 1bytes
+short: 2bytes
+int: 4bytes
+long: 4bytes
+long long: 8bytes
+float: 4bytes
+double: 8bytes
+long double: 8bytes
+bool: 1bytes
+```
+## 练习 4.29：
+### 推断下面代码的输出结果并说明理由。实际运行这段程序，结果和你想象的一样吗？如果不一样，为什么？
+```
+int x[10]; int *p = x;
+cout << sizeof(x) / sizeof(*x) << endl;
+cout << sizeof(p) / sizeof(*p) << endl;
+```
+答：  
+* sizeof(x) / sizeof(\*x)语句将输出数组的元素个数，即10。	sizeof(p) / sizeof(\*p)语句输出的结果取决于不同的系统，本人电脑输出为2。
+## 练习 4.30:
+### 根据4.12节中的表(第147页),在下述表达式的适当位置加上括号,使得,加上括号之后表达式的含义与原来的含义相同。
+```
+(a) sizeof x + y;	(b) sizeof p->mem[i];
+(c) sizeof a < b;	(d) sizeof f();
+```
+答：  
+```
+(a) (sizeof x) + y;	(b) sizeof ((p->mem)[i]);
+(c) (sizeof a) < b;	(d) sizeof (f());
+```
