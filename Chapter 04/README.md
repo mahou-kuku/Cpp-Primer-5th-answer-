@@ -367,3 +367,26 @@ someValue ? ++x, ++y : --x, --y
 ```
 答：  
 * 该表达式的含义：(someValue ? (++x, ++y) : --x), --y	 这个表达式逻辑非常混乱，因为条件运算符和逗号都具有求值顺序，并且逗号会丢弃左侧表达式的结果。
+## 练习 4.34:
+### 根据本节给出的变量定义,说明在下面的表达式中将发生什么样的类型转换:
+```
+(a) if (fval)	(b) dbvl = fval + ival;	(c) dval + ival*cval;
+```
+需要注意每种运算符遵循的是左结合律还是右结合律。
+答：  
+* (a) fval转换成bool	(b) ival转换成flog，计算结果转换成double	(c) cval转成成int，计算结果转换成double
+* 运算符的优先级和结合律先于类型转换生效。
+## 练习 4.35：
+### 假设有如下的定义
+```
+char cval;	int ival;	unsigned int ui;
+float fval;	double dval;
+```
+请回答在下面的表达式中发生了隐式类型转换吗？如果有，指出来。
+```
+(a) cval = 'a' + 3;	(b) fval = ui - ival * 1.0;
+(c) dval = ui * fval;	(d) cval = ival + fval + dval;
+```
+答：  
+* (a) 'a'从char转换为int，和3相加后结果转换为char	(b)ival转换为douvle，和1.0相乘后ui转换为double，减去之前的相乘结果然后将结果转换为float 
+* (c) ui转换为float，和fvla相乘后结果转换为double	(d) ival转换为float，和fval相加后结果转换为double，再和dval相加后，将结果丢弃小数转换为char
