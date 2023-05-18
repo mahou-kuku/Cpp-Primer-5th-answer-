@@ -388,5 +388,26 @@ float fval;	double dval;
 (c) dval = ui * fval;	(d) cval = ival + fval + dval;
 ```
 答：  
-* (a) 'a'从char转换为int，和3相加后结果转换为char	(b)ival转换为douvle，和1.0相乘后ui转换为double，减去之前的相乘结果然后将结果转换为float 
-* (c) ui转换为float，和fvla相乘后结果转换为double	(d) ival转换为float，和fval相加后结果转换为double，再和dval相加后，将结果丢弃小数转换为char
+* (a) 'a'从char转换为int，和3相加后结果转换为char。
+* (b)ival转换为douvle，和1.0相乘后ui转换为double，减去之前的相乘结果然后将结果转换为float 。
+* (c) ui转换为float，和fvla相乘后结果转换为double。
+* (d) ival转换为float，和fval相加后结果转换为double，再和dval相加后，将结果丢弃小数转换为char。
+## 练习 4.36：
+### 假设 i 是 int 类型，d 是 double 类型，书写表达式 i*=d 使其执行整数类型的乘法而非浮点类型的乘法。
+答：  
+* i \*= static_cast\<int>(d);
+## 练习4.37:
+### 用命名的强制类型转换改写下列旧式的转换语句。
+int i; double d; const string \*ps; char \*pc; void \*pv;
+(a) pv = (void*)ps;	(b) i = int(\*pc);
+(c) pv = &d;		(d) pc = (char*)pv;
+答：  
+* (a) pv = static_cast\<void*>(const_cast<string*>(ps));	(b) i = static_cast\<int>(*pc);
+* (c) pv = static_cast\<void*>(&d);				(d) pc = static_cast\<char*>(pv);
+## 练习 4.38：
+### 说明下面这条表达式的含义。
+```
+double slope = static_cast<double>(j / i);
+```
+答：  
+* 先计算j/i的结果，然后将该值转换为double类型，最后用这个值对slope进行初始化。
