@@ -41,3 +41,121 @@ while (val <= 10)
     	}
     }
 ```
+## 练习 5.5：
+### 写一段自己的程序，使用 if else 语句实现把数字成绩转换成字母成绩的要求。
+答：  
+```
+#include <iostream>
+#include <string>
+
+int main() {
+	unsigned grade;
+	std::string letterGrade;
+	std::cout << "Please enter your numeric grade: ";
+	std::cin >> grade;
+
+	if (grade < 60) {
+		letterGrade = "F";
+	} else if (grade < 70) {
+		letterGrade = "D";
+	} else if (grade < 80) {
+		letterGrade = "C";
+	} else if (grade < 90) {
+		letterGrade = "B";
+	} else if (grade < 100) {
+		letterGrade = "A";
+	} else {
+		letterGrade = "A++";
+		grade = 100;
+	}
+
+	if (grade >= 60 && grade != 100) {
+		int lastDigit = grade % 10;
+		if (lastDigit >= 8) {
+			letterGrade += "+";
+		} else if (lastDigit <= 2) {
+			letterGrade += "-";
+		}
+	}
+	std::cout << "Your letter grade is: " << letterGrade << std::endl;
+
+	return 0;
+}
+```
+## 练习 5.6:
+### 改写上一题的程序,使用条件运算符(参见4.7节,第134页)代替if else语句。
+答：  
+```
+#include <iostream>
+#include <string>
+
+int main() {
+	unsigned grade;
+	std::string letterGrade;
+	std::cout << "Please enter your numeric grade: ";
+	std::cin >> grade;
+
+	letterGrade = (grade < 60) ? "F" :
+		(grade < 70) ? "D" :
+		(grade < 80) ? "C" :
+		(grade < 90) ? "B" :
+		(grade < 100) ? "A" : "A++";
+
+	letterGrade += (grade < 60 || grade > 100) ? "" :
+		(grade % 10 >= 8) ? "+" :
+		(grade % 10 <= 2) ? "-" : "";
+	std::cout << "Your letter grade is: " << letterGrade << std::endl;
+
+	return 0;
+}
+```
+## 练习 5.7:
+### 改正下列代码段中的错误。
+```
+	(a) if (ival1 != ival2)
+		ival1 = ival2
+	    else ival1 = ival2 = 0;
+	    
+	(b) if (ival < minval)
+		minval = ival;
+		occurs = 1;
+	
+	(c) if (int ival = get_value()) 
+		cout << "ival = " << ival << endl;
+	    if (!ival)
+		cout << "ival = 0\n";
+		
+	(d) if (ival = 0)
+		ival = get_value();
+```
+答：  
+* (a):
+```
+	if (ival1 != ival2)
+		ival1 = ival2;
+	else ival1 = ival2 = 0;
+```
+* (b):
+```
+	if (ival < minval) {
+		minval = ival;
+		occurs = 1;
+	}
+```
+* (c):
+```
+	if (int ival = get_value())
+		cout << "ival = " << ival << endl;
+	else if (!ival)
+		cout << "ival = 0\n";
+```
+* (d):
+```
+	if (ival == 0)
+		ival = get_value();
+```
+## 练习 5.8:
+### 什么是“悬垂else” ? C++语言是如何处理else子句的?
+答：  
+* 因为 if 语句可以嵌套，而且每个 if 语句都可以选择是否包含 else 分支。如果有多个连续的 if 语句并且都没有 else 分支，当最后一个 if 后面出现了一个 else，那么这个 else 应该归属于哪个 if 就是所谓的 "悬垂 else" 问题。
+* C++的规则是：else子句会匹配最近的尚未匹配的if。
