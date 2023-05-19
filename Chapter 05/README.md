@@ -16,3 +16,28 @@ while (val <= 10)
     sum += val, ++val;
 ```
 * 虽然这样的代码更简短，但是它的可读性可能降低了。一般来说，使用块和新行来组织代码可以使代码更清晰、更易读。
+## 练习 5.4:
+### 说明下列例子的含义，如果存在问题,试着修改它。
+```
+	(a) while (string::iterator iter != s.end()) {/*...*/ }
+	(b) while(bool status=find(word)){/*...*/}
+		    if(!status){/*...*/}
+```
+答：  
+* (a) 尝试使用 string::iterator 类型的变量 iter，但并没有声明它。应该在循环之前声明和初始化这个变量。修改后的代码可能如下：
+```
+	string s = "example";
+	string::iterator iter = s.begin();
+	while (iter != s.end()) {
+		/* ...*/
+		++iter;
+	}
+```
+* (b) 使用一个函数 find(word) 并将其返回值赋给一个 bool 类型的变量 status。但是，status 是在 while 循环的条件部分声明的，所以在循环体之外是无法访问的。修改后的代码可能如下：
+```
+    while(bool status=find(word)){
+    	if (!status) {
+    	/*...*/
+    	}
+    }
+```
