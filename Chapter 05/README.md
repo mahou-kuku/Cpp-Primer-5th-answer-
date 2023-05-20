@@ -575,3 +575,66 @@ int main() {
 	return 0;
 }
 ```
+## 练习 5.18：
+### 说明下列循环的含义并改正其中的错误。
+```
+(a)
+	do
+		int v1, v2;
+		cout << "Please enter two numbers to sum:";
+		if (cin >> v1 >> v2)
+			cout << "Sum is: " << v1 + v2 << endl;
+	while (cin);
+(b)
+	do {
+		//...
+	} while (int ival = get_response());
+(c)
+	do {
+		int ival = get_response();
+	} while (ival);
+```
+答：  
+```
+//(a) 这个 do-while 循环不包含花括号，正确的做法是将循环体放在花括号中。
+	do {
+		int v1, v2;
+		cout << "Please enter two numbers to sum:";
+		if (cin >> v1 >> v2)
+			cout << "Sum is: " << v1 + v2 << endl;
+	} while (cin);
+//(b) do-while 循环条件中使用的变量必须定义在循环体外。
+	int ival;
+	do {
+		//...
+	} while (ival = get_response());
+//(c) 变量 ival 在 do 语句块中被声明，所以它的作用范围只在 do 语句块中，while 不能访问它。
+	int ival;
+	do {
+		ival = get_response();
+	} while (ival);
+```
+## 练习 5.19:
+### 编写一段程序,使用do while循环重复地执行下述任务:首先提示用户输入两个string对象，然后挑出较短的那个并输出它。
+答：  
+```
+#include <iostream>
+#include <string>
+
+int main() {
+	
+	do {
+		std::string s1, s2;
+		std::cout << "Please enter two strings: ";
+		std::cin >> s1 >> s2;
+		std::cout << "The shorter one is: " << (s1 <= s2 ? s1 : s2) << std::endl;
+		std::cout << "Would you like to compare another pair of strings? (y/n): ";
+		char c;
+		std::cin >> c;
+		if (c != 'y' && c != 'Y') {
+			break;
+		}
+	} while (true);
+	return 0;
+}
+```
