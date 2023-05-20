@@ -456,3 +456,37 @@ int main() {
 		break;
 	}
 ```
+## 练习 5.14:
+### 编写一段程序，从标准输入中读取若干 string 对象并查找连续重复出现的单词。所谓连续重复出现的意思是：一个单词后面紧跟着这个单词本身。要求记录连续重复出现的最大次数以及对应的单词。如果这样的单词存在，输出重复出现的最大次数；如果不存在,输出一条信息说明任何单词都没有连续出现过。例如，如果输入是how now now now brown cow cow那么输出应该表明单词now连续出现了3次。
+答：  
+```
+#include <iostream>
+#include <string>
+
+int main() {
+	std::string word = "", preWord = "", maxWord = "";
+	int count = 0, maxCount = 0;
+
+	while (std::cin >> word) {
+		if (word == preWord) {
+			++count;
+			if (count > maxCount) {
+				maxWord = word;
+				maxCount = count;
+			}
+		} else {
+			preWord = word;
+			count = 1;
+		}
+	}
+
+	if (maxCount > 1) {
+		std::cout << "The word " << maxWord << " occured " << maxCount << " times consecutively." << std::endl;
+	} else {
+		std::cout << "No word was occured consecutively." << std::endl;
+	}
+
+	return 0;
+}
+
+```
