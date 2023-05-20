@@ -159,3 +159,300 @@ int main() {
 答：  
 * 因为 if 语句可以嵌套，而且每个 if 语句都可以选择是否包含 else 分支。如果有多个连续的 if 语句并且都没有 else 分支，当最后一个 if 后面出现了一个 else，那么这个 else 应该归属于哪个 if 就是所谓的 "悬垂 else" 问题。
 * C++的规则是：else子句会匹配最近的尚未匹配的if。
+## 练习 5.9：
+### 编写一段程序，使用一系列 if 语句统计从 cin 读入的文本中有多少元音字母。
+答：  
+```
+#include <iostream>
+#include <cctype>
+
+using std::cout;
+
+int main() {
+	unsigned aCnt = 0, eCnt = 0, iCnt = 0, oCnt = 0, uCnt = 0;
+	char ch;
+	while (std::cin >> ch) {
+		ch = std::tolower(ch);	//将大写字母转换为小写
+		//如果ch是元音字母，将其对应的计数值加1
+		if (ch == 'a') {
+			++aCnt;
+		} else if (ch == 'e') {
+			++eCnt;
+		} else if (ch == 'i') {
+			++iCnt;
+		} else if (ch == 'o') {
+			++oCnt;
+		} else if (ch == 'u') {
+			++uCnt;
+		}
+	}
+	//输出结果
+	cout << "Number of vowel a: \t" << aCnt << '\n'
+		<< "Number of vowel e: \t" << eCnt << '\n'
+		<< "Number of vowel i: \t" << iCnt << '\n'
+		<< "Number of vowel o: \t" << oCnt << '\n'
+		<< "Number of vowel u: \t" << uCnt << std::endl;
+
+	return 0;
+}
+
+```
+## 练习 5.10：
+### 我们之前实现的统计元音字母的程序存在一个问题：如果元音字母以大写形式出现，不会被统计在内。编写一段程序，既统计元音字母的小写形式，也统计大写形式，也就是说，新程序遇到'a'和'A'都应该递增 aCnt 的值，以此类推。
+答：  
+```
+#include <iostream>
+
+using std::cout;
+
+int main() {
+	unsigned aCnt = 0, eCnt = 0, iCnt = 0, oCnt = 0, uCnt = 0;
+	char ch;
+	while (std::cin >> ch) {
+		//如果ch是元音字母，将其对应的计数值加1
+		switch (ch) {
+		case 'a': case 'A':
+			++aCnt;
+			break;
+		case 'e': case 'E':
+			++eCnt;
+			break;
+		case 'i': case 'I':
+			++iCnt;
+			break;
+		case 'o': case 'O':
+			++oCnt;
+			break;
+		case 'u': case 'U':
+			++uCnt;
+			break;
+		default:
+			break;
+		}
+	}
+	//输出结果
+	cout << "Number of vowel a: \t" << aCnt << '\n'
+		<< "Number of vowel e: \t" << eCnt << '\n'
+		<< "Number of vowel i: \t" << iCnt << '\n'
+		<< "Number of vowel o: \t" << oCnt << '\n'
+		<< "Number of vowel u: \t" << uCnt << std::endl;
+
+	return 0;
+}
+```
+## 练习 5.11:
+### 修改统计元音字母的程序,使其也能统计空格、制表符和换行符的数量。
+答：  
+```
+#include <iostream>
+
+using std::cout;
+
+int main() {
+	unsigned aCnt = 0, eCnt = 0, iCnt = 0, oCnt = 0, uCnt = 0;
+	unsigned spaceCnt = 0, tabCnt = 0, nlCnt = 0;
+	char ch;
+	while (std::cin.get(ch)) {
+			//如果ch是元音字母或空白字符，将其对应的计数值加1
+			switch (ch) {
+			case 'a': case 'A':
+				++aCnt;
+				break;
+			case 'e': case 'E':
+				++eCnt;
+				break;
+			case 'i': case 'I':
+				++iCnt;
+				break;
+			case 'o': case 'O':
+				++oCnt;
+				break;
+			case 'u': case 'U':
+				++uCnt;
+				break;
+			case' ':
+				++spaceCnt;
+				break;
+			case'\t':
+				++tabCnt;
+				break;
+			case'\n':
+				++nlCnt;
+				break;
+			default:
+				break;
+			}
+		}
+	//输出结果
+	cout << "Number of vowel a: \t" << aCnt << '\n'
+		<< "Number of vowel e: \t" << eCnt << '\n'
+		<< "Number of vowel i: \t" << iCnt << '\n'
+		<< "Number of vowel o: \t" << oCnt << '\n'
+		<< "Number of vowel u: \t" << uCnt << '\n'
+		<< "Number of space: \t" << spaceCnt << '\n'
+		<< "Number of tab: \t" << tabCnt << '\n'
+		<< "Number of new line: \t" << nlCnt << std::endl;
+
+	return 0;
+}
+```
+## 练习 5.12:
+### 修改统计元音字母的程序，使其能统计以下含有两个字符的字符序列的数量:ff、fl 和 fi。
+答：  
+```
+#include <iostream>
+
+using std::cout;
+
+int main() {
+	unsigned aCnt = 0, eCnt = 0, iCnt = 0, oCnt = 0, uCnt = 0;
+	unsigned ffCnt = 0, flCnt = 0, fiCnt = 0;
+	char ch, prev_ch = '\0';	// prev_ch用于存储上一个字符
+	while ((ch = std::cin.get()) != EOF) {
+		//如果ch是元音字母，将其对应的计数值加1
+		switch (ch) {
+		case 'a': case 'A':
+			++aCnt;
+			break;
+		case 'e': case 'E':
+			++eCnt;
+			break;
+		case 'i':
+			if (prev_ch == 'f')++fiCnt;	// 如果上一个字符是'f', 增加'fi'的计数
+		case 'I':
+			++iCnt;
+			break;
+		case 'o': case 'O':
+			++oCnt;
+			break;
+		case 'u': case 'U':
+			++uCnt;
+			break;
+		case 'f':
+			if (prev_ch == 'f')++ffCnt;	// 如果上一个字符是'f', 增加'ff'的计数
+			break;
+		case 'l':
+			if (prev_ch == 'f')++flCnt;	// 如果上一个字符是'f', 增加'fl'的计数
+			break;
+		default:
+			break;
+		}
+		prev_ch = ch;	// 更新prev_ch以存储当前字符
+	}
+	//输出结果
+	cout << "Number of vowel a: \t" << aCnt << '\n'
+		<< "Number of vowel e: \t" << eCnt << '\n'
+		<< "Number of vowel i: \t" << iCnt << '\n'
+		<< "Number of vowel o: \t" << oCnt << '\n'
+		<< "Number of vowel u: \t" << uCnt << '\n'
+		<< "Number of sequence ff: \t" << ffCnt << '\n'
+		<< "Number of sequence fl: \t" << flCnt << '\n'
+		<< "Number of sequence fi: \t" << fiCnt << std::endl;
+
+	return 0;
+}
+```
+## 练习5.13:
+### 下面显示的每个程序都含有一个常见的编程错误,指出错误在哪里,然后修改它们。
+```
+(a) 
+	unsigned aCnt = 0, eCnt = 0, iouCnt = 0;
+	char ch = next_text();
+	switch (ch) {
+	case 'a': aCnt++;
+	case 'e': eCnt++;
+	default: iouCnt++;
+	}	    
+(b) 
+	unsigned index=some_value();
+	switch (index) {
+	case 1: 
+		int ix = get_value();
+		ivec[ix] = index;
+		break;
+	default:
+		ix = ivec.size() - 1;
+		ivec[ix] = index;
+	}
+(c)
+	unsigned evenCnt = 0, oddCnt = 0;
+	int digit = get_num() % 10;
+	switch (digit) {
+	case 1, 3, 5, 7, 9:
+		oddCnt++;
+		break;
+	case 2, 4, 6, 8, 10:
+		evenCnt++;
+		break;
+	}
+(d)
+	unsigned ival = 512, jval = 1024, kval = 4096;
+	unsigned bufsize;
+	unsigned swt = get_bufCnt();
+	switch (swt) {
+	case ival:
+		bufsize = ival * sizeof(int);
+		break;
+	case jval:
+		bufsize = jval * sizeof(int);
+		break;
+	case kval:
+		bufsize = kval * sizeof(int);
+		break;
+	}
+```
+答：  
+```
+//(a) 的问题是switch语句中没有使用break语句，导致一旦满足某个case，后面的case和default都会执行。
+	unsigned aCnt = 0, eCnt = 0, iouCnt = 0;
+	char ch = next_text();
+	switch (ch) {
+	case 'a':
+		aCnt++;
+		break;
+	case 'e':
+		eCnt++;
+		break;
+	default: 
+		iouCnt++;
+		break;
+	}
+//(b) 的问题在于ix只在第一个case中声明和定义，因此在default中是无法访问的。
+	unsigned index = some_value();
+	int ix;
+	switch (index) {
+	case 1:
+		ix = get_value();
+		ivec[ix] = index;
+		break;
+	default:
+		ix = ivec.size() - 1;
+		ivec[ix] = index;
+	}
+//(c) 的问题是case的值并不能像这样使用逗号分隔，它需要使用多个case语句。
+	unsigned evenCnt = 0, oddCnt = 0;
+	int digit = get_num() % 10;
+	switch (digit) {
+	case 1: case 3: case 5: case 7: case 9:
+		oddCnt++;
+		break;
+	case 2: case 4: case 6: case 8: case 0: // 这里是0而不是10，因为digit只能是0-9的整数
+		evenCnt++;
+		break;
+	}
+//(d) 的问题在于case语句的表达式必须是常量表达式，而不是变量。
+	constexpr unsigned ival = 512, jval = 1024, kval = 4096; // 使用constexpr定义常量表达式
+	unsigned bufsize;
+	unsigned swt = get_bufCnt();
+	switch (swt) {
+	case ival:
+		bufsize = ival * sizeof(int);
+		break;
+	case jval:
+		bufsize = jval * sizeof(int);
+		break;
+	case kval:
+		bufsize = kval * sizeof(int);
+		break;
+	}
+```
