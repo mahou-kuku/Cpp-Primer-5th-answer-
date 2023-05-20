@@ -490,3 +490,88 @@ int main() {
 }
 
 ```
+## 练习 5.15：
+### 说明下列循环的含义并改正其中的错误。
+```
+(a)
+	for (int ix = 0; ix != sz; ++ix){/* ...*/}
+	if(ix!=sz)
+		// ...
+(b)
+	int ix;
+	for (ix != sz; ++ix) {/* ...*/ }
+(c)
+	for (int ix = 0; ix != sz; ++ix, ++sz) {/* ...*/ }
+```
+答：  
+```
+//(a) 变量 ix 在 for 循环之外是不可见的，因此 if(ix!=sz) 将无法通过编译。如果需要在 for 循环之外使用 ix，那么应该在 for 循环外部声明这个变量
+	int ix;
+	for (ix = 0; ix != sz;++ix){/* ...*/}
+	if (ix != sz) {
+		// ...
+	}
+//(b) for 循环的初始化部分并未初始化 ix，那么条件语句左侧需要一个空语句
+	int ix = 0;
+	for (; ix != sz; ++ix) {/* ...*/ }
+//(c) ix 和 sz 同时增加，那么 ix 永远不可能等于 sz，这将会导致无限循环。
+	for (int ix = 0; ix != sz; ++ix) {/* ...*/ }
+```
+## 练习 5.16:
+### while循环特别适用于那种条件保持不变、反复执行操作的情况,例如,当未达到文件末尾时不断读取下一个值。for循环则更像是在按步骤迭代,它的索引值,在某个范围内依次变化。根据每种循环的习惯用法各自编写一段程序,然后分别用另一种循环改写。如果只能使用一种循环,你倾向于使用哪种呢?为什么?
+答：  
+```
+	//原始while循环
+	int num;
+	while (cin >> num) {
+		// ...
+	}
+	//转化为for循环：
+	for (int num; cin >> num;) {
+		// ...
+	}
+	
+	//原始for循环：
+	for (int i = 0; i < 10; ++i) {
+		cout << i << " ";
+	}
+	//转化为while循环：
+	int i = 0;
+	while (i < 10) {
+		cout << i << " ";
+		++i;
+	}
+```
+* 如果只能使用一种循环，我选择for循环，因为for循环在大多数情况下可以替代while循环，但反之并非如此。如果能选两种，我首选while。好看。
+## 练习 5.17：
+### 假设有两个包含整数的 vector 对象，编写一段程序，检验其中一个 vector对象是否是另一个的前缀。为了实现这一目标，对于两个不等长的 vector 对象，只需·挑出长度较短的那个,把它的所有元素和另一个vector对象比较即可。例如,如果两个vector对象的元素分别是0、1、1、2和0、1、1、2、3、5、8,则程序的返回结果应该为真。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+int main() {
+	std::vector<int> vec_1 = { 0, 1, 1, 2 };
+	std::vector<int> vec_2 = { 0, 1, 1, 2, 3, 5, 8 };
+	bool is_prefix = true;
+
+	// 取得长度较短的那个vector的长度
+	auto len = vec_1.size() < vec_2.size() ? vec_1.size() : vec_2.size();
+
+	// 遍历较短的vector的每一个元素，和较长的vector做比较
+	for (int i = 0; i < len; ++i)
+	{
+		if (vec_1[i] != vec_2[i]) {
+			is_prefix = false;
+		}
+	}
+
+	if (is_prefix) {
+		std::cout << "vec1 is a prefix of vec2\n";
+	} else {
+		std::cout << "vec1 is not a prefix of vec2\n";
+	}
+
+	return 0;
+}
+```
