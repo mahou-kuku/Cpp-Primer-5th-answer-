@@ -666,3 +666,52 @@ int main() {
 	return 0;
 }
 ```
+## 练习 5.21：
+### 修改 5.5.1 节（第 171 页）练习题的程序，使其找到的重复单词必须以大写字母开头。
+答：  
+```
+#include <iostream>
+#include <string>
+#include <cctype>
+
+int main() {
+	std::string prevWord = "", currWord = "";
+	bool isRepeated = false;
+
+	while (std::cin >> currWord) {
+		if (!std::isupper(currWord[0])) {
+			prevWord = currWord;
+			continue;
+		} else if (prevWord == currWord) {
+			isRepeated = true;
+			break;
+		}
+		prevWord = currWord;
+	}
+
+	if (isRepeated) {
+		std::cout << "The word '" << currWord << "' was repeated." << std::endl;
+	} else {
+		std::cout << "No word was repeated." << std::endl;
+	}
+
+	return 0;
+}
+```
+## 练习 5.22:
+### 本节的最后一个例子跳回到 begin,其实使用循环能更好地完成该任务。重写这段代码，注意不再使用 goto 语句。
+```
+begin:
+	int sz = get_size();
+	if (sz <= 0) {
+		goto begin;
+	}
+```
+答：  
+```
+	int sz;
+	do {
+		sz = get_size();
+	} while (sz <= 0);
+```
+* 这段代码并没能模拟goto例子的全部效果，使用标准循环结构时，难以做到在每轮循环中都重新初始化及销毁sz的同时还不影响sz的作用域。
