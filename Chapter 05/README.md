@@ -715,3 +715,81 @@ begin:
 	} while (sz <= 0);
 ```
 * 这段代码并没能模拟goto例子的全部效果，使用标准循环结构时，难以做到在每轮循环中都重新初始化及销毁sz的同时还不影响sz的作用域。
+## 练习 5.23：
+### 编写一段程序，从标准输入读取两个整数，输出第一个数除以第二个数的结果。
+答：  
+```
+#include <iostream>
+
+int main() {
+	int num_1, num_2;
+	while (true) {
+		std::cout << "Please enter two integers: " << std::endl;
+		std::cin >> num_1 >> num_2;
+
+		double result = static_cast<double>(num_1) / num_2;
+		std::cout << "The result of " << num_1 << " divided by " << num_2 << " is " << result << std::endl;
+		break;	//跳出循环
+	}
+
+	return 0;
+}
+```
+## 练习 5.24：
+### 修改你的程序，使得当第二个数是 0 时抛出异常。先不要设定 catch 子句，运行程序并真的为除数输入 0，看看会发生什么？
+答：  
+```
+#include <iostream>
+#include <stdexcept>
+
+int main() {
+	int num_1, num_2;
+	while (true) {
+		std::cout << "Please enter two integers: " << std::endl;
+		std::cin >> num_1 >> num_2;
+		if (num_2 == 0) {
+			throw std::invalid_argument("The second number cannot be zero!");
+		}
+		double result = static_cast<double>(num_1) / num_2;
+		std::cout << "The result of " << num_1 << " divided by " << num_2 << " is " << result << std::endl;
+		break;	//没有抛出异常则跳出循环
+	}
+
+	return 0;
+}
+```
+* 除数为0时，程序会停止工作。
+## 练习 5.25:
+### 修改上一题的程序，使用try 语句块去捕获异常。catch子句应该为用户输出一条提示信息，询问其是否输入新数并重新执行try 语句块的内容。
+答：  
+```
+#include <iostream>
+#include <stdexcept>
+
+int main() {
+	while (true) {	
+		try {
+			std::cout << "Please enter two integers: " << std::endl;
+			int num_1, num_2;
+			std::cin >> num_1 >> num_2;
+			if (num_2 == 0) {
+				throw std::invalid_argument("The second number cannot be zero!");
+			}
+			double result = static_cast<double>(num_1) / num_2;
+			std::cout << "The result of " << num_1 << " divided by " << num_2 << " is " << result << std::endl;
+			break;	//没有抛出异常则跳出循环
+		}
+		catch (const std::invalid_argument &e) {
+			std::cout << "Exception: " << e.what() << std::endl;
+			std::cout << "Would you like to enter two new numbers? (y/n)" << std::endl;
+			char c;
+			std::cin >> c;
+			if (c != 'y') {
+				break;
+			}
+		}
+	}
+
+	return 0;
+}
+```
