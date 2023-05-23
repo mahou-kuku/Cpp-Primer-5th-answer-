@@ -63,7 +63,7 @@ void factorial() {
 		while (num > 1) {
 			result *= num--;
 		}
-		std::cout << "The factorial of " << num << " is equal to：" << result << std::endl;
+		std::cout << "The factorial of the integer is equal to：" << result << std::endl;
 	}
 }
 
@@ -129,5 +129,68 @@ int main() {
 size_t count_calls() {
 	static size_t ctr = 0;
 	return ctr++;
+}
+```
+## 练习 6.8:
+### 编写一个名为 Chapter6.h 的头文件，令其包含 6.1 节练习(第 184 页)中的函数声明。
+答：  
+```
+#ifndef CHAPTER6_H
+#define CHAPTER6_H
+
+unsigned long long factorial(int num);
+void factorial();
+double absoluteValue(double num);
+
+#endif
+```
+## 练习 6.9：
+### 编写你自己的 fact.cc 和 factMain.cc，这两个文件都应该包含上一小节·的练习中编写的Chapter6.h头文件。通过这些文件,理解你的编译器是如何支持分离式编译的。
+答：  
+* fact.cpp
+```
+#include <iostream>
+#include <cstdlib>
+#include "Chapter6.h"
+
+unsigned long long factorial(int num) {
+	unsigned long long ret = 1;
+	while (num > 1) {
+		ret *= num--;
+	}
+	return ret;
+}
+
+void factorial() {
+	int num;
+	std::cout << "Please enter a number to calculat factorial:";
+	std::cin >> num;
+	if (num < 0) {
+		std::cout << "cannot calculate the factorial of a negative number!";
+	} else {
+		unsigned long long result = num ? 1 : 0;
+		while (num > 1) {
+			result *= num--;
+		}
+		std::cout << "The factorial of the integer is equal to：" << result << std::endl;
+	}
+}
+
+double absoluteValue(double num) {
+	return std::abs(num);
+}
+```
+* factMain.cpp
+```
+#include <iostream>
+#include "Chapter6.h"
+
+
+int main() {
+	std::cout << "Factorial is: " << factorial(5) << std::endl;
+	factorial();
+	std::cout << "The absolut value of -9.9 is: " << absoluteValue(-9.9) << std::endl;
+
+	return 0;
 }
 ```
