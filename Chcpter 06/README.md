@@ -94,3 +94,40 @@ int main() {
 	return 0;
 }
 ```
+## 练习 6.6：
+### 说明形参、局部变量以及局部静态变量的区别。编写一个函数，同时用到这三种形式。
+答：  
+* 形参：形参在函数被调用时以实参的值初始化。形参的作用域是它所在的函数，而生命周期是该函数的执行过程。
+* 局部变量：局部变量是在函数体中定义的变量，它的作用域和生命周期也是它所在的函数，函数执行结束时销毁。
+* 局部静态变量：局部静态变量的作用域仍限于定义它们的函数，但它们的生命周期却持续到程序结束。在函数被多次调用的情况下，局部静态变量可以保持之前调用时的值。
+```
+#include <iostream>
+
+void myFunction(int param) {	//param是形参
+	int localVar = 10;	//localVar是局部变量
+	static int staticLocalVar = 10;	//staticLocalVar是局部静态变量
+
+	staticLocalVar += param;	//修改局部静态变量
+	localVar += param;	//修改局部变量
+
+	std::cout << "Parameter value: " << param << std::endl;
+	std::cout << "Local variable value: " << localVar << std::endl;
+	std::cout << "Static local variable value: " << staticLocalVar << std::endl;
+}
+
+int main() {
+	myFunction(5);
+	myFunction(5);
+
+	return 0;
+}
+```
+## 练习 6.7：
+### 编写一个函数，当它第一次被调用时返回0，以后每次被调用返回值加1。
+答：  
+```
+size_t count_calls() {
+	static size_t ctr = 0;
+	return ctr++;
+}
+```
