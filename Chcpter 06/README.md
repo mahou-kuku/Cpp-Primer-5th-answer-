@@ -342,3 +342,94 @@ int sum(vector<int>::iterator, vector<int>::iterator, int);
 ### 引用形参什么时候应该是常量引用?如果形参应该是常量引用,而我们将其设为了普通引用，会发生什么情况？
 答：  
 * 当函数内部不需要修改实参的值时，应该考虑使用常量引用形参。使用普通引用可能会意外修改实参的值，并且限制函数可以接受的实参类型。
+## 练习 6.21：
+### 编写一个函数，令其接受两个参数：一个是 int 型的数，另一个是 int 指针。函数比较int的值和指针所指的值,返回较大的那个。在该函数中指针的类型应该是什么？
+答：  
+```
+int compare(const int num, const int* ptr) {
+	return (num > *ptr) ? num : *ptr;
+}
+```
+* 指针的类型应该是const int* 。
+## 练习 6.22:
+### 编写一个函数,令其交换两个int指针。
+答：  
+```
+void exchangePtr(int*& ptr_1, int*& ptr_2) {
+	int* temp = ptr_1;
+	ptr_1 = ptr_2;
+	ptr_2 = temp;
+}
+```
+## 练习 6.23：
+### 参考本节介绍的几个 print 函数，根据理解编写你自己的版本。依次调用每个函数使其输入下面定义的i 和j：
+```
+int i = 0, j[2] = { 0,1 };
+```
+答：  
+```
+#include <iostream>
+
+void print(const int& pi) {
+	std::cout << pi << std::endl;
+}
+
+void print(const char* cp) {
+	if (cp) {
+		while (*cp) {
+			std::cout << *cp++;
+		}
+		std::cout << std::endl;
+	}
+}
+
+void print(const int* beg, const int* end) {
+	while (beg != end) {
+		std::cout << *beg++ << std::endl;
+	}
+
+}
+
+void print(const int ia[], size_t size) {
+	for (size_t i = 0; i != size; ++i) {
+		std::cout << ia[i] << std::endl;
+	}
+}
+
+void print(const int(&arr)[2]) {
+	for (auto elem : arr) {
+		std::cout << elem << std::endl;
+	}
+}
+
+int main() {
+	int i = 0, j[2] = { 0,1 };
+	const char* c = "Hello world!";
+
+	print(i);
+	print(c);
+	print(std::begin(j), std::end(j));
+	print(j, std::end(j) - std::begin(j));
+	print(j);
+
+	return 0;
+}
+```
+## 练习 6.24:
+### 描述下面这个函数的行为。如果代码中存在问题，请指出并改正。
+```
+void print(const int ia[10])
+{
+	for (size_t i = 0; i != 10; ++i)
+		cout << ia[i] << endl;
+}
+```
+答：  
+* 这个函数只能保证接受的实参是一个int\*类型，\[10]指针指向的地址处并不一定真的有10个有效的int元素。可以将ia声明为引用或指针来确保只接受含有10个int元素的数组实参。
+```
+void print(const int (&ia)[10])
+{
+	for (size_t i = 0; i != 10; ++i)
+		cout << ia[i] << endl;
+}
+```
