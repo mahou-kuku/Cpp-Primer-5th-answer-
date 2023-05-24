@@ -433,3 +433,37 @@ void print(const int (&ia)[10])
 		cout << ia[i] << endl;
 }
 ```
+## 练习 6.25：
+### 编写一个 main 函数，令其接受两个实参。把实参的内容连接成一个 string对象并输出出来。
+答：  
+```
+#include <iostream>
+#include <string>
+
+int main(int argc, char* argv[]) {
+	std::string str;
+
+	while (*argv) {
+		str += *argv++;
+		str += ' ';
+	}
+
+	std::cout << str << std::endl;
+	return 0;
+}
+```
+## 练习 6.26：
+### 编写一个程序，使其接受本节所示的选项；输出传递给 main 函数的实参的内容。
+答：  
+```
+#include <iostream>
+
+int main(int argc, char* argv[]) {
+
+	while (*argv) {
+		std::cout << *argv++ << std::endl;
+	}
+
+	return 0;
+}
+```
