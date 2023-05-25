@@ -486,3 +486,56 @@ int sum(std::initializer_list<int>il) {
 ## 练习 6.29:
 ### 在范围for循环中使用initializer_list对象时,应该将循环控制变量声明成引用类型吗？为什么？
 * 可以根据需要来选择是否将循环控制变量声明为引用类型。但是initializer_list中的元素始终是const的，尝试修改这些元素的值会导致编译错误，所以要将循环控制变量声明成引用的话，应该声明为const引用。
+## 练习 6.30：
+### 编译第 200 页的 str_subrange 函数，看看你的编译器是如何处理函数中的错误的。
+答：  
+* error C2561: “str_subrang”: 函数必须返回值		note: 参见“str_subrang”的声明
+## 练习 6.31:
+### 什么情况下返回的引用无效?什么情况下返回常量的引用无效?
+答：  
+* 无论是不是常量引用，当返回局部对象的引用时，都将绑定到被销毁的无效内存。
+## 练习 6.32：
+### 下面的函数合法吗？如果合法，说明其功能；如果不合法，修改其中的错误并解释原因。
+```
+int& get(int* arry, int index) { return arry[index]; }
+int main() {
+	int ia[10];
+	for (int i = 0; i != 10; ++i)
+		get(ia, i) = i;
+}
+```
+答：  
+* 合法，该函数返回一个int对象的引用，这是一个左值可以被赋值。
+## 练习 6.33：
+### 编写一个递归函数，输出 vector 对象的内容。
+答：  
+```
+#include <iostream>
+#include <vector>
+
+void printVectorRecursively(const std::vector<int>& v, const size_t index = 0) {
+	if (index >= v.size()) {
+		return;		//基本情况：已打印完所有元素
+	}
+	std::cout << v[index] << " ";
+	printVectorRecursively(v, index + 1);	//递归情况：打印当前元素，然后递归处理其余元素
+}
+
+int main() {
+	std::vector<int> vec = { 1,2,3,4,5 };
+	printVectorRecursively(vec);
+
+	return 0;
+}
+```
+## 练习 6.34:
+### 如果factorial函数的停止条件如下所示,将发生什么情况?
+```
+if (val != 0)
+```
+答：  
+* 程序将多递归一次。另外新的判断条件不能防止val是个负数时的无限递归问题。
+## 练习 6.35:
+### 在调用factorial 函数时，为什么我们传入的值是 val-1 而非 val--?
+答：  
+* 后置递增返回的是对象递增前的副本，所以调用函数时传递的值将永远不会减少而导致无限递归
