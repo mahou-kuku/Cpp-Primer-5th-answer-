@@ -467,3 +467,22 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 ```
+## 练习 6.27：
+### 编写一个函数，它的参数是 initializer_list\<int>类型的对象，函数的功能是计算列表中所有元素的和。
+答：  
+```
+int sum(std::initializer_list<int>il) {
+	int total = 0;
+	for (auto i : il) {
+		total += i;
+	}
+	return total;
+}
+```
+## 练习 6.28：
+### 在 error_msg 函数的第二个版本中包含 ErrCode 类型的参数，其中循环内的 elem 是什么类型？
+答：  
+* elem 的类型是const string& 。
+## 练习 6.29:
+### 在范围for循环中使用initializer_list对象时,应该将循环控制变量声明成引用类型吗？为什么？
+* 可以根据需要来选择是否将循环控制变量声明为引用类型。但是initializer_list中的元素始终是const的，尝试修改这些元素的值会导致编译错误，所以要将循环控制变量声明成引用的话，应该声明为const引用。
