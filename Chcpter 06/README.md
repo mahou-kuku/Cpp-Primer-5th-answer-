@@ -569,3 +569,18 @@ decltype(odd)& arrRef(int i){
 	return (i % 2) ? odd : even;
 }
 ```
+## 练习 6.39:
+### 说明在下面的每组声明中第二条声明语句是何含义。如果有非法的声明,请指出来。
+```
+(a)
+int calc(int, int);
+int calc(const int, const int);
+(b)
+int get();
+double get();
+(c)
+int *reset(int *);
+double *reset(double *);
+```
+答：
+* 这些声明语句是在尝试进行函数重载。(a) 非法。顶层const不影响传入函数的对象。(b) 非法。函数重载不能仅仅依靠返回类型的不同。 (c) 合法。
