@@ -584,3 +584,42 @@ double *reset(double *);
 ```
 答：
 * 这些声明语句是在尝试进行函数重载。(a) 非法。顶层const不影响传入函数的对象。(b) 非法。函数重载不能仅仅依靠返回类型的不同。 (c) 合法。
+## 练习 6.40:
+### 下面的哪个声明是错误的?为什么?
+```
+(a) int ff(int a, int b = 0, int = 0);
+(b) char *init(int ht = 24, int wd, char bckgrnd);
+```
+答：
+```
+(a) 正确。
+(b) 错误。一旦某个形参被赋予了默认值，它后面所有的形参都必须有默认值。
+```
+## 练习 6.41：
+### 下面的哪个调用是非法的？为什么？哪个调用虽然合法但显然与程序员的初衷不符？为什么？
+```
+char *init(int ht, int wd = 80, char bckgrnd = ' ');
+(a) init();	(b) init(24, 10);	(c) init(14, '*');
+```
+答：
+* (a) 非法。在函数 init 的声明中 ht 没有默认值，所以在调用函数时，必须提供 ht 的值。
+* (b) 合法。
+* (c) 合法但显然与程序员的初衷不符。在这个调用中，'\*' 是一个字符常量，但由于缺少了 wd 的值，它被当作了第二个参数 wd 。
+## 练习 6.42:
+### 给make_plural函数(参见6.3.2节,第201页)的第二个形参赋予默认实参's',利用新版本的函数输出单词success和failure的单数和复数形式。
+答：
+```
+#include <iostream>
+#include <string>
+
+std::string mack_plural(size_t ctr, const std::string &word, const std::string &ending = "s") {
+	return (ctr > 1) ? word + ending : word;
+}
+
+int main() {
+	std::cout << "Singular: " << mack_plural(1, "success", "es") << " " << mack_plural(1, "failure") << std::endl;
+	std::cout << "Plural: " << mack_plural(2, "success", "es") << " " << mack_plural(2, "failure") << std::endl;
+
+	return 0;
+}
+```
