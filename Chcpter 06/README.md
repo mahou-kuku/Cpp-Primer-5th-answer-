@@ -724,3 +724,30 @@ void f(double, double = 3.14) {
 	std::cout << "In f(double,double = 3.14).";
 }
 ```
+## 练习 6.52：
+### 已知有如下声明，
+```
+void manip(int, int);
+double dobj;
+```
+请指出下列调用中每个类型转换的等级(参见 6.6.1 节，第219页)。
+```
+(a) manip('a', 'z');	(b) manip(55.3, dobj);
+```
+答：
+* (a) 'a':等级3 	'z'：等级3 	(b)55.3：等级4	 dobj：等级4
+## 练习 6.53:
+### 说明下列每组声明中的第二条语句会产生什么影响,并指出哪些不合法(如果有的话）。
+```
+(a)
+int calc(int&, int&);
+int calc(const int&, const int&);
+(b)
+int calc(char*, char*);
+int calc(const char*, const char*);
+(c)
+int calc(char, char*);
+int calc(char* const, char* const);
+```
+答：
+* (a) 产生函数重载。(b) 产生函数重载。(c) 不合法，顶层const不影响传入函数的对象。
