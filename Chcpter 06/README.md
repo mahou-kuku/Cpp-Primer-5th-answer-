@@ -652,3 +652,38 @@ inline bool isShorter(const string &s1, const string &s2) {
 ### 能把 isShorter 函数定义成 constexpr 函数吗？如果能，将它改写成constexpr函数;如果不能,说明原因。
 答：
 * 不能，如果试图在constexpr函数中调用非constexpr函数，编译器会报错，string类型的成员函数size不是constexpr 函数。
+## 练习 6.47:
+### 改写6.3.2节(第205页)练习中使用递归输出vector内容的程序,使其有条件地输出与执行过程有关的信息。例如，每次调用时输出 vector对象的大小。分别在打开和关闭调试器的情况下编译并执行这个程序。
+答：
+```
+#include <iostream>
+#include <vector>
+
+void printVectorRecursively(const std::vector<int>& v, const size_t index = 0) {
+#ifndef NDEBUG
+	std::cout << "Size of v: " << v.size() << std::endl;
+#endif
+	if (index >= v.size()) {
+		return;		//基本情况：已打印完所有元素
+	}
+	std::cout << v[index] << std::endl;
+	printVectorRecursively(v, index + 1);	//递归情况：打印当前元素，然后递归处理其余元素
+}
+
+int main() {
+	std::vector<int> vec = { 1,2,3,4,5 };
+	printVectorRecursively(vec);
+
+	return 0;
+}
+
+```
+## 练习 6.48：
+### 说明下面这个循环的含义，它对 assert 的使用合理吗？
+```
+	string s;
+	while (cin >> s&&s != sought) { }	//空函数体
+	assert(cin);
+```
+答：
+* 不合理。assert是用来检查在程序的开发和测试阶段预期中程序本身的逻辑错误，而不应用于处理用户输入错误。因为 assert 在发布版本中通常会被禁用，如果依赖 assert 来处理运行环境或用户交互错误，那么在发布版本中，这些错误就不会被正确处理。
