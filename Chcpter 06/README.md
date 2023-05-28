@@ -751,3 +751,77 @@ int calc(char* const, char* const);
 ```
 答：
 * (a) 产生函数重载。(b) 产生函数重载。(c) 不合法，顶层const不影响传入函数的对象。
+## 练习 6.54：
+### 编写函数的声明，令其接受两个 int 形参并且返回类型也是 int；然后声明一个 vector 对象，令其元素是指向该函数的指针。
+答：
+```
+#include <vector>
+
+int func(int, int);
+int main() {
+	std::vector<int(*)(int, int)> vec;
+
+	return 0;
+}
+```
+## 练习 6.55：
+### 编写 4 个函数，分别对两个 int 值执行加、减、乘、除运算；在上一题创建的 vector 对象中保存指向这些函数的指针。
+答：
+```
+#include <vector>
+
+int add(int number_1, int number_2) {
+	return number_1 + number_2;
+}
+
+int subtrack(int number_1, int number_2) {
+	return number_1 - number_2;
+}
+
+int multiply(int number_1, int number_2) {
+	return number_1 * number_2;
+}
+
+int divide(int number_1, int number_2) {
+	return number_1 / number_2;
+}
+
+int main() {
+	std::vector<int(*)(int, int)> vec = { add,subtrack,multiply,divide };
+	
+	return 0;
+}
+
+```
+## 练习 6.56：
+### 调用上述 vector 对象中的每个元素并输出其结果。
+答：
+```
+#include <iostream>
+#include <vector>
+
+int add(int number_1, int number_2) {
+	return number_1 + number_2;
+}
+
+int subtrack(int number_1, int number_2) {
+	return number_1 - number_2;
+}
+
+int multiply(int number_1, int number_2) {
+	return number_1 * number_2;
+}
+
+int divide(int number_1, int number_2) {
+	return number_1 / number_2;
+}
+
+int main() {
+	std::vector<int(*)(int, int)> vec = { add,subtrack,multiply,divide };
+	for (auto i : vec) {
+		std::cout << i(9, 3) << std::endl;
+	}
+
+	return 0;
+}
+```
