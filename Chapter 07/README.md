@@ -32,7 +32,6 @@ int main()
 			<< total.revenue << " " << total.revenue / total.units_sold << std::endl;
 	} else {
 		std::cerr << "No data?!" << std::endl;
-		return -1;
 	}
 	return 0;
 }
@@ -104,7 +103,6 @@ int main()
 			<< total.revenue << " " << total.revenue / total.units_sold << std::endl;
 	} else {
 		std::cerr << "No data?!" << std::endl;
-		return -1;
 	}
 	return 0;
 }
@@ -231,7 +229,6 @@ int main()
 		print(std::cout, total) << std::endl;
 	} else {
 		std::cerr << "No data?!" << std::endl;
-		return -1;
 	}
 	return 0;
 }
@@ -261,3 +258,173 @@ if (read(read(cin, data1), data2))
 ```
 答：
 * 读取输入流的数据依次输入给data1和data2。
+## 练习 7.11：
+### 在你的 Sales_data 类中添加构造函数，然后编写一段程序令其用到每个构造函数。
+答：
+```
+#include <iostream>
+#include <string>
+
+struct Sales_data {
+	Sales_data() = default;
+	Sales_data(const std::string &s) :bookNo(s) {}
+	Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(p*n) {}
+	Sales_data(std::istream &is);
+
+	std::string isbn() const {
+		return bookNo;
+	}
+	Sales_data& combine(const Sales_data&rhs);
+	double avg_price() const;
+
+	std::string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+};
+
+Sales_data add(const Sales_data &lhs, const Sales_data &rhs) {
+	Sales_data sum = lhs;
+	return sum.combine(rhs);
+}
+
+std::ostream& print(std::ostream &os, const Sales_data &item) {
+	os << item.isbn() << " " << item.units_sold << " "
+		<< item.revenue << " " << item.avg_price();
+	return os;
+}
+
+std::istream& read(std::istream &is, Sales_data &item) {
+	double price = 0;
+	is >> item.bookNo >> item.units_sold >> price;
+	item.revenue = item.units_sold*price;
+	return is;
+}
+
+Sales_data::Sales_data(std::istream &is) {
+	read(is, *this);
+}
+
+Sales_data & Sales_data::combine(const Sales_data &rhs) {
+	units_sold += rhs.units_sold;
+	revenue += rhs.revenue;
+	return *this;
+}
+
+double Sales_data::avg_price() const {
+	if (units_sold) {
+		return revenue / units_sold;
+	} else {
+		return 0;
+	}
+}
+
+int main()
+{
+	Sales_data item_1;
+	Sales_data item_2("0-201-78345-X");
+	Sales_data item_3("0-201-78345-X", 3, 20);
+	Sales_data item_4(std::cin);
+
+	print(std::cout, item_1) << std::endl;
+	print(std::cout, item_2) << std::endl;
+	print(std::cout, item_3) << std::endl;
+	print(std::cout, item_4) << std::endl;
+
+	return 0;
+}
+```
+## 练习 7.12:
+### 把只接受一个 istream作为参数的构造函数定义移到类的内部。
+答：
+```
+struct Sales_data;  // 前向声明
+std::istream& read(std::istream &is, Sales_data &item);
+
+struct Sales_data {
+	Sales_data() = default;
+	Sales_data(const std::string &s) :bookNo(s) {}
+	Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(p*n) {}
+	Sales_data(std::istream &is) {
+		read(is, *this);
+	}
+
+	std::string isbn() const {
+		return bookNo;
+	}
+	Sales_data& combine(const Sales_data&rhs);
+	double avg_price() const;
+
+	std::string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+};
+
+std::istream& read(std::istream &is, Sales_data &item) {
+	double price = 0;
+	is >> item.bookNo >> item.units_sold >> price;
+	item.revenue = item.units_sold*price;
+	return is;
+}
+```
+## 练习 7.13:
+### 使用istream构造函数重写第229页的程序。
+答：
+```
+	Sales_data total(std::cin);
+	if (std::cin) {
+		Sales_data trans(std::cin);
+		while (std::cin) {
+			if (total.isbn() == trans.isbn()) {
+				total.combine(trans);
+			} else {
+				print(std::cout, total) << std::endl;
+				total = trans;
+			}
+			read(std::cin,trans);
+		}
+		print(std::cout, total) << std::endl;
+	} else {
+		std::cerr << "No data?!" << std::endl;
+	}
+```
+## 练习 7.14：
+### 编写一个构造函数，令其用我们提供的类内初始值显式地初始化成员。
+答：
+```
+// 显式初始化
+Sales_data::Sales_data(): bookNo(""), units_sold(0), revenue(0.0) {
+    
+}
+```
+## 练习 7.15:
+### 为你的Person类添加正确的构造函数。
+答：
+```
+struct Person {
+	Person() = default;
+	Person(const std::string &s_1, const std::string &s_2) :name(s_1), address(s_2){}
+	Person(std::istream &is);
+	std::string getName() const { return name; }
+	std::string getAddress() const { return address; }
+	std::string name;
+	std::string address;
+};
+
+// Person 的接口函数声明
+std::ostream& print(std::ostream &os, const Person &item);
+std::istream& read(std::istream &is, Person &item);
+
+Person::Person(std::istream &is) {
+	read(is, *this);
+}
+
+std::ostream& print(std::ostream &os, const Person &human) {
+	os << human.getName() << " " << human.getAddress();
+	return os;
+}
+
+std::istream& read(std::istream &is, Person &human) {
+	is >> human.name >> human.address;
+	return is;
+}
+```
