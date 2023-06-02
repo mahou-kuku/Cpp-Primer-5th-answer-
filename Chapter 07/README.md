@@ -447,3 +447,128 @@ std::istream& read(std::istream &is, Person &human) {
 答：
 * getName()和getAddress()两个成员函数应该被声明为public，它们是Person类对外提供的接口，允许外部的代码获取Person对象的name和address的值。同时，由于这两个函数都是const的，它们不会修改Person对象的状态，保证了数据的安全性。此外，Person类的构造函数也应该声明为public，因为我希望外部的代码能够创建Person对象。
 * 应该将name和address两个数据成员声明为private，这可以使类的内部状态能被良好地封装，对外部代码隐藏实现的具体细节，确保这些数据成员不会被外部的代码直接访问和修改。
+## 练习 7.20：
+### 友元在什么时候有用?请分别列举出使用友元的利弊。
+答：
+* 当某个函数需要访问类的私有成员，但又不能或者不应该是类的成员函数时，需要使用友元函数。或者当两个类需要共享一些数据，但又不希望完全公开这些数据时，可以将其中一个类声明为另一个类的友元。
+* 优点：
+* 更大的灵活性：友元机制提供了一种方式，使得非类成员函数也能访问类的私有成员。
+* 对于某些函数，使用友元是必要的。
+* 缺点：
+* 破坏封装：理论上，类的私有成员只应该能被类的成员函数访问。友元打破了这种封装，让外部函数可以访问类的私有成员。这可能会绕过成员函数的实现导致数据被不恰当地修改。
+* 增加依赖：当将一个函数或者类声明为友元，就增加了类与这个函数或者类之间的耦合。这可能会让代码更难以维护，因为需要在修改类的时候同时考虑这些友元的影响。
+## 练习 7.21：
+### 修改你的 Sales_data 类使其隐藏实现的细节。你之前编写的关于Sales_data 操作的程序应该继续使用，借助类的新定义重新编译该程序，确保其工作正常。
+答：
+```
+#include <iostream>
+#include <string>
+
+struct Sales_data {
+	friend Sales_data add(const Sales_data &lhs, const Sales_data &rhs);
+	friend std::ostream& print(std::ostream &os, const Sales_data &item);
+	friend std::istream& read(std::istream &is, Sales_data &item);
+
+	Sales_data() = default;
+	Sales_data(const std::string &s) :bookNo(s) {}
+	Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(p*n) {}
+	Sales_data(std::istream &is);
+
+	std::string isbn() const {
+		return bookNo;
+	}
+	Sales_data& combine(const Sales_data&rhs);
+private:
+	double avg_price() const;
+
+	std::string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+};
+Sales_data add(const Sales_data &lhs, const Sales_data &rhs);
+std::ostream& print(std::ostream &os, const Sales_data &item);
+std::istream& read(std::istream &is, Sales_data &item);
+
+Sales_data::Sales_data(std::istream &is) {
+	read(is, *this);
+}
+
+Sales_data & Sales_data::combine(const Sales_data &rhs) {
+	units_sold += rhs.units_sold;
+	revenue += rhs.revenue;
+	return *this;
+}
+
+double Sales_data::avg_price() const {
+	if (units_sold) {
+		return revenue / units_sold;
+	} else {
+		return 0;
+	}
+}
+
+Sales_data add(const Sales_data &lhs, const Sales_data &rhs) {
+	Sales_data sum = lhs;
+	return sum.combine(rhs);
+}
+
+std::ostream& print(std::ostream &os, const Sales_data &item) {
+	os << item.isbn() << " " << item.units_sold << " "
+		<< item.revenue << " " << item.avg_price();
+	return os;
+}
+
+std::istream& read(std::istream &is, Sales_data &item) {
+	double price = 0;
+	is >> item.bookNo >> item.units_sold >> price;
+	item.revenue = item.units_sold*price;
+	return is;
+}
+
+int main()
+{
+	Sales_data total(std::cin);
+	if (std::cin) {
+		Sales_data trans(std::cin);
+		while (std::cin) {
+			if (total.isbn() == trans.isbn()) {
+				total.combine(trans);
+			} else {
+				print(std::cout, total) << std::endl;
+				total = trans;
+			}
+			read(std::cin,trans);
+		}
+		print(std::cout, total) << std::endl;
+	} else {
+		std::cerr << "No data?!" << std::endl;
+	}
+
+	return 0;
+}
+```
+## 练习 7.22:
+### 修改你的Person类使其隐藏实现的细节。
+答：
+```
+struct Person {
+	Person() = default;
+	Person(const std::string &s_1, const std::string &s_2) :name(s_1), address(s_2) {}
+	Person(std::istream &is) { read(is); }
+
+	std::string getName() const { return name; }
+	std::string getAddress() const { return address; }
+	std::ostream& print(std::ostream &os) const {
+		os << getName() << " " << getAddress();
+		return os;
+	}
+
+	std::istream& read(std::istream &is) {
+		is >> name >> address;
+		return is;
+	}
+private:
+	std::string name;
+	std::string address;
+};
+```
