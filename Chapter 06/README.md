@@ -825,3 +825,64 @@ int main() {
 	return 0;
 }
 ```
+## 练习 7.23：
+### 编写你自己的 Screen 类。
+答：
+```
+class Screen {
+public:
+	typedef std::string::size_type pos;
+	Screen() = default;
+	Screen(pos ht, pos wd, char c) :height(ht), width(wd), contents(ht * wd, c) {}
+	char get()const { return contents[cursor]; }
+	char get(pos row, pos column) const { return contents[row * width + column]; }
+	Screen& move(pos row, pos column);
+private:
+	pos cursor = 0, height = 0, width = 0;
+	std::string contents;
+};
+inline Screen& Screen::move(pos row, pos column) {
+	cursor = row * width + column;
+	return *this;
+}
+```
+## 练习 7.24：
+### 给你的 Screen 类添加三个构造函数：一个默认构造函数；另一个构造函数接受宽和高的值，然后将 contents 初始化成给定数量的空白；第三个构造函数接受宽和高的值以及一个字符，该字符作为初始化之后屏幕的内容。
+答：
+```
+class Screen {
+public:
+	typedef std::string::size_type pos;
+
+	// Default constructor
+	Screen() = default;
+	// Constructor with width and height parameters,initializes contents with spaces
+	Screen(pos ht, pos wd) :height(ht), width(wd), contents(ht * wd, ' ') {}
+	// Constructor with width, height and a character for contents initialization
+	Screen(pos ht, pos wd, char c) :height(ht), width(wd), contents(ht * wd, c) {}
+
+	char get()const { return contents[cursor]; }
+	char get(pos row, pos column) const { return contents[row * width + column]; }
+	Screen& move(pos row, pos column);
+
+private:
+	pos cursor = 0, height = 0, width = 0;
+	std::string contents;
+};
+inline Screen& Screen::move(pos row, pos column) {
+	cursor = row * width + column;
+	return *this;
+}
+```
+## 练习 7.25：
+### Screen 能安全地依赖于拷贝和赋值操作的默认版本吗？如果能，为什么？如果不能，为什么？
+答：
+* Screen 类可以安全地依赖编译器生成的默认拷贝构造函数和赋值操作。因为Screen 类定义中的数据成员是可以被直接拷贝的简单类型，以及有良好定义的拷贝和赋值操作的std::string类型。
+## 练习 7.26:
+### 将Sales data::avg price定义成内联函数。
+答:
+```
+inline double Sales_data::avg_price() const {
+	return units_sold ? revenue / units_sold : 0;
+}
+```
