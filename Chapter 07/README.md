@@ -572,3 +572,93 @@ private:
 	std::string address;
 };
 ```
+## 练习 7.27:
+### 给你自己的Screen类添加move、 set 和 display 函数，通过执行下面的代码检验你的类是否正确。
+```
+	Screen myScreen(5, 5, 'X');
+	myScreen.move(4, 0).set('#').display(std::cout);
+	std::cout << "\n";
+	myScreen.display(std::cout);
+	std::cout << "\n";
+```
+答：
+```
+#include <iostream>
+#include <string>
+
+class Screen {
+public:
+	typedef std::string::size_type pos;
+
+	Screen() = default;
+	Screen(pos ht, pos wd) :height(ht), width(wd), contents(ht * wd, ' ') {}
+	Screen(pos ht, pos wd, char c) :height(ht), width(wd), contents(ht * wd, c) {}
+
+	char get()const { return contents[cursor]; }
+	char get(pos row, pos column) const { return contents[row * width + column]; }
+	Screen& move(pos row, pos column);
+	Screen& set(char c);
+	Screen& set(pos row, pos column, char c);
+	Screen& display(std::ostream &os);
+	const Screen& display(std::ostream &os) const ;
+
+private:
+	void doDisplay(std::ostream &os) const { os << contents; }
+
+	pos cursor = 0, height = 0, width = 0;
+	std::string contents;
+};
+inline Screen& Screen::move(pos row, pos column) {
+	cursor = row * width + column;
+	return *this;
+}
+
+inline Screen& Screen::set(char c) {
+	contents[cursor] = c;
+	return *this;
+}
+
+inline Screen& Screen::set(pos row, pos column, char c) {
+	contents[row * width + column] = c;
+	return *this;
+}
+
+inline Screen& Screen::display(std::ostream &os) {
+	doDisplay(os);
+	return *this;
+}
+
+inline const Screen& Screen::display(std::ostream &os) const {
+	doDisplay(os);
+	return *this;
+}
+
+int main()
+{
+	Screen myScreen(5, 5, 'X');
+	myScreen.move(4, 0).set('#').display(std::cout);
+	std::cout << "\n";
+	myScreen.display(std::cout);
+	std::cout << "\n";
+
+	return 0;
+}
+```
+## 练习 7.28:
+### 如果move, set和display函数的返回类型不是Screen&而是Screen,则在上一个练习中将会发生什么情况？
+答：
+* 将会创建一个临时对象，并在该临时对象上进行操作，myScreen本身不会受到任何影响。这将导致代码的行为和预期的不同。
+* 此外，由于每次调用move，set或display都会创建一个新的Screen对象，这会增加额外的开销，导致程序运行效率下降。
+## 练习 7.29:
+### 修改你的 Screen 类，令move、 set 和 display 函数返回 Screen 并检查程序的运行结果，在上一个练习中你的推测正确吗？
+答：
+* 正确
+## 练习 7.30:
+### 通过this指针使用成员的做法虽然合法,但是有点多余。讨论显式地使用指针访问成员的优缺点。
+答：
+* 优点:
+* 代码清晰：使用this指针可以明确表明正在访问的是类的成员，而不是某个局部变量或全局变量。这使得代码更加清晰，易于理解。
+* 消除命名冲突：当局部变量或函数参数与类的成员同名时，使用this指针可以消除命名冲突。
+* 缺点:
+* 代码冗余：在大多数情况下，显式地使用this指针是不必要的，因为编译器会自动插入this指针。过度使用this指针可能会使代码看起来冗余。
+* 可读性降低：虽然使用this指针可以增强代码的清晰性，但是过度使用可能会使代码变得难以阅读。每次看到this指针时，都需要思考一下正在访问的是什么，这可能会打断思路，使代码更难理解。
