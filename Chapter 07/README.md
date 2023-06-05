@@ -676,3 +676,77 @@ class Y {
 	X x;
 };
 ```
+## 练习 7.32:
+### 定义你自己的Screen和 Window_mgr,其中 clear 是Window_mgr的成员，是 Screen 的友元。
+答：
+```
+class Screen;
+
+class Window_mgr {
+public:
+	using ScreenIndex = std::vector<Screen>::size_type;
+
+	Window_mgr();	//initialize screens
+
+	void clear(ScreenIndex i);
+private:
+	std::vector<Screen> screens;
+};
+
+class Screen {
+public:
+	friend void Window_mgr::clear(Window_mgr::ScreenIndex);
+
+	using pos = std::string::size_type;
+
+	Screen() = default;
+	Screen(pos ht, pos wd) :height(ht), width(wd), contents(ht * wd, ' ') {}
+	Screen(pos ht, pos wd, char c) :height(ht), width(wd), contents(ht * wd, c) {}
+
+	char get()const { return contents[cursor]; }
+	char get(pos row, pos column) const { return contents[row * width + column]; }
+	Screen& move(pos row, pos column);
+	Screen& set(char c);
+	Screen& set(pos row, pos column, char c);
+	Screen& display(std::ostream &os);
+	const Screen& display(std::ostream &os) const ;
+
+private:
+	void doDisplay(std::ostream &os) const { os << contents; }
+
+	pos cursor = 0, height = 0, width = 0;
+	std::string contents;
+};
+
+Window_mgr::Window_mgr() :screens{ (24,80,' ') } {}
+
+void Window_mgr::clear(ScreenIndex i) {
+	Screen &s = screens[i];
+	s.contents = std::string(s.height*s.width, ' ');
+}
+
+inline Screen& Screen::move(pos row, pos column) {
+	cursor = row * width + column;
+	return *this;
+}
+
+inline Screen& Screen::set(char c) {
+	contents[cursor] = c;
+	return *this;
+}
+
+inline Screen& Screen::set(pos row, pos column, char c) {
+	contents[row * width + column] = c;
+	return *this;
+}
+
+inline Screen& Screen::display(std::ostream &os) {
+	doDisplay(os);
+	return *this;
+}
+
+inline const Screen& Screen::display(std::ostream &os) const {
+	doDisplay(os);
+	return *this;
+}
+```
