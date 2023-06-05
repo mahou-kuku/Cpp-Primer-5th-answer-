@@ -750,3 +750,17 @@ inline const Screen& Screen::display(std::ostream &os) const {
 	return *this;
 }
 ```
+## 练习 7.33：
+### 如果我们给 Screen 添加一个如下所示的 size 成员将发生什么情况？如果出现了问题，请尝试修改它。
+```
+pos Screen::size() const {
+	return height * width;
+}
+```
+答：
+```
+//需要明确指定pos是在Screen类中定义的
+Screen::pos Screen::size() const {
+	return height * width;
+}
+```
