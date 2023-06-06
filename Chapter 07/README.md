@@ -764,3 +764,44 @@ Screen::pos Screen::size() const {
 	return height * width;
 }
 ```
+## 练习 7.34：
+### 如果我们把第 256 页 Screen 类的 pos 的 typedef 放在类的最后一行会发生什么情况？
+答：
+* 会导致编译错误。在 typedef 声明之前的成员函数和成员变量将无法识别 pos。
+## 练习 7.35：
+### 解释下面代码的含义，说明其中的 Type 和 initVal 分别使用了哪个定义。如果代码存在错误，尝试修改它。
+```
+typedef string Type;
+Type initVal();
+class Exercise {
+public:
+	typedef double Type;
+	Type setVal(Type);
+	Type initVal();
+private:
+	int val;
+};
+Type Exercise::setVal(Type parm) {
+	val = parm + initVal();
+	return val;
+}
+```
+答：
+* 类定义内部使用的是double的别名Type，类定义外部使用的是string的别名Type，setVal的定义在类外部，返回类型将使用string的别名Type。例外的是Exercise::指定了剩余的setVal定义将处于Exercise类的作用域之内，所以形参parm将使用类定义内部的double的别名Type。
+```
+//fixed
+typedef string TypeStr;
+TypeStr initVal();
+class Exercise {
+public:
+	typedef double TypeDouble;
+	TypeDouble setVal(TypeDouble);
+	TypeDouble initVal();
+private:
+	TypeDouble val;
+};
+Exercise::TypeDouble Exercise::setVal(TypeDouble parm) {
+	val = parm + initVal();
+	return val;
+}
+```
