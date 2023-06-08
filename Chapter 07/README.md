@@ -805,3 +805,80 @@ Exercise::TypeDouble Exercise::setVal(TypeDouble parm) {
 	return val;
 }
 ```
+## 练习 7.36:
+### 下面的初始值是错误的,请找出问题所在并尝试修改它。
+```
+struct X {
+	X(int i, int j) :base(i), rem(base % j) {}
+	int rem, base;
+};
+```
+答：
+```
+struct X {
+	X(int i, int j) :base(i), rem(i % j) {}
+	int rem, base;
+};
+```
+## 练习 7.37:
+### 使用本节提供的Sales_data类，确定初始化下面的变量时分别使用了哪个构造函数,然后罗列出每个对象所有数据成员的值。
+```
+Sales_data first_item(cin);
+int main() {
+	Sales_data next;
+	Sales_data last("9-999-99999-9");
+}
+```
+答：
+```
+//使用Sales_data(std::istream &is)，各数据成员的值根据输入内容改变
+Sales_data first_item(cin);	
+int main() {
+	//使用Sales_data(const std::string &s = "")，各数据成员的值:  bookNo:""  units_sold:0  revenue:0.0
+	Sales_data next;
+	//使用Sales_data(const std::string &s = "")，各数据成员的值： bookNo:"9-999-99999-9"  units_sold:0  revenue:0.0
+	Sales_data last("9-999-99999-9");	
+}
+```
+## 练习 7.38：
+### 有些情况下我们希望提供 cin 作为接受 istream&参数的构造函数的默认实参，请声明这样的构造函数。
+答：
+```
+Sales_data(std::istream &is=std::cin);
+```
+## 练习 7.39：
+### 如果接受 string 的构造函数和接受 istream&的构造函数都使用默认实参,这种行为合法吗?如果不,为什么?
+答：
+* 不合法。将产生二义性调用错误，对重载函数的调用不明确。
+## 练习 7.40:
+### 从下面的抽象概念中选择一个(或者你自己指定一个),思考这样的类需要哪些数据成员,提供一组合理的构造函数并阐明这样做的原因。
+```
+(a)book		(b)Date		(c)Employee
+(d)Vehicle	(e)Object	(f)Tree
+```
+答：
+```
+class Object {
+public:
+    // 有时需要能够创建无属性的对象，因此提供一个默认构造函数是合理的
+    Object() : id(counter++), name("Unnamed") {}
+    
+    // 也可能想要在创建对象时就给予它一个名字，所以提供一个接受名字的构造函数也是合理的
+    Object(const std::string& name) : id(counter++), name(name) {}
+
+    // 获取对象的ID和名字的函数
+    int getId() const { return id; }
+    const std::string& getName() const { return name; }
+
+    // 修改对象名字的函数
+    void setName(const std::string& newName) { name = newName; }
+
+private:
+    static int counter;  // 静态成员，用于生成唯一的ID
+    int id;             // 每个对象的唯一ID
+    std::string name;   // 对象的名字
+};
+
+// 初始化静态成员
+int Object::counter = 0;
+```
