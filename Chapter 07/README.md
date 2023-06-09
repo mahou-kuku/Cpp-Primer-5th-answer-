@@ -882,3 +882,42 @@ private:
 // 初始化静态成员
 int Object::counter = 0;
 ```
+## 练习7.41:
+### 使用委托构造函数重新编写你的 Sales_data类，给每个构造函数体添加一条语句，令其一旦执行就打印一条信息。用各种可能的方式分别创建Sales_data对象，认真研究每次输出的信息直到你确实理解了委托构造函数的执行顺序。
+答：
+```
+//先为委托构造函数的参数求值，再由被委托的构造函数来设置对象的初始状态，随后被委托构造函数的函数体先执行，最后执行委托构造函数的函数体。
+Sales_data() :Sales_data("", 0, 0.0) { std::cout << "In defautlt constructor." << std::endl; }
+Sales_data(const std::string &s) :Sales_data(s, 0, 0.0) { std::cout << "In (const string&) constructor." << std::endl; }
+Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(p*n) {
+	std::cout << "In (const string&,unsigned,double) constructor." << std::endl;
+}
+```
+## 练习 7.42：
+### 对于你在练习 7.40（参见 7.5.1 节，第 261 页）中编写的类，确定哪些构造函数可以使用委托。如果可以的话，编写委托构造函数。如果不可以，从抽象概念列表中重新选择一个你认为可以使用委托构造函数的,为挑选出的这个概念编写类定义。
+答：
+```
+class Object {
+public:
+	// 默认构造函数，所有其他构造函数都会委托给这个构造函数,以合理的默认值初始化数据成员
+	Object() : id(counter++), name("Unnamed") {}
+
+	// 接受名字的构造函数，通过委托默认构造函数实现共享的初始化代码
+	Object(const std::string& newName) : Object() { name = newName; }
+
+	// 获取对象的ID和名字的函数
+	int getId() const { return id; }
+	const std::string& getName() const { return name; }
+
+	// 修改对象名字的函数
+	void setName(const std::string& newName) { name = newName; }
+
+private:
+	static int counter;  // 静态成员，用于生成唯一的ID
+	int id;             // 每个对象的唯一ID
+	std::string name;   // 对象的名字
+};
+
+// 初始化静态成员
+int Object::counter = 0;
+```
