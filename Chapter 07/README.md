@@ -958,3 +958,43 @@ vector<NoDefult> vec(10);
 * (b)不完全正确。默认构造函数是参数列表为空，或者所有参数都有默认值的构造函数。
 * (c)不完全正确。即使对于类来说不存在有意义的默认值，类也可以提供一个默认构造函数。默认构造函数的任务是默认初始化或值初始化类的成员，没有“有意义的默认值”并不意味着不能有默认构造函数。
 * (d)不正确。如果类没有定义任何构造函数，编译器才会自动为其生成一个默认构造函数。
+## 练习 7.47：
+### 说明接受一个string 参数的 sales_data 构造函数是否应该是 explicit的，并解释这样做的优缺点。
+答：
+* 是否将Sales_data的单参数构造函数设置为explicit，这主要取决于对该构造函数的预期使用方式。
+* 优点：避免由于自动类型转换导致的代码混淆和错误。
+* 缺点：有的隐式类型转换是自然和合理的，使用explicit会阻碍这种便捷性。
+## 练习 7.48：
+### 假定 Sales_data 的构造函数不是 explicit 的，则下述定义将执行什么样的操作？
+```
+	string null_isbn("9-999-99999-9");
+	Sales_data item1(null_isbn);
+	Sales_data item2("9-999-99999-9");
+```
+### 如果Sales data的构造函数是explicit的,又会发生什么呢?
+答：
+* item1和item2都是通过string对象进行直接初始化，直接初始化不受构造函数的explicit关键字影响。
+## 练习 7.49:
+### 对于combine函数的三种不同声明,当我们调用i.combine(s)时分别发生什么情况？其中 i 是一个 Sales_data，而 s 是一个string 对象。
+```
+	(a)Sales_data &combine(Sales_data);
+	(b)Sales_data &combine(Sales_data&);
+	(c)Sales_data &combine(const Sales_data&) const;
+```
+答：
+* (a) 会使用Sales_data(const std::string &s)构造函数将s转换为Sales_data对象。这是一个隐式的类型转换。
+* (b) 会产生编译错误，从string到Sales_data的隐式转换，生成的将是一个临时的Sales_data对象。这是一个右值，所以不能被非const的Sales_data&引用绑定。
+* (c) 与(a)相同，会将s通过构造函数转换为Sales_data对象。而函数的参数是一个const的Sales_data引用，这个调用是合法的。
+## 练习 7.50：
+### 确定在你的 Person 类中是否有一些构造函数应该是 explicit 的。
+答：
+```
+	// std::istream对象通常不会通过隐式转换从其他类型得到。该单参数构造函数不需要使用explicit
+	Person(std::istream &is) {
+		read(is);
+	}
+```
+## 练习 7.51:
+### vector将其单参数的构造函数定义成explicit的,而string则不是,你觉得原因何在？
+答：
+* 如果不将vector的单参数构造函数定义成explicit的，可能会出现一些令人困惑的拷贝初始化或隐式转换。譬如：vector<int> v = 10;（一个包含10个默认初始化int的vector），而string的情况则很自然合理，string s = "Hello world!";
