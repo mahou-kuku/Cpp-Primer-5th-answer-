@@ -997,4 +997,47 @@ vector<NoDefult> vec(10);
 ## 练习 7.51:
 ### vector将其单参数的构造函数定义成explicit的,而string则不是,你觉得原因何在？
 答：
-* 如果不将vector的单参数构造函数定义成explicit的，可能会出现一些令人困惑的拷贝初始化或隐式转换。譬如：vector<int> v = 10;（一个包含10个默认初始化int的vector），而string的情况则很自然合理，string s = "Hello world!";
+* 如果不将vector的单参数构造函数定义成explicit的，可能会出现一些令人困惑的拷贝初始化或隐式转换。譬如：vector\<int>v = 10;（一个包含10个默认初始化int的vector），而string的情况则很自然合理，string s = "Hello world!"
+## 练习 7.52：
+### 使用 2.6.1 节（第 64 页）的 Sales_data 类，解释下面的初始化过程。如果存在问题，尝试修改它。
+```
+Sales_data item = { "978-0590353403",25,15.99 };
+```
+答：
+```
+//原始版本Sales_data类有类内初始值，并不是一个聚合类
+//修改如下
+struct Sales_data {
+	std::string bookNo;
+	unsigned units_sold;
+	double rebenue;
+};
+```
+## 练习7.53:
+### 定义你自己的Debug。
+答：
+```
+class Debug {
+public:
+	constexpr Debug(bool b = true) : hw(b), io(b), other(b) {
+	}
+	constexpr Debug(bool h, bool i, bool o) : hw(h), io(i), other(o) {
+	}
+	constexpr bool any() { return hw || io || other; } 
+	void set_io(bool b) { io = b; } 
+	void set_hw(bool b) { hw = b; } 
+	void set_other(bool b) { hw = b; }
+private:
+	bool hw; 
+	bool io; 
+	bool other; 
+};
+```
+## 练习 7.54:
+### Debug 中以 set_开头的成员应该被声明成 constexpr 吗？如果不，为什么？
+答：
+* 不应该。void 返回类型对于constexpr函数是禁止的
+## 练习 7.55:
+### 7.5.5节(第266页)的Data类是字面值常量类吗?请解释原因。
+答：
+* std::string不是字面值类，所以包含 std::string 作为数据成员的Data类也不是字面值类。
