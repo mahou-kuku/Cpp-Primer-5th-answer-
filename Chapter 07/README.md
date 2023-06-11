@@ -1041,3 +1041,62 @@ private:
 ### 7.5.5节(第266页)的Data类是字面值常量类吗?请解释原因。
 答：
 * std::string不是字面值类，所以包含 std::string 作为数据成员的Data类也不是字面值类。
+## 练习 7.56：
+### 什么是类的静态成员？它有何优点？静态成员与普通成员有何区别？
+答：
+* 静态成员是类的一个特性，它与类的每个对象无关，而是与类本身有关。
+* 静态成员的优点：
+* 提供了一种将数据和函数与类的对象分离的方式，这有助于在不需要创建对象的情况下管理和维护数据和函数。
+* 静态数据成员通常用于存储类特有的信息，这些信息由类的所有对象共享。
+* 静态成员与普通成员的区别：
+* 静态成员与非静态成员的主要区别在于静态成员是与类关联的，而非静态成员是与类的每个独立对象关联的。
+* 静态成员函数只能访问静态数据成员或其他静态成员函数，而非静态成员函数可以访问类的所有成员。
+* 静态数据成员可以是不完全类型。
+* 非静态数据成员不能作为默认实参。
+## 练习 7.57：
+### 编写你自己的Account类。
+答：
+```
+class Account {
+public:
+	void calculate() { amount += amount * interestRate; }
+	static double rate() { return interestRate; }
+	static void rate(double newRate) { interestRate = newRate; }
+private:
+	std::string owner;
+	double amount;
+	static double interestRate;
+	static double initRate() { return 1.0; }
+};
+double Account::interestRate = initRate();
+```
+## 练习 7.58：
+### 下面的静态数据成员的声明和定义有错误吗？请解释原因。
+```
+// example.h
+class Example {
+public:
+ static double rate = 6.5; 
+ static const int vecSize = 20; 
+ static vector<double> vec(vecSize);
+};
+// example.C
+#include "example.h"
+double Example::rate;
+vector<double> Example::vec;
+```
+答：
+* 有错误。非const整数类型的静态数据成员在类的内部声明时不能进行初始化。也就是说static double rate = 6.5;和static vector\<double> vec(vecSize);是错误的。应该在类的内部声明，然后在类的外部定义并初始化。修正后的代码如下：
+```
+// example.h
+class Example {
+public:
+	static double rate;
+	static const int vecSize = 20;
+	static vector<double> vec;
+};
+// example.C
+#include "example.h"
+double Example::rate = 6.5;
+vector<double> Example::vec(Example::vecSize);
+```
