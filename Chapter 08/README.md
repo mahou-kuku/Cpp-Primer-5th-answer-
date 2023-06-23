@@ -244,3 +244,53 @@ int main() {
 答：
 * PersonInfo 的数据成员会被默认初始化为特定的初始值，我们不需要提供一个默认的值。
 * PersonInfo 的对象将被动态赋值，即使我们使用了类内初始化，初始化的值也会被后续的赋值操作覆盖。
+## 练习 8.13：
+### 重写本节的电话号码程序，从一个命名文件而非 cin 读取数据。
+答：
+```
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+struct PersonInfo {
+	string name;
+	vector<string> phones;
+};
+
+int main() {
+	string line, word;
+	vector<PersonInfo> people;
+
+	// 创建一个文件流，以从一个特定的文件中读取
+	ifstream inFile("input.txt");
+
+	// 检查文件是否成功打开
+	if (!inFile) {
+		cerr << "Unable to open input file\n";
+		return -1;
+	}
+
+	while (getline(inFile, line)) { // 从文件中读取而不是从cin
+		PersonInfo info;
+		istringstream record(line);
+		record >> info.name;
+		while (record >> word) {
+			info.phones.push_back(word);
+		}
+		people.push_back(info);
+	}
+
+	inFile.close(); // 关闭文件
+
+	return 0;
+}
+```
+## 练习 8.14:
+### 我们为什么将entry和nums定义为const auto&?
+答：
+* 性能考虑：如果我们不使用引用，每次迭代都会从people向量或entry.phones向量中复制一个对象。这可能会导致非常昂贵的性能开销，尤其是在处理大型数据结构时。当我们使用const auto&时，我们实际上是获取了这些对象的常量引用，避免了复制的开销。
+* 避免修改：const关键字保证了我们无法通过entry或nums来修改people向量或entry.phones向量中的元素。这防止了因误修改数据而引发的可能的错误。
