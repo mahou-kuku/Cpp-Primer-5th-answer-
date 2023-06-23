@@ -158,3 +158,89 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 ```
+## 练习 8.9：
+### 使用你为 8.1.2 节(第281页)第一个练习所编写的函数打印一个istringstream 对象的内容。
+答：
+```
+std::istream& func(std::istream &is) {
+	std::string buf;
+	while (is >> buf) {
+		std::cout << buf << std::endl;
+	}
+	is.clear();  // 对流进行复位
+	return is;  // 返回流
+}
+
+int main() {
+	istringstream iss("Hello world!");
+	std::istream& is = func(iss);
+	std::cout << is.rdstate() << std::endl;  // 检查流的状态
+	return 0;
+}
+```
+## 练习 8.10：
+### 编写程序，将来自一个文件中的行保存在一个 vector<string>中。然后使用一个 istringstream 从 vector 读取数据元素，每次读取一个单词。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+
+int main() {
+	std::vector<std::string> lines;
+	std::string line, word;
+
+	std::ifstream file("input.txt");
+	if (file.is_open()) {
+		while (getline(file, line)) {
+			lines.push_back(line);
+		}
+		file.close();
+	}
+
+	for (const auto &l : lines) {
+		std::istringstream record(l);
+		while (record >> word) {
+			std::cout << word << std::endl;
+		}
+	}
+
+	return 0;
+}
+```
+## 练习 8.11： 
+### 本节的程序在外层 while 循环中定义了 istringstream 对象。如果record 对象定义在循环之外,你需要对程序进行怎样的修改?重写程序,将record的定义移到 while 循环之外，验证你设想的修改方法是否正确。
+答：
+```
+int main() {
+	string line, word;
+	vector<PersonInfo> people;
+	istringstream record;
+
+	while (getline(cin, line)) {
+		PersonInfo info;
+		record.clear();
+		record.str(line);	
+		record >> info.name;
+		while (record >> word) 
+			info.phones.push_back(word);
+		people.push_back(info); 
+	}
+
+	for (auto &i : people) {
+		cout << i.name<<" ";
+		for (auto &j : i.phones) {
+			cout << j << " ";
+		}
+		cout << endl;
+	}
+	return 0;
+}
+```
+## 练习 8.12:
+### 我们为什么没有在PersonInfo中使用类内初始化?
+答：
+* PersonInfo 的数据成员会被默认初始化为特定的初始值，我们不需要提供一个默认的值。
+* PersonInfo 的对象将被动态赋值，即使我们使用了类内初始化，初始化的值也会被后续的赋值操作覆盖。
