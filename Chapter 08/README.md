@@ -98,3 +98,63 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 ```
+## 练习 8.7：
+### 修改上一节的书店程序，将结果保存到一个文件中。将输出文件名作为第二个参数传递给 main 函数。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include "Sales_data.h"
+
+using namespace std;
+
+int main(int argc, char *argv[]) {
+	ifstream input(argv[1]);
+	ofstream output(argv[2]);
+	Sales_data total;
+	if (read(input, total)) {
+		Sales_data trans;
+		while (read(input, trans)) {
+			if (total.isbn() == trans.isbn())
+				total.combine(trans);
+			else {
+				print(output, total) << endl;
+				total = trans;
+				print(output, total) << endl;
+			}
+		}
+	} else
+		cerr << "No data?!" << endl;
+	return 0;
+}
+```
+## 练习 8.8:
+### 修改上一题的程序,将结果追加到给定的文件末尾。对同一个输出文件,运行程序至少两次,检验数据是否得以保留。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include "Sales_data.h"
+
+using namespace std;
+
+int main(int argc, char *argv[]) {
+	ifstream input(argv[1]);
+	ofstream output(argv[2],ofstream::app);
+	Sales_data total;
+	if (read(input, total)) {
+		Sales_data trans;
+		while (read(input, trans)) {
+			if (total.isbn() == trans.isbn())
+				total.combine(trans);
+			else {
+				print(output, total) << endl;
+				total = trans;
+				print(output, total) << endl;
+			}
+		}
+	} else
+		cerr << "No data?!" << endl;
+	return 0;
+}
+```
