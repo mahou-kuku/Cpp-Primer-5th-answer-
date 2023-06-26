@@ -68,4 +68,4 @@ std::vector<int>::size_type
 ## 练习 9.8：
 ### 为了读取 string 的 list 中的元素，应该使用什么类型？如果写入 list，又该使用什么类型？
 答：
-* 读取应该使用 list<string>::const_iterator ，写入应该使用 list<string>::iterator 。
+* 读取应该使用 list/<string>::const_iterator ，写入应该使用 list/<string>::iterator 。
