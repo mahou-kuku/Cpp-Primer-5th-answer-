@@ -58,3 +58,14 @@ while (iter1 < iter2) /* ... */
 //在链表中，元素的地址并不连续，无法直接通过偏移量计算得到一个元素的位置，因此无法有效地比较两个迭代器的先后顺序
 while (iter1 != iter2) /* ... */
 ```
+## 练习 9.7:
+### 为了索引int的vector中的元素,应该使用什么类型?
+答：
+```
+//“索引”通常是指通过下标来访问数组或者容器中的元素
+std::vector<int>::size_type
+```
+## 练习 9.8：
+### 为了读取 string 的 list 中的元素，应该使用什么类型？如果写入 list，又该使用什么类型？
+答：
+* 读取应该使用 list<string>::const_iterator ，写入应该使用 list<string>::iterator 。
