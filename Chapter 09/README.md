@@ -69,3 +69,19 @@ std::vector<int>::size_type
 ### 为了读取 string 的 list 中的元素，应该使用什么类型？如果写入 list，又该使用什么类型？
 答：
 * 读取应该使用 list\<string>::const_iterator ，写入应该使用 list\<string>::iterator 。
+## 练习 9.9：
+### begin 和 cbegin 两个函数有什么不同？
+答：
+* begin 在非const对象上返回普通迭代器，允许修改它所指向的元素。在const对象上返回const迭代器，不允许修改它所指向的元素。
+* cbegin 总是返回const迭代器，不管在const对象还是非const对象上。这意味着通过从cbegin返回的迭代器，不能修改它所指向的元素。
+## 练习 9.10：
+### 下面 4个对象分别是什么类型？
+```
+vector<int> v1;
+const vector<int> v2;
+auto it1 = v1.begin(), it2 = v2.begin();
+auto it3 = v1.cbegin(), it4 = v2.cbegin();
+```
+答：
+* it1 是 vector<int>::iterator
+* it2 、 it3 、 it4 是 vector<int>::const_iterator
