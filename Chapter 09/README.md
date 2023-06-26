@@ -13,3 +13,48 @@
 ```
 std::list<std::deque<int>> ldi;
 ```
+## 练习 9.3:
+### 构成迭代器范围的迭代器有何限制?
+答：
+* 两个迭代器必须来自同一个容器。
+* 可以通过反复递增“起始”迭代器来到达“结束”迭代器。
+## 练习 9.4:
+### 编写函数，接受一对指向vector<int>的迭代器和一个int值。在两个迭代器指定的范围中查找给定的值，返回一个布尔值来指出是否找到。
+答：
+```
+bool findValue(std::vector<int>::const_iterator begin, std::vector<int>::const_iterator end, int value) {
+	for (; begin != end; ++begin) {
+		if (*begin == value) {
+			return true;
+		}
+	}
+	return false;
+}
+```
+## 练习 9.5:
+### 重写上一题的函数,返回一个迭代器指向找到的元素。注意,程序必须处理未找到给定值的情况。
+答：
+```
+std::vector<int>::const_iterator findValue(std::vector<int>::const_iterator begin, std::vector<int>::const_iterator end, int value) {
+	for (; begin != end; ++begin) {
+		if (*begin == value) {
+			return begin;
+		}
+	}
+	return end;
+}
+```
+## 练习 9.6：
+### 下面程序有何错误？你应该如何修改它？
+```
+list<int> lst1;
+list<int>::iterator iter1 = lst1.begin(),
+ iter2 = lst1.end();
+while (iter1 < iter2) /* ... */
+```
+答：
+```
+//list不支持 < 运算符
+//在链表中，元素的地址并不连续，无法直接通过偏移量计算得到一个元素的位置，因此无法有效地比较两个迭代器的先后顺序
+while (iter1 != iter2) /* ... */
+```
