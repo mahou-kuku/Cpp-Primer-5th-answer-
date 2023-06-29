@@ -85,3 +85,30 @@ auto it3 = v1.cbegin(), it4 = v2.cbegin();
 答：
 * it1 是 vector<int>::iterator
 * it2 、 it3 、 it4 是 vector<int>::const_iterator
+## 练习 9.11:
+### 对6种创建和初始化vector对象的方法,每一种都给出一个实例。 解释每个vector 包含什么值。
+答：
+```
+	std::vector<int> v1;	// v1里没有元素
+	std::vector<int> v2(9);	// v2里有9个0
+	std::vector<int> v3(9,8);	// v3里有9个8
+	std::vector<int> v4 = {0,1,3};	// v4里有3个元素，分别是0、1、3
+	std::vector<int> v5(v3);	// v5里也是9个8
+	std::vector<int> v6(v5.begin(),v5.end());	// v6里也是9个8
+```
+## 练习 9.12：
+### 对于接受一个容器创建其拷贝的构造函数，和接受两个迭代器创建拷贝的构造函数，解释它们的不同。
+答：
+* 当将一个容器初始化为另一个容器的拷贝时，两个容器的容器类型和元素类型都必须相同。
+* 当将一个容器初始化为迭代器对指定的元素范围时，不要求容器类型是相同的。而且,只要能将要拷贝的元素类型转换为要初始化的容器的元素类型,新容器和原容器中的元素类型也可以不同。
+## 练习9.13:
+### 如何从一个list/<int>初始化一个vector/<double>?从一个vector/<int>又该如何创建？编写代码验证你的答案。
+答：
+```
+	std::list<int> l;
+	std::vector<int> intVec ;
+
+	//都不符合容器类型和元素类型必须相同这一条件，需要使用迭代器范围初始化
+	std::vector<double> doubleVec(l.begin(),l.end());
+	std::vector<double> doubleVec_2(intVec.begin(),intVec.end());
+```
