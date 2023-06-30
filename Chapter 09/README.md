@@ -112,3 +112,11 @@ auto it3 = v1.cbegin(), it4 = v2.cbegin();
 	std::vector<double> doubleVec(l.begin(),l.end());
 	std::vector<double> doubleVec_2(intVec.begin(),intVec.end());
 ```
+## 练习 9.14：
+### 编写程序，将一个 list 中的 char *指针（指向 C 风格字符串）元素赋值给一个 vector 中的 string。
+答：
+```
+	list<const char*> listChar = {"Hello world!"};
+	vector<string> vectorString;
+	vectorString.assign(listChar.cbegin(), listChar.cend());
+```
