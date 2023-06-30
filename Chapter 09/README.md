@@ -120,3 +120,32 @@ auto it3 = v1.cbegin(), it4 = v2.cbegin();
 	vector<string> vectorString;
 	vectorString.assign(listChar.cbegin(), listChar.cend());
 ```
+## 练习 9.15：
+### 编写程序，判定两个 vector<int>是否相等。
+答：
+```
+	vector<int> vectorIntA, vectorIntB;
+	if (vectorIntA == vectorIntB) {
+		// ...
+	}
+```
+## 练习 9.16:
+### 重写上一题的程序,比较一个list<int>中的元素和一个vector<int>中的元素。
+答：
+```
+	list<int> listInt;
+	vector<int> vectorInt;
+	if (listInt == list<int>(vectorInt.begin(), vectorInt.end())) {
+		// ...
+	}
+```
+## 练习 9.17：
+### 假定 c1 和 c2 是两个容器，下面的比较操作有何限制（如果有的话）？
+```
+if (c1 < c2)
+```
+答：
+
+* 必须是相同类型的容器。
+* 必须保存相同类型的元素。
+* 元素类型必须定义了相应的相等、比较运算符。
