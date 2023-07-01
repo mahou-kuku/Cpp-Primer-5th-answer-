@@ -149,3 +149,121 @@ if (c1 < c2)
 * 必须是相同类型的容器。
 * 必须保存相同类型的元素。
 * 元素类型必须定义了相应的相等、比较运算符。
+## 练习 9.18:
+### 编写程序,从标准输入读取string序列,存入一个deque中。编写一个循环,用迭代器打印deque中的元素。
+答：
+```
+#include <iostream>
+#include <deque>
+#include <string>
+
+int main() {
+	std::deque<std::string> dq;
+	std::string word;
+
+	while (std::cin >> word) {
+		dq.push_back(word);
+	}
+
+	for (auto it = dq.begin(); it != dq.end(); ++it) {
+		std::cout << *it << std::endl;
+	}
+
+	return 0;
+}
+```
+## 练习 9.19：
+### 重写上题的程序，用 list 替代 deque。列出程序要做出哪些改变。
+答：
+```
+#include <iostream>
+#include <list>
+#include <string>
+
+int main() {
+	std::list<std::string> li;
+	std::string word;
+
+	while (std::cin >> word) {
+		li.push_back(word);
+	}
+
+	for (auto it = li.begin(); it != li.end(); ++it) {
+		std::cout << *it << std::endl;
+	}
+
+	return 0;
+}
+```
+## 练习 9.20：
+### 编写程序，从一个 list<int>拷贝元素到两个deque 中。值为偶数的所有元素都拷贝到一个 deque中，而奇数值元素都拷贝到另一个deque 中。
+答：
+```
+#include <iostream>
+#include <list>
+#include <deque>
+
+int main() {
+	std::list<int> lst = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	std::deque<int> evenDeque; 
+	std::deque<int> oddDeque; 
+
+	for (const auto &num : lst) {
+		if (num % 2 == 0) {
+			evenDeque.push_back(num); 
+		} else {
+			oddDeque.push_back(num);  
+		}
+	}
+
+	std::cout << "Even numbers: ";
+	for (const auto &num : evenDeque) {
+		std::cout << num << " ";
+	}
+	std::cout << std::endl;
+
+	std::cout << "Odd numbers: ";
+	for (const auto &num : oddDeque) {
+		std::cout << num << " ";
+	}
+	std::cout << std::endl;
+
+	return 0;
+}
+```
+## 练习 9.21：
+### 如果我们将第 308 页中使用 insert 返回值将元素添加到 list 中的循环程序改写为将元素插入到vector中,分析循环将如何工作。
+答：
+```
+	string word;
+	vector<string> vec;
+	auto iter = vec.begin();
+	while (cin >> word) {
+		iter = vec.insert(iter, word);
+	}
+```
+## 练习 9.22:
+### 假定iv是一个 int 的vector,下面的程序存在什么错误?你将如何修改?
+```
+	vector<int>::iterator iter = iv.begin(), 
+		mid = iv.begin() + iv.size() / 2;
+	while (iter != mid)
+		if (*iter == some_val) 
+			iv.insert(iter, 2 * some_val);
+```
+答：
+* 这段代码有一些问题。首先，在插入元素后，迭代器iter、mid可能会失效。
+* 其次，代码中没有改变iter的值，这可能会导致无限循环。
+```
+	vector<int>::iterator iter = iv.begin();
+	mid = iv.begin() + iv.size() / 2;
+	while (iter != mid) {
+		if (*iter == some_val) {
+			iter = iv.insert(iter, 2 * some_val);	// 更新可能失效的迭代器
+			iter += 2;		// 插入元素后，跳过该符合条件的原始元素
+			mid = iv.begin() + iv.size() / 2;		// 因为有元素被插入，所以“中点”也相应地更新
+		} else {
+			++iter;		// 移动到下一个元素
+		}
+	}
+```
