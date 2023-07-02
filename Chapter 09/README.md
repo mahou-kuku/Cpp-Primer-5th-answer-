@@ -267,3 +267,25 @@ int main() {
 		}
 	}
 ```
+## 练习 9.23：
+### 在本节第一个程序（第 309 页)中，若 c.size（)为 1，则 val、val2、val3和 val4 的值会是什么？
+答：
+* val、val2、val3和 val4 的值都是首元素的值。
+## 练习 9.24:
+### 编写程序,分别使用at、下标运算符、front 和 begin提取一个vector 中的第一个元素。在一个空 vector 上测试你的程序。
+答：
+```
+#include <vector>
+
+int main()
+{
+	std::vector<int> vec;
+
+	vec.at(0);       // 抛出out_of_range异常
+	vec[0];          // 未定义行为
+	vec.front();     // 未定义行为
+	*vec.begin();    // 未定义行为
+
+	return 0;
+}
+```
