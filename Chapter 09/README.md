@@ -289,3 +289,44 @@ int main()
 	return 0;
 }
 ```
+## 练习 9.25：
+### 对于第 312 页中删除一个范围内的元素的程序，如果 elem1 与 elem2 相等会发生什么？如果 elem2是尾后迭代器,或者 elem1 和 elem2皆为尾后迭代器,又会发生什么？
+答：
+* 如果 elem1 和 elem2 相等，那么这个范围没有元素，所以 erase 不会删除任何元素，函数返回的迭代器与elem1 和 elem2 相等。
+* 如果 elem2 是尾后迭代器，那么 erase 将会删除从 elem1 开始到容器末尾的所有元素，函数返回尾后迭代器。
+* 如果 elem1 和 elem2 都是尾后迭代器，那么就跟第一个情况相同：没有元素会被删除，函数返回尾后迭代器。
+## 练习 9.26:
+### 使用下面代码定义的ia,将 ia拷贝到一个vector和一个list中。使用单迭代器版本的 erase从list中删除奇数元素,从vector中删除偶数元素。
+```
+int ia[] = { 0, 1, 1, 2, 3, 5, 8, 13, 21, 55, 89 };
+```
+答：
+```
+#include <iostream>
+#include <vector>
+#include <list>
+
+int main() {
+	int ia[] = { 0, 1, 1, 2, 3, 5, 8, 13, 21, 55, 89 };
+	std::vector<int> iv(std::begin(ia), std::end(ia));
+	std::list<int> il(std::begin(ia), std::end(ia));
+
+	// 使用单迭代器版本的 erase 从 list 中删除奇数元素
+	for (auto it = il.begin(); it != il.end(); ) {
+		if (*it % 2 != 0)
+			it = il.erase(it);
+		else
+			++it;
+	}
+
+	// 使用单迭代器版本的 erase 从 vector 中删除偶数元素
+	for (auto it = iv.begin(); it != iv.end(); ) {
+		if (*it % 2 == 0)
+			it = iv.erase(it);
+		else
+			++it;
+	}
+
+	return 0;
+}
+```
