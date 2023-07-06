@@ -330,3 +330,46 @@ int main() {
 	return 0;
 }
 ```
+## 练习 9.27：
+### 编写程序，查找并删除 forward_list<int>中的奇数元素。
+答：
+```
+#include <forward_list>
+
+using namespace std;
+
+int main() {
+
+	forward_list<int> flst{ 0,1,2,3,4,5 };
+	auto prev = flst.before_begin();
+	auto curr = flst.begin();
+	
+	while( curr!= flst.end()){
+		if (*curr % 2) {
+			curr = flst.erase_after(prev);
+		} else {
+			prev = curr++;
+		}
+	}
+
+	return 0;
+}
+```
+## 练习 9.28:
+### 编写函数，接受一个forward_list<string>和两个 string 共三个参数。函数应在链表中查找第一个string,并将第二个string插入到紧接着第一个string之后的位置。若第一个string 未在链表中,则将第二个string插入到链表末尾。
+答：
+```
+void find_and_insert(std::forward_list<std::string>& flist, const std::string& to_find, const std::string& to_insert) {
+	auto prev = flist.before_begin();
+	auto curr = flist.begin();
+	while (curr != flist.end()) {
+		if (*curr == to_find) {
+			flist.insert_after(curr, to_insert);
+			return;
+		}
+		prev = curr++;
+	}
+
+	flist.insert_after(prev, to_insert);
+}
+```
