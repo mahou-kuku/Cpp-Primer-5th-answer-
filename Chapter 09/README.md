@@ -373,3 +373,11 @@ void find_and_insert(std::forward_list<std::string>& flist, const std::string& t
 	flist.insert_after(prev, to_insert);
 }
 ```
+## 练习 9.29：
+### 假定 vec 包含 25 个元素，那么 vec.resize(100)会做什么？如果接下来调用vec.resize (10)会做什么?
+答：
+* 调用 vec.resize(100) 将会将 vec 的大小增加到 100。由于原本 vec 只有 25 个元素，所以这个操作将会在 vec 的末尾添加 75 个元素。这些新添加的元素将会被默认初始化。然后，当调用 vec.resize(10) 时，vec 的大小将会被调整为 10。由于 vec 的当前大小是 100，所以这个操作将会删除最后 90 个元素。所以最后，vec 将只包含最初的 10 个元素。
+## 练习 9.30：
+### 接受单个参数的 resize 版本对元素类型有什么限制（如果有的话）？
+答：
+* 容器中的元素类型必须拥有默认构造函数。如果元素类型没有默认构造函数，编译器将无法构造新的元素。
