@@ -376,8 +376,61 @@ void find_and_insert(std::forward_list<std::string>& flist, const std::string& t
 ## 练习 9.29：
 ### 假定 vec 包含 25 个元素，那么 vec.resize(100)会做什么？如果接下来调用vec.resize (10)会做什么?
 答：
-* 调用 vec.resize(100) 将会将 vec 的大小增加到 100。由于原本 vec 只有 25 个元素，所以这个操作将会在 vec 的末尾添加 75 个元素。这些新添加的元素将会被默认初始化。然后，当调用 vec.resize(10) 时，vec 的大小将会被调整为 10。由于 vec 的当前大小是 100，所以这个操作将会删除最后 90 个元素。所以最后，vec 将只包含最初的 10 个元素。
+* 调用 vec.resize(100) 将会将 vec 的大小增加到 100。由于原本 vec 只有 25 个元素，所以这个操作将会在 vec 的末尾添加 75 个元素。这些新添加的元素将会被默认初始化。
+* 然后，当调用 vec.resize(10) 时，vec 的大小将会被调整为 10。由于 vec 的当前大小是 100，所以这个操作将会删除最后 90 个元素。所以最后，vec 将只包含最初的 10 个元素。
 ## 练习 9.30：
 ### 接受单个参数的 resize 版本对元素类型有什么限制（如果有的话）？
 答：
 * 容器中的元素类型必须拥有默认构造函数。如果元素类型没有默认构造函数，编译器将无法构造新的元素。
+## 练习 9.31:
+### 第316页中删除偶数值元素并复制奇数值元素的程序不能用于list 或forward_list。为什么？修改程序，使之也能用于这些类型。
+答：
+* 这个程序不能用于list或forward_list主要有两个原因：
+* std::list和std::forward_list的迭代器不支持+=操作。这是因为这两种类型使用的是双向迭代器和前向迭代器，不支持随机访问。
+```
+	std::list<int> li = { 0,1,2,3,4,5,6,7,8,9 };
+	auto iter = li.begin();
+	while (iter != li.end()) {
+		if (*iter % 2) {
+			iter = li.insert(iter, *iter);
+			std::advance(iter, 2); // 使用 std::advance 替换 += 操作
+		} else
+			iter = li.erase(iter);
+	}
+```
+* std::forward_list没有insert和erases成员函数，应该使用insert_after和erase_after。
+```
+	std::forward_list<int> fl = { 0,1,2,3,4,5,6,7,8,9 };
+	auto prev = fl.before_begin();
+	auto iter = fl.begin();
+	while (iter != fl.end()) {
+		if (*iter % 2) {
+			iter = fl.insert_after(prev, *iter);
+			std::advance(prev, 2);
+			std::advance(iter, 2);
+		} else
+			iter = fl.erase_after(prev);
+	}
+```
+## 练习 9.32:
+### 在第316页的程序中,向下面语句这样调用insert是否合法?如果不合法,为什么？
+```
+iter = vi.insert(iter, *iter++);
+```
+答：
+* 该调用是非法的。传参并没有规定求值顺序。当执行 vi.insert(iter, *iter++) 时， iter++ 可能在 iter 被传递给 insert 之前就被执行了。
+## 练习 9.33：
+### 在本节最后一个例子中，如果不将 insert 的结果赋予 begin，将会发生什么？编写程序，去掉此赋值语句，验证你的答案。
+答：
+* 迭代器begin可能会失效。
+## 练习 9.34:
+### 假定vi是一个保存int的容器,其中有偶数值也有奇数值,分析下面循环的行为，然后编写程序验证你的分析是否正确。
+```
+	iter = vi.begin();
+	while (iter != vi.end())
+		if (*iter % 2)
+			iter = vi.insert(iter, *iter);
+		++iter;
+```
+答：
+* 这会是一个无限循环。
