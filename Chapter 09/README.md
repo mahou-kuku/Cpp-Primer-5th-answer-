@@ -434,3 +434,68 @@ iter = vi.insert(iter, *iter++);
 ```
 答：
 * 这会是一个无限循环。
+## 练习 9.35：
+### 解释一个vector的 capacity和 size有何区别。
+答：
+* "size"是指容器当前存储的元素数量。
+* "capacity"则是指容器在必须分配更多内存之前可以存储的元素数量。
+## 练习 9.36:
+### 一个容器的capacity可能小于它的size吗?
+答：
+* 不可能。
+## 练习 9.37:
+### 为什么list或array没有capacity成员函数?
+答：
+* list是由一系列节点组成，每个节点包含一个元素和指向前后节点的指针。因此，list没有固定的内存块，也没有预留的空间。当添加新的元素时，list会动态地分配新的节点来存储这个元素。因此，list没有capacity成员函数，因为它的"容量"本质上是由可用内存限制的。
+* array的大小在编译时就固定了，它没有capacity函数，因为其大小是不变的。在定义array时就需要指定其大小，之后就不能再改变它的大小了。换句话说，array的capacity就是它的size，因此，没有必要有一个单独的capacity成员函数。
+## 练习 9.38:
+### 编写程序，探究在你的标准库实现中，vector是如何增长的。
+答：
+```
+#include <vector>
+#include <iostream>
+
+using namespace std;
+
+int main() {
+
+	vector<int> ivec;
+	cout << "ivec: size: " << ivec.size()
+		<< " capacity: " << ivec.capacity() << endl;
+	for (vector<int>::size_type ix = 0; ix != 24; ++ix) {
+		ivec.push_back(ix);
+		cout << "ivec: size: " << ivec.size()
+			<< " capacity: " << ivec.capacity() << endl;
+	}
+	ivec.shrink_to_fit();
+	cout << "ivec: size: " << ivec.size()
+		<< " capacity: " << ivec.capacity() << endl;
+
+	return 0;
+}
+```
+## 练习 9.39：
+### 解释下面程序片段做了什么：
+```
+vector<string> svec;
+svec.reserve(1024);
+string word;
+while (cin >> word)
+ svec.push_back(word);
+svec.resize(svec.size()+svec.size()/2);
+```
+答：
+* 1.	创建一个string类型的vector。
+* 2.	预留1024个string对象的空间。这里的reserve函数不会改变vector的size，但会至少保证vector能够存储1024个元素而不需要进行重新分配内存和复制操作。
+* 3.	从标准输入读取字符串，将读入的字符串添加到vector的末尾。此处读取会一直持续到遇到文件结束符或者某种错误。
+* 4.	调整vector的size。如果当前vector的size为n，那么resize将vector的size改为n + n/2。在这个程序中，如果size超过了预留的1024个单词，vector会进行扩容操作，以便可以添加更多的元素。
+
+
+## 练习 9.40:
+### 如果上一题中的程序读入了256个词，在resize之后容器的capacity可能是多少？如果读入了512个、1000个或 1048个词呢？
+答：
+* 如果读入了256个词，由于预先设定的capacity是1024，256是低于这个值的，所以不会触发vector的扩容操作。capacity仍然保持为1024。
+* 如果读入了512个词，同样，由于预先设定的capacity是1024，不会触发扩容操作。capacity仍然保持为1024。
+* 如果读入了1000个词，在执行resize之后，vector的size将变为1000 + 1000/2 = 1500，这超过了最初的capacity（1024）。由于需要扩容，新的capacity至少会达到2000，因为一般实现会至少翻倍容量。
+* 如果读入了1048个词，在执行resize之后，vector的size将变为1048 + 1048/2 = 1572，这同样超过了最初的capacity（1024）。需要扩容，新的capacity至少会达到2096，因为一般实现会至少翻倍容量。
+* 具体的增长策略依赖于库的实现，所以这里的数字可能会有所不同。
