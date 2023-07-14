@@ -499,3 +499,22 @@ svec.resize(svec.size()+svec.size()/2);
 * 如果读入了1000个词，在执行resize之后，vector的size将变为1000 + 1000/2 = 1500，这超过了最初的capacity（1024）。需要扩容，新的capacity至少会超过1500。
 * 如果读入了1048个词，读入操作本身就超过了最初的capacity，需要扩容。在执行resize之后，vector的size将变为1048 + 1048/2 = 1572，这可能又超过了之前扩容过的capacity。需要再次扩容，新的capacity至少会超过1572。
 * 具体的增长策略依赖于库的实现，所以这里的数字可能会有所不同。
+## 练习 9.41:
+### 编写程序,从一个vector<char>初始化一个string。
+答：
+```
+	vector<char> vec{ 'H','e','l','l','o' };
+	string s(vec.begin(),vec.end());
+```
+## 练习 9.42：
+### 假定你希望每次读取一个字符存入一个 string中，而且知道最少需要读取100 个字符，应该如何提高程序的性能？
+答：
+```
+	string s;
+	// 这样，push_back操作在添加第101个字符前，都不需要分配新的内存，可以有效提高性能
+	s.reserve(100);
+	char c;
+	while (cin >> c) {
+		s.push_back(c);
+	}
+```
