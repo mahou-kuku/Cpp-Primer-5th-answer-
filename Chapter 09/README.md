@@ -518,3 +518,98 @@ svec.resize(svec.size()+svec.size()/2);
 		s.push_back(c);
 	}
 ```
+## 练习 9.43：
+### 编写一个函数，接受三个 string 参数 s、 oldVal 和 newVal。使用迭代器及insert和erase函数将s中所有oldval替换为newVal。测试你的程序,用它替换通用的简写形式,如,将"tho"替换为"though",将"thru"替换为"through"。
+答：
+```
+#include <iostream>
+#include <string>
+
+void find_and_replace(std::string& s, const std::string& oldVal, const std::string& newVal) {
+	for (auto it = s.begin(); it != s.end(); ++it) {
+		if (std::string{ it, it + oldVal.size() } == oldVal) {
+			it = s.erase(it, it + oldVal.size());
+			it = s.insert(it, newVal.begin(), newVal.end());
+			std::advance(it, newVal.size());
+		}
+	}
+}
+
+int main() {
+	std::string text = "I tho that was a cat thru the window.";
+	find_and_replace(text, "tho", "though");
+	find_and_replace(text, "thru", "through");
+	std::cout << text << std::endl;
+
+	return 0;
+}
+```
+## 练习 9.44:
+### 重写上一题的函数，这次使用一个下标和 replace。
+答：
+```
+#include <iostream>
+#include <string>
+
+void find_and_replace(std::string& s, const std::string& oldVal, const std::string& newVal) {
+	for (size_t i = 0; i != s.size(); ++i) {
+		if (s.substr(i,oldVal.size()) == oldVal) {
+			s.replace(i,oldVal.size(),newVal);
+			i += newVal.size();
+		}
+	}
+}
+
+int main() {
+	std::string text = "I tho that was a cat thru the window.";
+	find_and_replace(text, "tho", "though");
+	find_and_replace(text, "thru", "through");
+	std::cout << text << std::endl;
+
+	return 0;
+}
+```
+## 练习 9.45：
+### 编写一个函数，接受一个表示名字的 string 参数和两个分别表示前缀（如"Mr."或"Ms.")和后缀（如"Jr."或"III")的字符串。使用迭代器及 insert 和 append函数将前缀和后缀添加到给定的名字中,将生成的新 string 返回。
+答：
+```
+#include <iostream>
+#include <string>
+
+std::string add_prefix_suffix(const std::string& name, const std::string& prefix, const std::string& suffix) {
+	std::string new_name = name;
+	new_name.insert(new_name.begin(), prefix.begin(), prefix.end());
+	new_name.append(suffix);
+	return new_name;
+}
+
+int main() {
+	std::string name = "John Doe";
+	std::string new_name = add_prefix_suffix(name, "Mr. ", ", Jr.");
+	std::cout << new_name << std::endl;
+
+	return 0;
+}
+```
+## 练习 9.46:
+### 重写上一题的函数，这次使用位置和长度来管理 string，并只使用 insert。
+答：
+```
+#include <iostream>
+#include <string>
+
+std::string add_prefix_suffix(const std::string& name, const std::string& prefix, const std::string& suffix) {
+	std::string new_name = name;
+	new_name.insert(0, prefix);
+	new_name.insert(new_name.size(), suffix);
+	return new_name;
+}
+
+int main() {
+	std::string name = "John Doe";
+	std::string new_name = add_prefix_suffix(name, "Mr. ", ", Jr.");
+	std::cout << new_name << std::endl;
+
+	return 0;
+}
+```
