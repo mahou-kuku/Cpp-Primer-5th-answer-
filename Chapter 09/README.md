@@ -613,3 +613,94 @@ int main() {
 	return 0;
 }
 ```
+## 练习9.47:
+### 编写程序,首先查找string "ab2c3d7R4E6"中的每个数字字符,然后查找其中每个字母字符。 编写两个版本的程序,第一个要使用find_first_of,第二个 要使用 find_first_not_of。
+答：
+* 使用find_first_of
+```
+#include <iostream>
+#include <string>
+
+int main() {
+	std::string numbers("0123456789");
+	std::string alphabets("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	std::string str("ab2c3d7R4E6");
+
+	// 查找数字字符
+	std::size_t pos = 0;
+	while ((pos = str.find_first_of(numbers, pos)) != std::string::npos) {
+		std::cout << "Find the number:" << str[pos] << " in position:" << pos << std::endl;
+		++pos;
+	}
+
+	// 查找字母字符
+	pos = 0;
+	while ((pos = str.find_first_of(alphabets, pos)) != std::string::npos) {
+		std::cout << "Find the alphabet:" << str[pos] << " in position:" << pos << std::endl;
+		++pos;
+	}
+
+	return 0;
+}
+```
+* 使用find_first_not_of
+```
+#include <iostream>
+#include <string>
+
+int main() {
+	std::string numbers("0123456789");
+	std::string alphabets("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	std::string str("ab2c3d7R4E6");
+
+	// 查找数字字符
+	std::size_t pos = 0;
+	while ((pos = str.find_first_not_of(alphabets, pos)) != std::string::npos) {
+		std::cout << "Find the number:" << str[pos] << " in position:" << pos << std::endl;
+		++pos;
+	}
+
+	// 查找字母字符
+	pos = 0;
+	while ((pos = str.find_first_not_of(numbers, pos)) != std::string::npos) {
+		std::cout << "Find the alphabet:" << str[pos] << " in position:" << pos << std::endl;
+		++pos;
+	}
+
+	return 0;
+}
+```
+## 练习 9.48：
+### 假定 name 和 numbers 的定义如 325 页所示，numbers.find (name) 返回什么？
+答：
+* 返回string::npos 。
+## 练习 9.49:
+### 如果一个字母延伸到中线之上,如d或f,则称其有上出头部分(ascender)。如果一个字母延伸到中线之下，如 p 或 g，则称其有下出头部分(descender)。编写程序，读入一个单词文件，输出最长的既不包含上出头部分，也不包含下出头部分的单词。
+答：
+```
+#include <fstream>
+#include <string>
+
+std::string longestWordWithoutAscendersDescenders(const std::string &filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("Unable to open file");
+    }
+
+    std::string longestWord;
+    std::string word;
+    std::string ascenders = "bdfhiklt";
+    std::string descenders = "gjpqy";
+
+    while (file >> word) {
+        if (word.find_first_of(ascenders) == std::string::npos &&
+            word.find_first_of(descenders) == std::string::npos) {
+            if (word.size() > longestWord.size()) {
+                longestWord = word;
+            }
+        }
+    }
+
+    return longestWord;
+}
+```
