@@ -704,3 +704,80 @@ std::string longestWordWithoutAscendersDescenders(const std::string &filename) {
     return longestWord;
 }
 ```
+## 练习9.50:
+### 编写程序处理一个vector<string>,其元素都表示整型值。计算vector 中所有元素之和。修改程序,使之计算表示浮点值的string之和。
+答：
+```
+#include <iostream>
+#include <string>
+#include <vector>
+
+int main() {
+    // 这个vector<string>中的元素都表示整型值
+    std::vector<std::string> vec1 = {"1", "2", "3", "4", "5"};
+    int sum1 = 0;
+    for (const auto& str : vec1) {
+        sum1 += std::stoi(str);
+    }
+    std::cout << "The sum of int is: " << sum1 << std::endl;
+
+    // 修改程序，使之计算表示浮点值的string之和
+    std::vector<std::string> vec2 = {"1.1", "2.2", "3.3", "4.4", "5.5"};
+    float sum2 = 0.0f;
+    for (const auto& str : vec2) {
+        sum2 += std::stof(str);
+    }
+    std::cout << "The sum of float is: " << sum2 << std::endl;
+
+    return 0;
+}
+```
+## 练习 9.51:
+### 设计一个类,它有三个 unsigned成员,分别表示年、月和日。为其编写构造函数,接受一个表示日期的string参数。你的构造函数应该能处理不同数据格式,如January 1,1900、 1/1/1990、Jan 1 1900等。
+答：
+```
+#include <iostream>
+#include <string>
+
+class Date {
+public:
+	unsigned year;
+	unsigned month;
+	unsigned day;
+
+	Date(const std::string& date) {
+		std::string months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+			"Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+		for (int i = 0; i < 12; ++i) {
+			size_t pos = date.find(months[i]);
+			if (pos != std::string::npos) {
+				month = i + 1;
+				day = std::stoi(date.substr(pos + date.find_first_not_of("abcdefghijklmnopqrstuvwxyz",pos+1)));
+				year = std::stoi(date.substr(date.find_last_of(" ,") + 1));
+				return;
+			}
+		}
+
+		size_t pos1 = date.find("/");
+		size_t pos2 = date.rfind("/");
+		month = std::stoi(date.substr(0, pos1));
+		day = std::stoi(date.substr(pos1 + 1, pos2 - pos1 - 1));
+		year = std::stoi(date.substr(pos2 + 1));
+	}
+
+	void print() {
+		std::cout << "Year: " << year << ", Month: " << month << ", Day: " << day << "\n";
+	}
+};
+
+int main() {
+	Date d1("January 1,1900");
+	d1.print();
+	Date d2("1/1/1990");
+	d2.print();
+	Date d3("Jan 1 1900");
+	d3.print();
+
+	return 0;
+}
+```
