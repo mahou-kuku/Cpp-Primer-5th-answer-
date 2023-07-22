@@ -781,3 +781,89 @@ int main() {
 	return 0;
 }
 ```
+## 练习 9.52:
+### 使用stack处理括号化的表达式。 当你看到一个左括号,将其记录下来。 当你在一个左括号之后看到一个右括号,从stack中pop对象,直至遇到左括号,将左括号也一起弹出栈。然后将一个值(括号内的运算结果) push到栈中,表示一个括号化的（子）表达式已经处理完毕，被其运算结果所替代。
+答：
+```
+#include <iostream>
+#include <stack>
+#include <string>
+#include <sstream>
+
+// 简单计算函数
+int calculate(const std::string &expr) {
+	std::istringstream iss(expr);
+	int result = 0;
+	int num;
+	char op;
+
+	iss >> result;
+	while (iss >> op >> num) {
+		switch (op) {
+		case '+':
+			result += num;
+			break;
+		case '-':
+			result -= num;
+			break;
+		case '*':
+			result *= num;
+			break;
+		case '/':
+			if (num == 0) {
+				throw std::runtime_error("Divide by zero");
+			}
+			result /= num;
+			break;
+		default: throw std::runtime_error("Invalid operator");
+		}
+	}
+
+	return result;
+}
+
+void process(const std::string &expr) {
+	std::stack<char> s;
+
+	for (char c : expr) {
+		if (c != ')') {
+			s.push(c);
+		} else {
+			std::string sub_expr;
+			while (!s.empty() && s.top() != '(') {
+				sub_expr = s.top() + sub_expr;
+				s.pop();
+			}
+			if (!s.empty()) {
+				s.pop();  // pop '('
+			}
+
+			// 计算子表达式的结果
+			int result = calculate(sub_expr);
+
+			// 将结果转为字符串，并压入栈中
+			std::ostringstream oss;
+			oss << result;
+			std::string result_str = oss.str();
+			for (char ch : result_str) {
+				s.push(ch);
+			}
+		}
+	}
+
+	// 输出经过处理的表达式（求值括号内子表达式）
+	std::string result;
+	while (!s.empty()) {
+		result = s.top() + result;
+		s.pop();
+	}
+
+	std::cout << result << std::endl;
+}
+
+int main() {
+	process("10*(20+30)/5-(1+2)");
+
+	return 0;
+}
+```
