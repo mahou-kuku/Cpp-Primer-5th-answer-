@@ -59,3 +59,32 @@ int main() {
 	return 0;
 }
 ```
+## 练习 10.3： 
+### 用 accumulate 求一个 vector<int>中的元素之和。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+using namespace std;
+
+int main() {
+	vector<int> vec{ 0,1,2,3,4,5 };
+
+	auto sum = accumulate(vec.cbegin(), vec.cend(), 0);
+	cout << sum;
+
+	return 0;
+}
+```
+## 练习 10.4：
+### 假定v是一个 vector<double>，那么调用 accumulate (v.cbegin (), v.cend()，0)有何错误(如果存在的话)？
+答：
+* 0是一个int类型的字面值，它使得std::accumulate在进行累加计算时，将所有的double类型的数值都转换成int进行运算。这会导致两个问题：
+* 可能丢失所有的小数部分，因为int类型不能保存小数。
+* 如果vector中的double值过大，它可能超出int能表示的范围，从而导致溢出。
+## 练习 10.5：
+### 在本节对名册（roster）调用 equal 的例子中，如果两个名册中保存的都是 c 风格字符串而不是 string，会发生什么？
+答：
+* 函数的行为会变得与预期不同。因为C风格字符串是指针类型，所以equal函数会比较两个指针的值，而不是指向的字符串内容。
