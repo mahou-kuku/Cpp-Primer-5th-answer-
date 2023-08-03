@@ -139,3 +139,49 @@ fill_n(vec.begin(), 10, 0);
 ### 本节提到过，标准库算法不会改变它们所操作的容器的大小。为什么使用 back _inserter 不会使这一断言失效？
 答：
 * 算法本身并没执行任何能改变容器大小的操作，这些可能导致容器大小改变的操作实际上是在迭代器层次上通过特殊设计的迭代器完成的。
+## 练习 10.9：
+### 实现你自己的 elimDups。 测试你的程序，分别在读取输入后、调用 unique 后以及调用 erase后打印 vector的内容。
+答：
+```
+#include <vector>
+#include <iostream>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+void elimDups(vector<string> &words)
+{
+	cout << "Container size after passed: " << words.size() << endl;
+	for (const auto &i : words) {
+		cout << "Output element: " << i << endl;
+	}
+
+	sort(words.begin(), words.end());
+	auto end_unique = unique(words.begin(), words.end());
+	cout << "Container size after calling unique: " << words.size() << endl;
+	for (const auto &i : words) {
+		cout << "Output element: " << i << endl;
+	}
+
+	words.erase(end_unique, words.end());
+	cout << "Container size after calling erase: " << words.size() << endl;
+	for (const auto &i : words) {
+		cout << "Output element: " << i << endl;
+	}
+}
+
+int main() {
+	vector<string> vs{ "aaa","bbb","ccc","aaa","bbb" };
+	elimDups(vs);
+
+	return 0;
+}
+```
+## 练习 10.10:
+### 你认为算法不改变容器大小的原因是什么?
+答：
+* 通用性和复用性: 如果算法能够改变容器大小，那么它们将不再是通用的，因为不是所有容器都支持有效的大小更改。
+* 迭代器失效问题: 许多算法通过迭代器进行工作。改变容器大小可能会导致迭代器失效。通过确保算法不更改容器大小，可以减轻这个问题。
+* 明确职责: 通过将元素访问和修改与容器大小管理分离，使代码的职责更加明确。算法主要关注元素如何处理，而容器主要关注元素如何组织和存储。
+* 性能考虑: 改变容器大小可能是昂贵的操作，特别是对于需要重新分配内存的容器。通过确保算法不更改大小，可以避免由此引起的性能问题，挽救算法设计者的头发。
