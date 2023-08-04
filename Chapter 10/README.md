@@ -185,3 +185,105 @@ int main() {
 * 迭代器失效问题: 许多算法通过迭代器进行工作。改变容器大小可能会导致迭代器失效。通过确保算法不更改容器大小，可以减轻这个问题。
 * 明确职责: 通过将元素访问和修改与容器大小管理分离，使代码的职责更加明确。算法主要关注元素如何处理，而容器主要关注元素如何组织和存储。
 * 性能考虑: 改变容器大小可能是昂贵的操作，特别是对于需要重新分配内存的容器。通过确保算法不更改大小，可以避免由此引起的性能问题，挽救算法设计者的头发。
+## 练习 10.11:
+### 编写程序,使用stable_sort和isShorter将传递给你的elimDups 版本的vector排序。打印vector的内容,验证你的程序的正确性。
+答：
+```
+#include <vector>
+#include <iostream>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+bool isShorter(const string &s1, const string &s2) {
+	return s1.size() < s2.size();
+}
+
+void elimDups(vector<string> &words)
+{
+	cout << "After passed: \t\t\t\t";
+	for (const auto &i : words) {
+		cout << i << " ";
+	}
+	cout << endl;
+
+	sort(words.begin(), words.end());
+	cout << "After calling sort: \t\t\t";
+	for (const auto &i : words) {
+		cout << i << " ";
+	}
+	cout << endl;
+
+	stable_sort(words.begin(), words.end(), isShorter);
+	cout << "After calling isShorter and stable_sort: ";
+	for (const auto &i : words) {
+		cout << i << " ";
+	}
+	cout << endl;
+}
+
+int main() {
+	vector<string> vs{ "ccc","aaa","aab","ab","ccc" };
+	elimDups(vs);
+
+	return 0;
+}
+
+```
+## 练习 10.12：
+### 编写名为 compareIsbn 的函数，比较两个 Sales_data 对象的 isbn () 成员。使用这个函数排序一个保存 Sales_data 对象的 vector。
+答：
+```
+#include <vector>
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include "Sales_data.h"
+
+using namespace std;
+
+bool compareIsbn(const Sales_data &s1, const Sales_data &s2) {
+	return s1.isbn() < s2.isbn();
+}
+
+int main() {
+	Sales_data data_1("aaa"), data_2("ab"), data_3("abc"), data_4("aba");
+	vector<Sales_data> words{ data_1,data_2 ,data_3 ,data_4 };
+
+	sort(words.begin(), words.end(), compareIsbn);
+
+	for (const auto &i : words) {
+		cout << i.isbn() << " ";
+	}
+	cout << endl;
+
+	return 0;
+}
+```
+#  练习 10.13：
+### 标准库定义了名为 partition 的算法，它接受一个谓词，对容器内容进行划分,使得谓词为true的值会排在容器的前半部分,而使谓词为false的值会排在后半部分。算法返回一个迭代器，指向最后一个使谓词为 true的元素之后的位置。编写函数,接受一个string,返回一个 bool值,指出 string是否有5个或更多字符。使用此函数划分 words。打印出长度大于等于 5 的元素。
+答:
+```
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+
+bool isFiveOrMore(const std::string &s) {
+    return s.size() >= 5;
+}
+
+int main() {
+    std::vector<std::string> words = {"apple", "banana", "cherry", "dog", "elephant", "fox"};
+
+    auto it = std::partition(words.begin(), words.end(), isFiveOrMore);
+
+    std::cout << "Words that are five or more characters long:\n";
+    for (auto i = words.begin(); i != it; ++i) {
+        std::cout << *i << '\n';
+    }
+
+    return 0;
+}
+```
