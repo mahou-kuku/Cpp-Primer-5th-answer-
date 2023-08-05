@@ -287,3 +287,89 @@ int main() {
     return 0;
 }
 ```
+## 练习 10.14:
+### 编写一个lambda,接受两个int,返回它们的和。
+答：
+```
+auto lamb = [](int number1, int number2) {return number1 + number2; };
+```
+## 练习 10.15:
+### 编写一个lambda,捕获它所在函数的int,并接受一个int参数。lambda应该返回捕获的 int 和 int 参数的和。
+答：
+```
+	int number2 = 9;
+	auto lamb = [number2](int number1 ) {return number1 + number2; };
+```
+## 练习 10.16：
+### 使用 lambda 编写你自己版本的 biggies。
+答：
+```
+void mybiggies(vector<string> &words, vector<string>::size_type sz)
+{
+	elimDups(words);
+	stable_sort(words.begin(), words.end(), [](const string &a, const string &b) { return a.size() < b.size(); });
+	auto wc = find_if(words.begin(), words.end(), [sz](const string &a) { return a.size() >= sz; });
+	auto count = words.end() - wc;
+	cout << count << " " << make_plural(count, "word", "s") << " of length " << sz << " or longer" << endl;
+	for_each(wc, words.end(), [](const string &s) {cout << s << " "; });
+	cout << endl;
+}
+```
+## 练习 10.17：
+### 重写 10.3.1 节练习 10.12（第 345 页）的程序，在对 sort 的调用中使用 lambda来代替函数 compareIsbn。
+答：
+```
+#include <vector>
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include "Sales_data.h"
+
+using namespace std;
+
+int main() {
+	Sales_data data_1("aaa"), data_2("ab"), data_3("abc"), data_4("aba");
+	vector<Sales_data> words{ data_1,data_2 ,data_3 ,data_4 };
+
+	sort(words.begin(), words.end(),
+		[](const Sales_data &s1, const Sales_data &s2) {return s1.isbn() < s2.isbn(); });
+
+	for (const auto &i : words) {
+		cout << i.isbn() << " ";
+	}
+	cout << endl;
+
+	return 0;
+}
+```
+## 练习 10.18： 
+### 重写 biggies，用 partition 代替 find_if。我们在 10.3.1 节练习 10.13 (第345页)中介绍了partition算法。
+答：
+```
+void mybiggies(vector<string> &words, vector<string>::size_type sz)
+{
+	elimDups(words);
+	stable_sort(words.begin(), words.end(), [](const string &a, const string &b) { return a.size() < b.size(); });
+	auto wc = partition(words.begin(), words.end(), [sz](const string &a) { return a.size() >= sz; });
+	auto count = wc - words.begin();
+	cout << count << " " << make_plural(count, "word", "s") << " of length " << sz << " or longer" << endl;
+	for_each(words.begin(), wc, [](const string &s) {cout << s << " "; });
+	cout << endl;
+}
+```
+## 练习 10.19:
+### 用stable_partition重写前一题的程序,与stable_sort类似,在划分后的序列中维持原有元素的顺序。
+答：
+```
+void mybiggies(vector<string> &words, vector<string>::size_type sz)
+{
+	elimDups(words);
+	stable_sort(words.begin(), words.end(), [](const string &a, const string &b) { return a.size() < b.size(); });
+	auto wc = stable_partition(words.begin(), words.end(), [sz](const string &a) { return a.size() >= sz; });
+	auto count = wc - words.begin();
+	cout << count << " " << make_plural(count, "word", "s") << " of length " << sz << " or longer" << endl;
+	for_each(words.begin(), wc, [](const string &s) {cout << s << " "; });
+	cout << endl;
+}
+```
+
