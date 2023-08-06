@@ -372,4 +372,42 @@ void mybiggies(vector<string> &words, vector<string>::size_type sz)
 	cout << endl;
 }
 ```
+## 练习 10.20:
+### 标准库定义了一个名为count_if的算法。类似find_if,此函数接受一对迭代器,表示一个输入范围,还接受一个谓词,会对输入范围中每个元素执行。count_if 返回一个计数值，表示谓词有多少次为真。使用 count_if 重写我们程序中统计有多少单词长度超过6的部分。
+答：
+```
+void mybiggies(vector<string> &words, vector<string>::size_type sz = 6)
+{
+	auto count = count_if(words.begin(), words.end(), [sz](const string &a) { return a.size() >= sz; });
+	cout << count << " " << make_plural(count, "word", "s") << " of length " << sz << " or longer" << endl;
+}
+```
+## 练习 10.21:
+### 编写一个lambda，捕获一个局部 int变量，并递减变量值，直至它变为0.一旦变量变为 0，再调用lambda应该不再递减变量。lambda应该返回一个bool 值，指出捕获的变量是否为 0。
+答：
+```
+#include <iostream>
 
+int main() {
+    int value = 10;  // 局部变量初始化为10
+
+    auto decrement_until_zero = [&value]() -> bool {
+        if(value > 0) {
+            --value;
+        }
+        return value == 0;
+    };
+
+    // 测试该lambda
+    while (true) {
+        if (decrement_until_zero()) {
+            std::cout << "Value is now zero!\n";
+            break;
+        } else {
+            std::cout << "Value is " << value << '\n';
+        }
+    }
+
+    return 0;
+}
+```
