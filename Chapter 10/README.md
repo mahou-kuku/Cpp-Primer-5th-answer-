@@ -411,3 +411,83 @@ int main() {
     return 0;
 }
 ```
+## 练习 10.22:
+### 重写统计长度小于等于6的单词数量的程序,使用函数代替lambda.
+答：
+```
+#include <vector>
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <functional>
+
+using namespace std;
+using namespace std::placeholders;
+
+bool lessThen7(const std::string &s, string::size_type sz){
+	return s.size() < sz;
+}
+
+int main() {
+	vector<string> words = { "aaaa","bbbbb","cccccc","ddddddd" };
+	string::size_type sz= 7;
+
+	cout << count_if(words.begin(), words.end(), bind(lessThen7, _1, sz));
+
+	return 0;
+}
+```
+## 练习 10.23：
+### bind 接受几个参数？
+答：
+* bind 接受一个可调用对象参数，外加该可调用对象所需要的参数数量。
+* 调用bind生成的函数对象时需要至少提供占位符的数字所示的参数数量，多余的参数以及位置没有被占位符数字指定的参数都会被忽略。
+## 练习 10.24: 
+### 给定一个 string，使用 bind 和 check_size 在一个 int 的 vector 中查找第一个大于 string长度的值。
+答：
+```
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <functional>
+#include <iostream>
+
+using namespace std;
+using namespace std::placeholders;
+
+bool check_size(const string &s, string::size_type sz){
+    return s.size() < sz;
+}
+
+int main() {
+    string s = "Hello";
+    vector<int> vec = {1, 2, 3, 4, 5, 6, 7};
+
+    auto it = std::find_if(vec.begin(), vec.end(), bind(check_size, s, _1));
+
+    if (it != vec.end())
+        cout << "The first integer larger than string length is: " << *it << endl;
+    else
+        cout << "No such integer found." << endl;
+
+    return 0;
+}
+```
+## 练习 10.25：
+### 在 10.3.2 节（第 349 页）的练习中，编写了一个使用 partition 的 biggies 版本。使用 check_size 和 bind 重写此函数。
+答：
+```
+bool check_size(const string &s, string::size_type sz) {
+	return s.size() >= sz;
+}
+
+void mybiggies(vector<string> &words, vector<string>::size_type sz){
+	elimDups(words);
+	stable_sort(words.begin(), words.end(), [](const string &a, const string &b) { return a.size() < b.size(); });
+	auto wc = partition(words.begin(), words.end(), bind(check_size,_1,sz));
+	auto count = wc - words.begin();
+	cout << count << " " << make_plural(count, "word", "s") << " of length " << sz << " or longer" << endl;
+	for_each(words.begin(), wc, [](const string &s) {cout << s << " "; });
+	cout << endl;
+}
+```
