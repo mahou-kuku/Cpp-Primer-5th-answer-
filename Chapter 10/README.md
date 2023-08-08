@@ -491,3 +491,83 @@ void mybiggies(vector<string> &words, vector<string>::size_type sz){
 	cout << endl;
 }
 ```
+## 练习 10.26: 
+### 解释三种插入迭代器的不同之处。
+答：
+* back_inserter 在容器的末尾添加元素。
+* front_inserter 在容器的开始添加元素。
+* inserter 在容器的指定的位置之前添加元素。
+## 练习 10.27:
+### 除了unique (参见10.2.3节,第343页)之外,标准库还定义了名为 unique_copy 的函数，它接受第三个迭代器，表示拷贝不重复元素的目的位置。 编写一个程序，使用 unique_copy 将一个 vector 中不重复的元素拷贝到一个初始为空的 list 中。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <list>
+#include <algorithm>
+#include <iterator>
+
+int main() {
+    // 初始化 vector
+    std::vector<int> vec = {1, 1, 2, 3, 4, 4, 4, 5, 6, 6, 7};
+
+    // 排序 vector（如果原始数据不是已排序的）
+    std::sort(vec.begin(), vec.end());
+
+    // 初始为空的 list
+    std::list<int> lst;
+
+    // 使用 unique_copy
+    std::unique_copy(vec.begin(), vec.end(), std::back_inserter(lst));
+
+    // 打印 list 的内容
+    for (const int &i : lst) {
+        std::cout << i << " ";
+    }
+
+    return 0;
+}
+```
+## 练习 10.28:
+### 一个vector中保存1到9,将其拷贝到三个其他容器中。分别使用inserter, back_inserter和front_inserter将元素添加到三个容器中。对每种 inserter，估计输出序列是怎样的，运行程序验证你的估计是否正确。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <list>
+#include <iterator>
+#include <algorithm>
+
+int main() {
+    // 初始化vector
+    std::vector<int> vec = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    // 使用inserter插入到list中
+    std::list<int> list1;
+    std::copy(vec.begin(), vec.end(), std::inserter(list1, list1.begin()));
+
+    // 使用back_inserter插入到vector中
+    std::vector<int> vec2;
+    std::copy(vec.begin(), vec.end(), std::back_inserter(vec2));
+
+    // 使用front_inserter插入到list中（元素的顺序会被颠倒）
+    std::list<int> list3;
+    std::copy(vec.begin(), vec.end(), std::front_inserter(list3));
+
+    // 打印结果
+    std::cout << "list1: ";
+    for (const int &i : list1) {
+        std::cout << i << " ";
+    }
+    std::cout << "\nvec2: ";
+    for (const int &i : vec2) {
+        std::cout << i << " ";
+    }
+    std::cout << "\nlist3: ";
+    for (const int &i : list3) {
+        std::cout << i << " ";
+    }
+
+    return 0;
+}
+```
