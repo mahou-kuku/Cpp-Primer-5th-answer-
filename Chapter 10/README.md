@@ -571,3 +571,165 @@ int main() {
     return 0;
 }
 ```
+## 练习 10.29:
+### 编写程序，使用流迭代器读取一个文本文件，存入一个vector 中的string里。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <iterator>
+
+int main() {
+	std::ifstream inFile("textfile.txt");
+	if (!inFile) {
+		std::cerr << "Can not open the file!" << std::endl;
+		return 1;
+	}
+
+	std::istream_iterator<std::string> fileIter(inFile), eof;
+	std::vector<std::string> words(fileIter, eof);
+
+	for (const auto &word : words) {
+		std::cout << word << " ";
+	}
+	std::cout << std::endl;
+
+	return 0;
+}
+```
+## 练习 10.30：
+### 使用流迭代器、sort 和 copy 从标准输入读取一个整数序列，将其排序， 并将结果写到标准输出。
+答：
+```
+#include <iostream>
+#include <iterator>
+#include <vector>
+#include <algorithm>
+
+int main() {
+	std::istream_iterator<int> in_iter(std::cin), in_eof;
+	std::vector<int> numbers(in_iter, in_eof);
+
+	std::sort(numbers.begin(), numbers.end());
+
+	std::ostream_iterator<int> out_iter(std::cout, " ");
+	std::copy(numbers.begin(), numbers.end(), out_iter);
+	std::cout << std::endl;
+
+	return 0;
+}
+```
+## 练习 10.31：
+### 修改前一题的程序，使其只打印不重复的元素。你的程序应使用 unique_copy (参见 10.4.1 节，第 359 页)。
+答：
+```
+#include <iostream>
+#include <iterator>
+#include <vector>
+#include <algorithm>
+
+int main() {
+	std::istream_iterator<int> in_iter(std::cin), in_eof;
+	std::vector<int> numbers(in_iter, in_eof);
+	std::vector<int> uniqueNumbers;
+
+	std::sort(numbers.begin(), numbers.end());
+	std::unique_copy(numbers.begin(), numbers.end(), std::back_inserter(uniqueNumbers));
+
+	std::ostream_iterator<int> out_iter(std::cout, " ");
+	std::copy(uniqueNumbers.begin(), uniqueNumbers.end(), out_iter);
+	std::cout << std::endl;
+
+	return 0;
+}
+```
+## 练习 10.32:
+### 重写1.6节(第21页)中的书店程序,使用一个vector保存交易记录, 使用不同算法完成处理。使用 sort 和 10.3.1 节（第 345 页）中的 compareIsbn 函数 来排序交易记录，然后使用 find 和 accumulate 求和。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+#include <iterator>
+#include "Sales_item.h"
+
+bool compareISBN(const Sales_item &s1, const Sales_item &s2) {
+	return s1.isbn() < s2.isbn();
+}
+
+int main()
+{
+	std::istream_iterator<Sales_item> item_iter(std::cin), eof;
+	std::vector<Sales_item> vec;
+
+	if (item_iter != eof) {
+		while (item_iter != eof) {
+			vec.push_back(*item_iter++);
+		}
+		std::sort(vec.begin(), vec.end(), compareISBN);
+
+		for (auto it = vec.begin(); it != vec.end();) {
+			auto next = std::find_if(it, vec.end(), [it](Sales_item &item) {return it->isbn() != item.isbn(); });
+			auto total = std::accumulate(it, next, Sales_item(it->isbn()));
+			std::cout << total << std::endl;
+			it = next;
+		}
+
+	} else {
+		std::cerr << "No data?!" << std::endl;
+		return -1;
+	}
+	return 0;
+}
+```
+## 练习 10.33:
+### 编写程序，接受三个参数：一个输入文件和两个输出文件的文件名。 输入文件保存的应该是整数。 使用istream_iterator读取输入文件。 使用ostream_iterator将奇数写入第一个输出文件,每个值之后都跟一个空格。 将偶数写入第二个输出文件，每个值都独占一行。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <iterator>
+#include <algorithm>
+
+int main(int argc, char **argv) {
+	if (argc != 4) {
+		std::cerr << "Usage: " << argv[0] << " <inputfile> <outputfile_odd> <outputfile_even>" << std::endl;
+		return 1;
+	}
+
+	std::ifstream input(argv[1]);
+	if (!input) {
+		std::cerr << "Failed to open input file: " << argv[1] << std::endl;
+		return 1;
+	}
+
+	std::ofstream output_odd(argv[2]);
+	if (!output_odd) {
+		std::cerr << "Failed to open output file for odd numbers: " << argv[2] << std::endl;
+		return 1;
+	}
+
+	std::ofstream output_even(argv[3]);
+	if (!output_even) {
+		std::cerr << "Failed to open output file for even numbers: " << argv[3] << std::endl;
+		return 1;
+	}
+
+	std::istream_iterator<int> in_iter(input), eof;
+	std::ostream_iterator<int> out_odd(output_odd, " ");
+	std::ostream_iterator<int> out_even(output_even, "\n");
+
+	std::for_each(in_iter, eof, [&](int i) {
+		if (i % 2) {
+			*out_odd++ = i;
+		} else {
+			*out_even++ = i;
+		}
+	});
+
+	return 0;
+}
+```
