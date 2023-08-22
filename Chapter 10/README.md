@@ -733,3 +733,87 @@ int main(int argc, char **argv) {
 	return 0;
 }
 ```
+## 练习 10.34:
+### 使用 reverse_iterator逆序打印一个 vector。
+答：
+```
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+	std::vector<int> vec = { 1, 2, 3, 4, 5 };
+
+	for (auto rIt = vec.crbegin(); rIt != vec.crend(); ++rIt) {
+		cout << *rIt << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 10.35：
+### 使用普通迭代器逆序打印一个 vector。
+答：
+```
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+	std::vector<int> vec = { 1, 2, 3, 4, 5 };
+
+	for (auto it = vec.cend(); it != vec.cbegin();) {
+		--it;
+		cout << *it << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 10.36：
+### 使用 find 在一个 int 的 list 中查找最后一个值为 0 的元素。
+答：
+```
+#include <iostream>
+#include <list>
+#include <algorithm>
+
+int main() {
+	std::list<int> ilist = { 1,2,3,0,4,5,0,6,7 };
+
+	auto iter = std::find(ilist.rbegin(), ilist.rend(), 0);
+
+	if (iter != ilist.rend()) {
+		std::cout << "The last 0 is at position: "
+			<< std::distance(ilist.begin(), --(iter.base()))
+			<< std::endl;
+	} else {
+		std::cout << "0 is not found in the list." << std::endl;
+	}
+
+	return 0;
+}
+```
+## 练习 10.37：
+### 给定一个包含 10 个元素的 vector，将位置 3 到 7 之间的元素按逆序拷贝到一个 list 中。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <list>
+
+int main() {
+	std::vector<int> vec = { 0,1,2,3,4,5,6,7,8,9 };
+	std::list<int> lst(vec.begin() + 3, vec.begin() + 8);
+
+	lst.reverse();  // 逆序list
+
+	for (const auto &num : lst) {
+		std::cout << num << " ";
+	}
+
+	return 0;
+}
+```
