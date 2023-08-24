@@ -844,19 +844,14 @@ replace_copy(beg, end, dest, old_val, new_val);
 replace_copy_if(beg, end, dest, pred, new_val);
 ```
 答：
-```
-    replace(beg, end, old_val, new_val);
-        功能：在序列的指定范围[beg, end)内，将所有与old_val相等的元素替换为new_val。
-
-    replace_if(beg, end, pred, new_val);
-        功能：在序列的指定范围[beg, end)内，将所有使一元谓词pred返回true的元素替换为new_val。
-
-    replace_copy(beg, end, dest, old_val, new_val);
-        功能：对序列指定范围[beg, end)内的每个元素，如果该元素等于old_val，则将new_val复制到目标序列dest（开始位置由dest指定）；否则，直接复制原始元素。原始序列保持不变。
-
-    replace_copy_if(beg, end, dest, pred, new_val);
-        功能：对序列指定范围[beg, end)内的每个元素，如果该元素使一元谓词pred返回true，则将new_val复制到目标序列dest（开始位置由dest指定）；否则，直接复制原始元素。原始序列保持不变。
-```
+* replace(beg, end, old_val, new_val);
+*        功能：在序列的指定范围[beg, end)内，将所有与old_val相等的元素替换为new_val。
+* replace_if(beg, end, pred, new_val);
+*        功能：在序列的指定范围[beg, end)内，将所有使一元谓词pred返回true的元素替换为new_val。
+* replace_copy(beg, end, dest, old_val, new_val);
+*        功能：对序列指定范围[beg, end)内的每个元素，如果该元素等于old_val，则将new_val复制到目标序列dest（开始位置由dest指定）；否则，直接复制原始元素。原始序列保持不变。
+* replace_copy_if(beg, end, dest, pred, new_val);
+*        功能：对序列指定范围[beg, end)内的每个元素，如果该元素使一元谓词pred返回true，则将new_val复制到目标序列dest（开始位置由dest指定）；否则，直接复制原始元素。原始序列保持不变。
 ## 练习 10.42:
 ### 使用list代替vector重新实现10.2.3节(第343页)中的去除重复单词的程序。
 答：
