@@ -86,3 +86,102 @@ int main() {
 	return 0;
 }
 ```
+## 练习 11.5：
+### 解释 map和 set的区别。你如何选择使用哪个?
+答：
+* map 存储的是 key-value 对，set 只存储 key 。
+* 如果需要关联数据，例如根据员工 ID 查找员工的薪水，应该使用 map。
+* 如果只需要确保元素的唯一性或者快速查找某个值是否存在，例如检查一个列表中是否已有某个数字，应该使用 set。
+## 练习 11.6:
+### 解释set和list的区别。你如何选择使用哪个?
+答：
+* 元素唯一性：
+* set 所有元素都是唯一的，不允许有重复元素。list 可以有重复的元素。
+* 排序：
+* set 元素总是保持有序。list 元素的顺序由插入顺序决定，但可以手动排序。
+* 时间复杂度：
+* set 插入、删除和查找操作通常具有对数时间复杂度。list 插入和删除操作具有常数时间复杂度，但查找操作是线性的。
+* 当需要元素的唯一性、需要经常进行查找操作时，优先选择 set，因为它自动确保元素的唯一性，查找速度是对数时间。
+* 当数据的插入和删除非常频繁、数据结构需要经常进行全局排序或需要维持插入顺序，但对查找性能要求不高时，可以使用 list。
+## 练习 11.7:
+### 定义一个map,关键字是家庭的姓,值是一个vector,保存家中孩子(们) 的名。编写代码,实现添加新的家庭以及向已有家庭中添加新的孩子。
+答：
+```
+#include <iostream>
+#include <string>
+#include <map>
+#include <vector>
+
+using namespace std;
+
+void addFamily(map<string, vector<string>>& families, const string& surname) {
+	families[surname] = vector<string>();
+}
+
+void addChild(map<string, vector<string>>& families, const string& surname, const string& childName) {
+	families[surname].push_back(childName);
+}
+
+int main() {
+	map<string, vector<string>> families;
+
+	// 添加一个新的家庭
+	addFamily(families, "Smith");
+
+	// 向Smith家庭添加孩子
+	addChild(families, "Smith", "John");
+	addChild(families, "Smith", "Jane");
+
+	// 添加另一个家庭
+	addFamily(families, "Johnson");
+
+	// 向Johnson家庭添加孩子
+	addChild(families, "Johnson", "Emily");
+	addChild(families, "Johnson", "Ella");
+
+	// 打印家庭及其孩子
+	for (const auto& family : families) {
+		cout << "Family surname: " << family.first << endl;
+		cout << "Children: ";
+		for (const auto& child : family.second) {
+			cout << child << " ";
+		}
+		cout << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 11.8：
+### 编写一个程序，在一个 vector 而不是一个 set 中保存不重复的单词。 使用 set 的优点是什么？
+答：
+```
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+	vector<string> words;
+	string word;
+
+	while (cin >> word) {
+		// 使用 std::find 检查 word 是否已经在 vector 中
+		if (find(words.begin(), words.end(), word) == words.end()) {
+			words.push_back(word);
+		}
+	}
+
+	for (const auto &w : words) {
+		cout << w << endl;
+	}
+
+	return 0;
+}
+```
+* set的优点：
+* 自动去重：在set中，所有的元素都是唯一的。不需要编写额外的代码来确保元素的唯一性。
+* 有序：set中的元素总是按照特定的顺序存储，而vector则不是。
+* 快速查找：set查找一个元素的时间复杂度是O(log n)。而在vector中使用find函数查找一个元素的平均时间复杂度是O(n)。
