@@ -185,3 +185,20 @@ int main() {
 * 自动去重：在set中，所有的元素都是唯一的。不需要编写额外的代码来确保元素的唯一性。
 * 有序：set中的元素总是按照特定的顺序存储，而vector则不是。
 * 快速查找：set查找一个元素的时间复杂度是O(log n)。而在vector中使用find函数查找一个元素的平均时间复杂度是O(n)。
+## 练习 11.9:
+### 定义一个map，将单词与一个行号的 list 关联， list 中保存的是单词所 出现的行号。
+答：
+```
+map<string, list<int>> search;
+```
+## 练习 11.10:
+### 可以定义一个 vector<int>::iterator 到 int 的 map 吗?list<int>::iterator 到 int 的 map呢？对于两种情况，如果不能，解释为什么。
+答：
+* map<vector<int>::iterator, int> m; 这是完全可行的。vector<int>::iterator满足map的关键字类型要求，提供了必要的比较运算符 < 。
+* map<list<int>::iterator, int> m;这不是直接可行的。原因是list迭代器不支持关系运算符 < 。如果确实需要这样做，可以通过提供自定义的比较函数或对象来实现，这通常是一个复杂和低效的操作。
+## 练习 11.11:
+### 不使用decltype重新定义bookstore。
+答：
+```
+multiset<Sales_data, bool(*)(const Sales_data &, const Sales_data &)>bookstore(compareIsbn);
+```
