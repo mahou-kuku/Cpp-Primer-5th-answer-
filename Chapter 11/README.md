@@ -202,3 +202,98 @@ map<string, list<int>> search;
 ```
 multiset<Sales_data, bool(*)(const Sales_data &, const Sales_data &)>bookstore(compareIsbn);
 ```
+## 练习 11.12：
+### 编写程序，读入 string 和 int 的序列，将每个 string和 int 存入一 个pair 中，pair 保存在一个 vector中。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <utility>
+
+using namespace std;
+
+int main() {
+	vector<pair<string, int>> vec;
+	string str;
+	int num;
+
+	cout << "Enter pairs of string and int (Enter 'exit' as string to stop):" << endl;
+
+	while (true) {
+		cin >> str;
+		if (str == "exit") {
+			break;
+		}
+		cin >> num;
+
+		vec.push_back(make_pair(str, num));
+	}
+
+	cout << "Pairs in vector are:" << endl;
+	for (const auto &p : vec) {
+		cout << p.first << ": " << p.second << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 11.13：
+### 在上一题的程序中，至少有三种创建 pair 的方法。编写此程序的三个版本，分别采用不同的方法创建pair。解释你认为哪种形式最易于编写和理解，为什么?
+答：
+```
+vec.push_back(pair<string, int>(str, num));
+vec.push_back(make_pair(str, num));
+vec.push_back({str, num});
+```
+* 选择哪种方法往往取决于具体的上下文和个人习惯。相对来说第三种方法最简洁，不过也有可读性的潜在问题，除非读者往上追溯 v 的类型声明，否则他们可能不会立即意识到这是一个 pair 的初始化。
+## 练习 11.14：
+### 扩展你在 11.2.1 节练习（第 378 页）中编写的孩子姓到名的 map，添加一个 pair 的 vector，保存孩子的名和生日。
+答：
+```
+#include <iostream>
+#include <string>
+#include <map>
+#include <vector>
+
+using namespace std;
+
+void addFamily(map<string, vector<pair<string, string>>>& families, const string& surname) {
+	families[surname] = vector<pair<string, string>>();
+}
+
+void addChild(map<string, vector<pair<string, string>>>& families, const string& surname
+	, const string& childName, const string& birthday) {
+	families[surname].push_back({ childName, birthday });
+}
+
+int main() {
+	map<string, vector<pair<string, string>>> families;
+
+	// 添加一个新的家庭
+	addFamily(families, "Smith");
+
+	// 向Smith家庭添加孩子
+	addChild(families, "Smith", "John", "2005-01-15");
+	addChild(families, "Smith", "Jane", "2008-06-20");
+
+	// 添加另一个家庭
+	addFamily(families, "Johnson");
+
+	// 向Johnson家庭添加孩子
+	addChild(families, "Johnson", "Emily", "2010-09-12");
+	addChild(families, "Johnson", "Ella", "2012-03-30");
+
+	// 打印家庭及其孩子
+	for (const auto& family : families) {
+		cout << "Family surname: " << family.first << endl;
+		cout << "Children: ";
+		for (const auto& child : family.second) {
+			cout << child.first << " (Birthday: " << child.second << ") ";
+		}
+		cout << endl;
+	}
+
+	return 0;
+}
+```
