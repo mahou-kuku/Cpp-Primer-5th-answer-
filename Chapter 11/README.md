@@ -297,3 +297,62 @@ int main() {
 	return 0;
 }
 ```
+## 练习 11.15:
+### 对一个 int 到 vector<int>的 map,其mapped_type、 key_type和 value_type 分别是什么？
+答：
+* mapped_type : vector<int>
+* key_type : int
+* value_type : pair<const int,vector<int>>
+## 练习 11.16:
+### 使用一个map迭代器编写一个表达式,将一个值赋予一个元素。
+答：
+```
+#include <iostream>
+#include <string>
+#include <map>
+
+int main() {
+	std::map<std::string, int> word_count;
+	word_count["hello"] = 1;
+	word_count["world"] = 2;
+
+	// 使用迭代器为 "hello" 对应的 value 赋新值
+	std::map<std::string, int>::iterator it = word_count.find("hello");
+	if (it != word_count.end()) {
+		it->second = 9;  // 使用迭代器修改value
+	}
+
+	for (const auto &item : word_count) {
+		std::cout << item.first << ": " << item.second << std::endl;
+	}
+
+	return 0;
+}
+```
+## 练习 11.17：
+### 假定 c 是一个 string 的 multiset， v 是一个 string 的 vector，解释下面的调用。指出每个调用是否合法:
+```
+copy(v.begin(), v.end(), inserter(c, c.end()));
+copy(v.begin(), v.end(), back_inserter(c));
+copy(c.begin(), c.end(), inserter(v, v.end()));
+copy(c.begin(), c.end(), back_inserter(v));
+```
+答：
+* copy(v.begin(), v.end(), inserter(c, c.end())); 合法。
+* 解释: 从v的开始到结束位置复制每个元素，并使用inserter插入这些元素到c。因为inserter适用于容器multiset，所以此调用是正确的。
+* copy(v.begin(), v.end(), back_inserter(c)); 不合法。
+* 解释: 试图从v的开始到结束位置复制每个元素，并使用back_inserter插入这些元素到c的末尾。但问题是multiset不支持push_back方法。
+* copy(c.begin(), c.end(), inserter(v, v.end())); 合法。
+* 解释: 从c的开始到结束位置复制每个元素，并使用inserter插入这些元素到v的末尾。vector支持在任意位置插入元素，这个调用是正确的。
+* copy(c.begin(), c.end(), back_inserter(v)); 合法。
+* 解释: 从c的开始到结束位置复制每个元素，并使用back_inserter插入这些元素到v的末尾。因为vector支持push_back方法，这个调用是正确的。
+## 练习 11.18:
+### 写出第382页循环中map_it的类型,不要使用auto或decltype.
+答：
+map<string, size_t>::const_iterator map_it
+## 练习 11.19：
+### 定义一个变量，通过对 11.2.2 节(第 378 页)中的名为 bookstore 的multiset 调用 begin()来初始化这个变量。写出变量的类型，不要使用 auto 或decltype。
+答：
+```
+multiset<Sales_data, bool(*)(const Sales_data &, const Sales_data &)>::iterator msetIt = bookstore.begin();
+```
