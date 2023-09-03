@@ -391,10 +391,10 @@ while (cin >> word)
 答：
 * 这个循环是用于读取标准输入中的单词并统计每个单词出现的次数。
 * 具体解析如下：
-* 1. cin >> word：这是一个输入操作，它从标准输入中读取一个单词并存放到 word 中。如果成功读取一个单词，循环将继续；否则，循环将结束。
-* 2. word_count.insert({word, 0})：这是对 word_count map 的插入操作。尝试将一个键值对 {word, 0} 插入到 map 中。如果 word 这个键在 map 中已经存在，那么插入操作不会发生，而是直接返回这个键对应的迭代器。如果 word 在 map 中不存在，则会插入 {word, 0} 这个键值对，并返回新插入键值对的迭代器。
-* 3. word_count.insert({word, 0}).first：这会返回上述 insert 操作返回的 pair 中的第一个元素，也就是一个指向 {word, count} 的迭代器。
-* 4. ++word_count.insert({word, 0}).first->second：这一操作会对迭代器指向的键值对中的值加一。如果这个单词在之前出现过，它的计数将增加；如果这是第一次遇到这个单词，它的计数将从0变为1。
+1. cin >> word：这是一个输入操作，它从标准输入中读取一个单词并存放到 word 中。如果成功读取一个单词，循环将继续；否则，循环将结束。
+2. word_count.insert({word, 0})：这是对 word_count map 的插入操作。尝试将一个键值对 {word, 0} 插入到 map 中。如果 word 这个键在 map 中已经存在，那么插入操作不会发生，而是直接返回这个键对应的迭代器。如果 word 在 map 中不存在，则会插入 {word, 0} 这个键值对，并返回新插入键值对的迭代器。
+3. word_count.insert({word, 0}).first：这会返回上述 insert 操作返回的 pair 中的第一个元素，也就是一个指向 {word, count} 的迭代器。
+4. ++word_count.insert({word, 0}).first->second：这一操作会对迭代器指向的键值对中的值加一。如果这个单词在之前出现过，它的计数将增加；如果这是第一次遇到这个单词，它的计数将从0变为1。
 ## 练习 11.22：给定一个 map<string,vector<int>>，对此容器的插入一个元素的insert 版本，写出其参数类型和返回类型。
 答：
 * pair<map<string, vector<int>>::iterator, bool> p = m.insert({ string("hello"),vector<int>({1})});
