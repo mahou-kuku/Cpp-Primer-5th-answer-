@@ -436,3 +436,44 @@ int main() {
 	return 0;
 }
 ```
+## 练习 11.24：
+### 下面的程序完成什么功能？
+```
+map<int, int> m;
+m[0] = 1;
+```
+答：
+* 定义了一个 map，其中键和值都是 int 类型。接下来使用下标运算符将键为 0 的元素的值赋值为 1。如果 m 中没有键为 0 的元素，会插入这样一个键值对：{0, 1}。如果 m 中已经存在键为 0 的元素，则会更新该键对应的值为 1。
+## 练习 11.25:
+### 对比下面程序与上一题程序
+```
+vector<int> v;
+v[0] = 1;
+```
+答：
+* 定义了一个整数类型的 vector。接着尝试使用下标运算符为位置为 0 的元素赋值为 1。而 v 是一个空的 vector，没有任何元素。所以，尝试访问 v[0] 会导致未定义的行为。
+## 练习 11.26:
+### 可以用什么类型来对一个map进行下标操作? 下标运算符返回的类型是什么？ 请给出一个具体例子——即，定义一个map,然后写出一个可以用来对map进行下 标操作的类型以及下标运算符将会返回的类型。
+答：
+* 对于一个map<key_type, mapped_type>，可以使用key_type类型来对它进行下标操作。,下标运算符返回的类型是mapped_type 。
+* 具体例子：
+```
+#include <iostream>
+#include <string>
+#include <map>
+
+int main() {
+	// 定义一个map
+	std::map<std::string, int> word_count;
+
+	// 对map进行下标操作的类型：std::string
+	word_count[std::string("apple")] = 1;
+
+	// 下标运算符将会返回的类型：int
+	int apple_count = word_count["apple"];
+
+	std::cout << "apple: " << apple_count << std::endl;  // 输出：apple: 1
+
+	return 0;
+}
+```
