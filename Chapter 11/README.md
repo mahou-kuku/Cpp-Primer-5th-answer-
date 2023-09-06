@@ -477,3 +477,121 @@ int main() {
 	return 0;
 }
 ```
+## 练习 11.27：
+### 对于什么问题你会使用 count 来解决？ 什么时候你又会选择 find 呢？
+答：
+* 如果只关心一个关键字在容器中出现了多少次（特别是在多重集合中），使用 count。
+* 如果需要检查一个关键字是否存在，并可能需要对其进行进一步的操作或检索相关数据，使用 find。
+## 练习 11.28:
+### 对一个string到int的vector的map,定义并初始化一个变量来保存 在其上调用 find 所返回的结果。
+答：
+```
+map<string, vector<int>> m;
+map<string, vector<int>>::iterator it = m.find("hello");
+```
+## 练习 11.29：
+### 如果给定的关键字不在容器中，upper_bound、 lower_bound 和 equal_range 分别会返回什么？
+答：
+* upper_bound 返回迭代器，lower_bound 返回迭代器，equal_range 返回一对迭代器(pair) 。
+* 这三个函数均基于容器的排序准则来确定返回的迭代器，即使关键字不在容器中。
+## 练习 11.30：
+### 对于本节最后一个程序中的输出表达式，解释运算对象 pos.first->second的含义。
+答：
+* pos 是 equal_range 返回的一个存储着迭代器对的 pair 对象。pos.first 是这个 pair 中的第一个迭代器，它指向当前正在处理的 multimap 中的元素。pos.first->second 表示当前元素的值，因为 pos.first 是一个迭代器，所以可以使用 -> 访问其所指向的对象的成员。
+## 练习 11.31:
+### 编写程序,定义一个作者及其作品的multimap。使用find在multimap 中查找一个元素并用erase删除它。确保你的程序在元素不在map中时也能正常运行。
+答：
+```
+#include <iostream>
+#include <string>
+#include <map>
+
+using namespace std;
+
+int main() {
+	multimap<string, string> authors;
+
+	// 初始化作者及其作品
+	authors.insert({ "Barth, John", "Sot-Weed Factor" });
+	authors.insert({ "Barth, John", "Lost in the Funhouse" });
+	authors.insert({ "Rowling, J.K.", "Harry Potter" });
+	authors.insert({ "Tolkien, J.R.R.", "The Lord of the Rings" });
+
+	string search_author, search_title;
+	cout << "Enter the author's name: ";
+	getline(cin, search_author);
+	cout << "Enter the title of the work: ";
+	getline(cin, search_title);
+
+	auto it = authors.find(search_author);
+	bool erased = false;
+
+	// 使用find在multimap中查找元素
+	while (it != authors.end() && it->first == search_author) {
+		if (it->second == search_title) {
+			authors.erase(it);  // 删除找到的元素
+			erased = true;
+			break;
+		}
+		++it;
+	}
+
+	if (erased) {
+		cout << "The work titled '" << search_title << "' by " << search_author << " was erased." << endl;
+	} else {
+		cout << "The work titled '" << search_title << "' by " << search_author << " was not found." << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 11.32：
+### 使用上一题定义的 multimap 编写一个程序，按字典序打印作者列表和他们的作品。
+答：
+```
+#include <iostream>
+#include <map>
+#include <set>
+#include <string>
+
+using namespace std;
+
+int main() {
+	multimap<string, string> authors;
+
+	// 插入作者和他们的作品
+	authors.insert({ "Austen, Jane", "Pride and Prejudice" });
+	authors.insert({ "Austen, Jane", "Emma" });
+	authors.insert({ "Tolkien, J.R.R.", "The Hobbit" });
+	authors.insert({ "Tolkien, J.R.R.", "The Silmarillion" });
+	authors.insert({ "Tolkien, J.R.R.", "The Lord of the Rings" });
+	authors.insert({ "Orwell, George", "1984" });
+	authors.insert({ "Orwell, George", "Animal Farm" });
+
+	// 当前正在处理的作者的名字
+	string current_author = "";
+	set<string> works;  // 用于暂存当前作者的作品并按字典序排列
+
+	for (const auto &item : authors) {
+		if (current_author != item.first) {
+			if (!works.empty()) {
+				for (const auto &work : works) {
+					cout << "\t" << work << endl;
+				}
+				works.clear();  // 清空已打印的作品列表
+			}
+
+			current_author = item.first;
+			cout << current_author << ":\n";
+		}
+		works.insert(item.second);
+	}
+
+	// 打印最后一个作者的作品
+	for (const auto &work : works) {
+		cout << "\t" << work << endl;
+	}
+
+	return 0;
+}
+```
