@@ -595,3 +595,84 @@ int main() {
 	return 0;
 }
 ```
+## 练习 11.33:
+### 实现你自己版本的单词转换程序。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <map>
+
+using namespace std;
+
+map<string, string> buildMap(ifstream &map_file) {
+	map<string, string> trans_map;
+	string key;
+	string value;
+	while (map_file >> key && getline(map_file, value)) {
+		if (value.size() > 1) {
+			trans_map[key] = value.substr(1);
+		} else {
+			throw runtime_error("no rule for " + key);
+		}
+	}
+	return trans_map;
+}
+
+const string &transform(const string &s, const map<string, string> &m) {
+	auto map_it = m.find(s);
+	if (map_it != m.cend()) {
+		return map_it->second;
+	} else {
+		return s;
+	}
+}
+
+void word_transform(ifstream &map_file, ifstream &input) {
+	auto trans_map = buildMap(map_file);
+	string text;
+	while (getline(input, text)) {
+		istringstream stream(text);
+		string word;
+		bool firstword = true;
+		while (stream >> word) {
+			if (firstword) {
+				firstword = false;
+			} else {
+				cout << " ";
+			}
+			cout << transform(word, trans_map);
+		}
+		cout << endl;
+	}
+}
+
+int main() {
+	ifstream mapRule("rule.txt"), strText("input.txt");
+	if (!mapRule&&!strText) {
+		std::cerr << "Can not open the file!" << std::endl;
+		return -1;
+	}
+	word_transform(mapRule, strText);
+
+	return 0;
+}
+```
+## 练习 11.34：
+### 如果你将 transform 函数中的 find 替换为下标运算符，会发生什么情况？
+答：
+* 会产生编译错误，下标运算符未找到关键字时会插入一个新元素,只可以对非const的map使用下标操作。
+## 练习 11.35：
+### 在 buildMap 中，如果进行如下改写，会有什么效果？
+```
+trans_map[key] = value.substr(1);
+改为 trans_map.insert({ key, value.substr(1) }) 
+```
+答：
+* 对于 map 和 set，只有当元素的关键字不在 trans_map 中时 insert 才插入（或构造）元素。如果有单词出现多次，循环会将保留第一个存入trans_map 的对应短语。
+## 练习 11.36:
+### 我们的程序并没有检查输入文件的合法性。特别是,它假定转换规则文件中的规则都是有意义的。如果文件中的某一行包含一个关键字、一个空格,然后就结束了,会发生什么?预测程序的行为并进行验证,再与你的程序进行比较。
+答：
+* getline 向 value 存入一个空格后结束，value.size() 不大于 1，会执行throw runtime_error("no rule for " + key);
