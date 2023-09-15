@@ -92,3 +92,100 @@ int main() {
 可以直接传递初始化列表给接受StrBlob参数的函数，由于StrBlob基本上是一个对字符串vector的封装，所以允许直接使用初始化列表来构造这样一个对象是直观的。
 * 缺点：
 可能导致意外的类型转换，由于该构造函数不是explicit的，编译器可能会在我们不期望的情况下隐式地进行类型转换。这可能会导致一些意料之外的行为。
+## 练习 12.6:
+### 编写函数,返回一个动态分配的int的vector。将此vector传递给另一个函数,这个函数读取标准输入，将读入的值保存在vector元素中。再将vector 传递给另一个函数，打印读入的值。记得在恰当的时刻 delete vector。
+答：
+```
+#include <iostream>
+#include <vector>
+
+// 创建并返回一个动态分配的vector
+std::vector<int>* create_vector() {
+	return new std::vector<int>();
+}
+
+// 从标准输入读取int值并存储到vector中
+void read_values(std::vector<int> *vec) {
+	int val;
+	while (std::cin >> val) {
+		vec->push_back(val);
+	}
+}
+
+// 打印vector中的所有int值
+void print_values(std::vector<int> *vec) {
+	for (const auto &val : *vec) {
+		std::cout << val << " ";
+	}
+	std::cout << std::endl;
+}
+
+int main() {
+	auto vec_ptr = create_vector();
+	read_values(vec_ptr);
+	print_values(vec_ptr);
+
+	delete vec_ptr;
+	return 0;
+}
+```
+## 练习 12.7：
+### 重做上一题，这次使用 shared_ptr 而不是内置指针。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <memory>
+
+// 创建并返回一个动态分配的vector
+std::shared_ptr<std::vector<int>> create_vector() {
+	return std::make_shared<std::vector<int>>();
+}
+
+// 从标准输入读取int值并存储到vector中
+void read_values(std::shared_ptr<std::vector<int>> vec) {
+	int val;
+	while (std::cin >> val) {
+		vec->push_back(val);
+	}
+}
+
+// 打印vector中的所有int值
+void print_values(const std::shared_ptr<std::vector<int>> &vec) {
+	for (const auto &val : *vec) {
+		std::cout << val << " ";
+	}
+	std::cout << std::endl;
+}
+
+int main() {
+	auto vec_ptr = create_vector();
+	read_values(vec_ptr);
+	print_values(vec_ptr);
+
+	// 使用shared_ptr，不需要显式地delete vector
+	return 0;
+}
+```
+## 练习 12.8:
+### 下面的函数是否有错误?如果有,解释错误原因。
+```
+bool b() {
+  int* p = new int;
+  // ...
+  return p;
+}
+```
+答：
+* 这个函数的问题在于它分配了内存，但却没有释放这块内存。并且由于返回的是一个布尔值，调用者也无法访问和释放这块内存。因此，这会导致内存泄漏。
+## 练习 12.9:
+### 解释下面代码执行的结果:
+```
+int *q = new int(42), *r = new int(100);
+r = q;
+auto q2 = make_shared<int>(42), r2 = make_shared<int>(100);
+r2 = q2;
+```
+答：
+* 使用内置指针时，r = q;导致内存泄漏。
+* 使用shared_ptr时，r2 = q2;没有导致内存泄漏，因为智能指针会自动管理内存。
