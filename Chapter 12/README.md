@@ -229,3 +229,27 @@ delete p;
 ```
 答：
 * sp会成为悬空的智能指针，对sp的使用是未定义的行为。sp的生命周期结束时会第二次释放内存导致未定义的行为。
+## 练习 12.14:
+### 编写你自己版本的用shared_ptr 管理 connection 的函数。
+答：
+```
+struct destination; 
+struct connection; 
+connection connect(destination*); 
+void disconnect(connection); 
+void end_connection(connection *p) { disconnect(*p); }
+void f(destination &d){
+	connection c = connect(&d); 
+	shared_ptr<connection> p(&c, end_connection);
+
+}
+```
+## 练习 12.15：
+### 重写第一题的程序，用 lambda（参见 10.3.2 节，第346 页）代替 end_connection 函数。
+答：
+```
+void f(destination &d){
+	connection c = connect(&d); 
+	shared_ptr<connection> p(&c, [](connection *p) { disconnect(*p); });
+}
+```
