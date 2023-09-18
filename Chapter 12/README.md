@@ -253,3 +253,38 @@ void f(destination &d){
 	shared_ptr<connection> p(&c, [](connection *p) { disconnect(*p); });
 }
 ```
+## 练习 12.16:
+### 如果你试图拷贝或赋值unique_ptr,编译器并不总是能给出易于理解的错误信息。编写包含这种错误的程序,观察编译器如何诊断这种错误。
+答：
+```
+// unique_ptr的拷贝构造函数和赋值操作符都被删除了，所以不支持这两种操作。但是unique_ptr提供了移动构造函数和移动赋值操作符。
+	int *p = new int(9);
+	unique_ptr<int> up(p);
+	unique_ptr<int> up2;
+	unique_ptr<int> up3(up);	// 尝试引用已删除的函数
+	up2 = up;	// 尝试引用已删除的函数
+	up2= unique_ptr<int>(p);	// 临时unique_ptr是一个右值，编译器会以“移动”的方式构造、赋值。
+```
+## 练习 12.17：
+### 下面的 unique_ptr 声明中，哪些是合法的，哪些可能导致后续的程序错误？解释每个错误的问题在哪里。
+```
+int ix = 1024, *pi = &ix, *pi2 = new int(2048);
+typedef unique_ptr<int> IntP;
+(a) IntP p0(ix);
+(b) IntP p1(pi);
+(c) IntP p2(pi2);
+(d) IntP p3(&ix);
+(e) IntP p4(new int(2048));
+(f) IntP p5(p2.get());
+```
+答：
+* (a) 不合法。unique_ptr需要一个指向动态分配对象的指针，而不是一个整数。
+* (b) 可能导致后续的程序错误，当p1超出作用域时，它会尝试删除它所指向的对象，但pi指向的是栈上的变量ix，不是动态分配的对象，所以删除它会导致未定义的行为。
+* (c) 合法。
+* (d) 可能导致后续的程序错误，这与(b)中的问题相似。
+* (e) 合法。
+* (f) 可能导致后续的程序错误，两个unique_ptr指向同一个对象。当其中一个unique_ptr超出作用域时，它会删除所指向的对象。当另一个unique_ptr超出作用域时，它也会尝试删除同一个对象，导致二次删除，从而引发未定义的行为。
+## 练习 12.18：
+### shared ptr 为什么没有 release 成员？
+答：
+* shared_ptr 提供了一个强大的共享所有权模型，而没有 release 方法可以确保资源在所有相关的 shared_ptr 对象之间正确且安全地管理。如果需要一个可以 release 的智能指针，unique_ptr 更适合这个目的。
