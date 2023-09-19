@@ -603,7 +603,7 @@ private:
 	std::shared_ptr<std::vector<std::string>> check(std::size_t i, const std::string& msg) const {
 		auto ret = wptr.lock(); // vector 还存在吗?
 		if (!ret) {
-			throw std::runtime_error("unbound StrBlobPtr");
+			throw std::runtime_error("unbound ConstStrBlobPtr");
 		}
 		if (i >= ret->size()) {
 			throw std::out_of_range(msg);
