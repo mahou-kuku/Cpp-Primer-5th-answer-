@@ -288,3 +288,340 @@ typedef unique_ptr<int> IntP;
 ### shared ptr 为什么没有 release 成员？
 答：
 * shared_ptr 提供了一个强大的共享所有权模型，而没有 release 方法可以确保资源在所有相关的 shared_ptr 对象之间正确且安全地管理。如果需要一个可以 release 的智能指针，unique_ptr 更适合这个目的。
+## 练习 12.19:
+### 定义你自己版本的strBlobPtr,更新strBlob类,加入恰当的friend 声明及 begin 和 end 成员。
+答：
+```
+#include <iostream>
+#include <string>
+#include <vector>
+#include <initializer_list>
+#include <memory>
+
+using namespace std;
+
+// 对于 StrBlob 中的友元声明来说，此前置声明是必要的
+class StrBlobPtr;
+
+class StrBlob {
+public:
+	friend class StrBlobPtr;
+	typedef vector<string>::size_type size_type;
+
+	StrBlob() : data(make_shared<vector<string>>()) { }
+	StrBlob(initializer_list<string> il) : data(make_shared<vector<string>>(il)) { }
+	size_type size() const { return data->size(); }
+	bool empty() const { return data->empty(); }
+	// 添加和删除元素
+	void push_back(const string &t) { data->push_back(t); }
+	void pop_back() {
+		check(0, "pop_back on empty StrBlob");
+		data->pop_back();
+	}
+	// 元素访问
+	string& front() {
+		// 如果 vector 为空，check 会抛出一个异常
+		check(0, "front on empty StrBlob");
+		return data->front();
+	}
+	string& back() {
+		check(0, "back on empty StrBlob");
+		return data->back();
+	}
+	string& front()const {
+		check(0, "front on empty StrBlob");
+		return data->front();
+	}
+	string& back()const {
+		check(0, "back on empty StrBlob");
+		return data->back();
+	}
+	// 返回指向首元素和尾后元素的 StrBlobPtr
+	StrBlobPtr begin();
+	StrBlobPtr end();
+private:
+	shared_ptr<vector<string>> data;
+	// 如果 data[i]不合法，抛出一个异常
+	void check(size_type i, const string &msg) const {
+		if (i >= data->size()) {
+			throw out_of_range(msg);
+		}
+	}
+};
+
+class StrBlobPtr {
+public:
+	StrBlobPtr() : curr(0) { }
+	StrBlobPtr(StrBlob &a, size_t sz = 0) : wptr(a.data), curr(sz) { }
+	std::string& deref() const {
+		auto p = check(curr, "dereference past end");
+		return (*p)[curr]; //（*p)是对象所指向的 vector
+	}
+	//前缀递增：返回递增后的对象的引用
+	StrBlobPtr& incr() {
+		// 如果 curr 已经指向容器的尾后位置，就不能递增它
+		check(curr, "increment past end of StrBlobPtr");
+		++curr; // 推进当前位置
+		return *this;
+	}
+private:
+	// 若检查成功，check 返回一个指向 vector 的 shared_ptr
+	std::shared_ptr<std::vector<std::string>> check(std::size_t i, const std::string& msg) const {
+		auto ret = wptr.lock(); // vector 还存在吗?
+		if (!ret) {
+			throw std::runtime_error("unbound StrBlobPtr");
+		}
+		if (i >= ret->size()) {
+			throw std::out_of_range(msg);
+		}
+		return ret; // 否则，返回指向 vector 的 shared_ptr
+	}
+	// 保存一个 weak ptr，意味着底层 vector 可能会被销毁
+	std::weak_ptr<std::vector<std::string>> wptr;
+	std::size_t curr; // 在vector中的当前位置
+};
+
+StrBlobPtr StrBlob::begin() { return StrBlobPtr(*this); }
+StrBlobPtr StrBlob::end() { return StrBlobPtr(*this, data->size()); }
+```
+## 练习 12.20:
+### 编写程序,逐行读入一个输入文件,将内容存入一个StrBlob中,用一个StrBlobPtr打印出StrBlob中的每个元素。
+答：
+```
+#include <iostream>
+#include <string>
+#include <vector>
+#include <initializer_list>
+#include <memory>
+#include <fstream>
+
+using namespace std;
+
+// 对于 StrBlob 中的友元声明来说，此前置声明是必要的
+class StrBlobPtr;
+
+class StrBlob {
+public:
+	friend class StrBlobPtr;
+	typedef vector<string>::size_type size_type;
+
+	StrBlob() : data(make_shared<vector<string>>()) { }
+	StrBlob(initializer_list<string> il) : data(make_shared<vector<string>>(il)) { }
+	size_type size() const { return data->size(); }
+	bool empty() const { return data->empty(); }
+	// 添加和删除元素
+	void push_back(const string &t) { data->push_back(t); }
+	void pop_back() {
+		check(0, "pop_back on empty StrBlob");
+		data->pop_back();
+	}
+	// 元素访问
+	string& front() {
+		// 如果 vector 为空，check 会抛出一个异常
+		check(0, "front on empty StrBlob");
+		return data->front();
+	}
+	string& back() {
+		check(0, "back on empty StrBlob");
+		return data->back();
+	}
+	string& front()const {
+		check(0, "front on empty StrBlob");
+		return data->front();
+	}
+	string& back()const {
+		check(0, "back on empty StrBlob");
+		return data->back();
+	}
+	// 返回指向首元素和尾后元素的 StrBlobPtr
+	StrBlobPtr begin();
+	StrBlobPtr end();
+private:
+	shared_ptr<vector<string>> data;
+	// 如果 data[i]不合法，抛出一个异常
+	void check(size_type i, const string &msg) const {
+		if (i >= data->size()) {
+			throw out_of_range(msg);
+		}
+	}
+};
+
+class StrBlobPtr {
+public:
+	StrBlobPtr() : curr(0) { }
+	StrBlobPtr(StrBlob &a, size_t sz = 0) : wptr(a.data), curr(sz) { }
+	std::string& deref() const {
+		auto p = check(curr, "dereference past end");
+		return (*p)[curr]; //（*p)是对象所指向的 vector
+	}
+	// 前缀递增：返回递增后的对象的引用
+	StrBlobPtr& incr() {
+		// 如果 curr 已经指向容器的尾后位置，就不能递增它
+		check(curr, "increment past end of StrBlobPtr");
+		++curr; // 推进当前位置
+		return *this;
+	}
+	// 重载迭代需要的!=运算符
+	bool operator!=(const StrBlobPtr& rhs) {
+		return curr != rhs.curr;
+	}
+private:
+	// 若检查成功，check 返回一个指向 vector 的 shared_ptr
+	std::shared_ptr<std::vector<std::string>> check(std::size_t i, const std::string& msg) const {
+		auto ret = wptr.lock(); // vector 还存在吗?
+		if (!ret) {
+			throw std::runtime_error("unbound StrBlobPtr");
+		}
+		if (i >= ret->size()) {
+			throw std::out_of_range(msg);
+		}
+		return ret; // 否则，返回指向 vector 的 shared_ptr
+	}
+	// 保存一个 weak ptr，意味着底层 vector 可能会被销毁
+	std::weak_ptr<std::vector<std::string>> wptr;
+	std::size_t curr; // 在vector中的当前位置
+};
+
+StrBlobPtr StrBlob::begin() { return StrBlobPtr(*this); }
+StrBlobPtr StrBlob::end() { return StrBlobPtr(*this, data->size()); }
+
+void readFileAndPrint(const string& filename) {
+	ifstream file(filename);
+	if (!file.is_open()) {
+		cerr << "Failed to open the file: " << filename << endl;
+		return;
+	}
+
+	StrBlob blob;
+	string line;
+
+	while (getline(file, line)) {
+		blob.push_back(line);
+	}
+
+	for (StrBlobPtr p = blob.begin(); p != blob.end(); p.incr()) {
+		cout << p.deref() << endl;
+	}
+}
+int main() {
+	readFileAndPrint("example.txt");
+
+	return 0;
+}
+```
+## 练习 12.21：
+### 也可以这样编写 StrBlobPtr 的 deref 成员：
+```
+std::string& deref() const
+{ return (*check(curr, "dereference past end"))[curr]; }
+```
+### 你认为哪个版本更好？为什么?
+答：
+* 这个版本的可读性更差。
+## 练习 12.22：
+### 为了能让StrBlobPtr使用 const StrBlob，你觉得应该如何修改?定义一个名为ConstStrBlobPtr的类,使其能够指向const StrBlob。
+答：
+```
+#include <iostream>
+#include <string>
+#include <vector>
+#include <initializer_list>
+#include <memory>
+
+using namespace std;
+
+// 对于 StrBlob 中的友元声明来说，此前置声明是必要的
+class ConstStrBlobPtr;
+
+class StrBlob {
+public:
+	friend class ConstStrBlobPtr;
+	typedef vector<string>::size_type size_type;
+
+	StrBlob() : data(make_shared<vector<string>>()) { }
+	StrBlob(initializer_list<string> il) : data(make_shared<vector<string>>(il)) { }
+	size_type size() const { return data->size(); }
+	bool empty() const { return data->empty(); }
+	// 添加和删除元素
+	void push_back(const string &t) { data->push_back(t); }
+	void pop_back() {
+		check(0, "pop_back on empty StrBlob");
+		data->pop_back();
+	}
+	// 元素访问
+	string& front() {
+		// 如果 vector 为空，check 会抛出一个异常
+		check(0, "front on empty StrBlob");
+		return data->front();
+	}
+	string& back() {
+		check(0, "back on empty StrBlob");
+		return data->back();
+	}
+	string& front()const {
+		check(0, "front on empty StrBlob");
+		return data->front();
+	}
+	string& back()const {
+		check(0, "back on empty StrBlob");
+		return data->back();
+	}
+	// 返回指向首元素和尾后元素的 ConstStrBlobPtr
+	ConstStrBlobPtr cbegin()const;
+	ConstStrBlobPtr cend()const;
+private:
+	shared_ptr<vector<string>> data;
+	// 如果 data[i]不合法，抛出一个异常
+	void check(size_type i, const string &msg) const {
+		if (i >= data->size()) {
+			throw out_of_range(msg);
+		}
+	}
+};
+
+class ConstStrBlobPtr {
+public:
+	ConstStrBlobPtr() : curr(0) { }
+	ConstStrBlobPtr(const StrBlob &a, size_t sz = 0) : wptr(a.data), curr(sz) { }
+	std::string& deref() const {
+		auto p = check(curr, "dereference past end");
+		return (*p)[curr]; //（*p)是对象所指向的 vector
+	}
+	// 前缀递增：返回递增后的对象的引用
+	ConstStrBlobPtr& incr() {
+		// 如果 curr 已经指向容器的尾后位置，就不能递增它
+		check(curr, "increment past end of ConstStrBlobPtr");
+		++curr; // 推进当前位置
+		return *this;
+	}
+	// 重载迭代需要的!=运算符
+	bool operator!=(const ConstStrBlobPtr& rhs) {
+		return curr != rhs.curr;
+	}
+private:
+	// 若检查成功，check 返回一个指向 vector 的 shared_ptr
+	std::shared_ptr<std::vector<std::string>> check(std::size_t i, const std::string& msg) const {
+		auto ret = wptr.lock(); // vector 还存在吗?
+		if (!ret) {
+			throw std::runtime_error("unbound StrBlobPtr");
+		}
+		if (i >= ret->size()) {
+			throw std::out_of_range(msg);
+		}
+		return ret; // 否则，返回指向 vector 的 shared_ptr
+	}
+	// 保存一个 weak ptr，意味着底层 vector 可能会被销毁
+	std::weak_ptr<std::vector<std::string>> wptr;
+	std::size_t curr; // 在vector中的当前位置
+};
+
+ConstStrBlobPtr StrBlob::cbegin() const { return ConstStrBlobPtr(*this); }
+ConstStrBlobPtr StrBlob::cend() const { return ConstStrBlobPtr(*this, data->size()); }
+
+int main() {
+	StrBlob const a;
+	auto it = a.cbegin();
+
+	return 0;
+}
+```
