@@ -625,3 +625,94 @@ int main() {
 	return 0;
 }
 ```
+## 练习 12.23:
+### 编写一个程序,连接两个字符串字面常量,将结果保存在一个动态分配的char数组中。 重写这个程序,连接两个标准库string对象。
+答：
+```
+// 使用字符数组：
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <cstring>
+
+int main() {
+	const char* str1 = "Hello, ";
+	const char* str2 = "World!";
+	char* result = new char[strlen(str1) + strlen(str2) + 1];  // +1 为 '\0' 结束符
+
+	strcpy(result, str1);
+	strcat(result, str2);
+
+	std::cout << result << std::endl;
+
+	delete[] result;
+
+	return 0;
+}
+
+// 使用标准库的string对象：
+#include <iostream>
+#include <string>
+
+int main() {
+    std::string s1 = "Hello, ";
+    std::string s2 = "World!";
+    std::string result = s1 + s2;
+
+    std::cout << result << std::endl;
+
+    return 0;
+}
+```
+## 练习 12.24：
+### 编写一个程序，从标准输入读取一个字符串，存入一个动态分配的字符数组中。描述你的程序如何处理变长输入。测试你的程序,输入一个超出你分配的数组长度的字符串。
+答：
+```
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <cstring>
+
+int main() {
+	const size_t BUFFER_SIZE = 10; // 每次从输入读取的字符数
+	char buffer[BUFFER_SIZE];
+
+	char* input = nullptr;
+	size_t totalSize = 0;
+
+	while (std::cin.read(buffer, BUFFER_SIZE - 1)) {
+		size_t bytesRead = std::cin.gcount();
+		buffer[bytesRead] = '\0'; // 添加终止字符
+
+		char* newInput = new char[totalSize + bytesRead + 1];
+		std::strcpy(newInput, input ? input : ""); // 复制旧的内容
+		std::strcat(newInput, buffer); // 连接新读取的内容
+
+		delete[] input;
+		input = newInput;
+		totalSize += bytesRead;
+	}
+
+	if (std::cin.eof()) {
+		size_t bytesRead = std::cin.gcount();
+		buffer[bytesRead] = '\0';
+
+		char* newInput = new char[totalSize + bytesRead + 1];
+		std::strcpy(newInput, input ? input : "");
+		std::strcat(newInput, buffer);
+
+		delete[] input;
+		input = newInput;
+	}
+
+	std::cout << "You entered: " << input << std::endl;
+
+	delete[] input;
+	return 0;
+}
+```
+## 练习 12.25：
+### 给定下面的 new 表达式，你应该如何释放 pa?
+```
+int *pa = new int[10];
+```
+答：
+* delete[] pa;
