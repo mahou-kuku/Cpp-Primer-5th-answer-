@@ -716,3 +716,32 @@ int *pa = new int[10];
 ```
 答：
 * delete[] pa;
+## 练习 12.26:
+### 用allocator重写第427页中的程序。
+答：
+```
+#include <iostream>
+#include <string>
+#include <memory>
+
+using namespace std;
+
+int main() {
+	const size_t allocSize = 9;
+	allocator<string> alloc;
+	string* p = alloc.allocate(allocSize);
+	string s;
+	string* q = p;
+	while (q != p + allocSize && cin >> s) {
+		alloc.construct(q++, s);
+	}
+	const size_t inputCount = q - p;
+
+	while (q != p) {
+		alloc.destroy(--q);
+	}
+	alloc.deallocate(p, allocSize);
+
+	return 0;
+}
+```
