@@ -745,3 +745,292 @@ int main() {
 	return 0;
 }
 ```
+## 练习 12.27：
+### TextQuery 和 QueryResult 类只使用了我们已经介绍过的语言和标准库特性。不要提前看后续章节内容，只用已经学到的知识对这两个类编写你自己的版本。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <set>
+#include <string>
+#include <memory>
+
+using namespace std;
+
+class QueryResult; // 前向声明
+class TextQuery {
+public:
+	using line_no = vector<string>::size_type;
+	TextQuery(ifstream&);
+	QueryResult query(const string&) const;
+private:
+	shared_ptr<vector<string>> file; // 输入文件
+	// 每个单词到它所在的行号的集合的映射
+	map<string, shared_ptr<set<line_no>>> wm;
+};
+
+class QueryResult {
+	friend std::ostream& print(std::ostream&, const QueryResult&);
+public:
+	QueryResult(string s, shared_ptr<set<TextQuery::line_no>> p,
+		shared_ptr<vector<string>> f) : sought(s), lines(p), file(f) { }
+private:
+	string sought; // 查询单词
+	shared_ptr<set<TextQuery::line_no>> lines; // 出现的行号
+	shared_ptr<vector<string>> file; // 输入文件
+};
+
+// 读取输入文件并建立单词到行号的映射
+TextQuery::TextQuery(ifstream &is) : file(new vector<string>){
+	string text;
+	while (getline(is, text)) { // 对文件中每一行
+		file->push_back(text); // 保存此行文本
+		int n = file->size() - 1; // 当前行号
+		istringstream line(text); // 将行文本分解为单词
+		string word;
+		while (line >> word) { // 对行中每个单词
+			// 如果单词不在 wm中，以之为下标在wm中添加一项
+			auto &lines = wm[word]; // lines 是一个 shared_ptr
+			if (!lines) // 在我们第一次遇到这个单词时，此指针为空
+				lines.reset(new set<line_no>); // 分配一个新的 set
+			lines->insert(n); // 将此行号插入 set 中
+		}
+	}
+}
+
+QueryResult TextQuery::query(const string &sought) const{
+	// 如果未找到 sought，我们将返回一个指向此 set 的指针
+	static shared_ptr<set<line_no>> nodata(new set<line_no>);
+	// 使用 find 而不是下标运算符来查找单词，避免将单词添加到 wm 中！
+	auto loc = wm.find(sought);
+	if (loc == wm.end()) {
+		return QueryResult(sought, nodata, file); // 未找到
+	} else {
+		return QueryResult(sought, loc->second, file);
+	}
+}
+
+ostream &print(ostream & os, const QueryResult &qr){
+	// 如果找到了单词,打印出现次数和所有出现的位置
+	os << qr.sought << " occurs " << qr.lines->size() << " " << "times" << endl;
+	// 打印单词出现的每一行
+	for (auto num : *qr.lines) { // 对 set 中每个单词
+		// 避免行号从 0 开始给用户带来的困惑
+		os << "\t(line " << num + 1 << ") " << *(qr.file->begin() + num) << endl;
+	}
+	return os;
+}
+```
+## 练习 12.28:
+### 编写程序实现文本查询,不要定义类来管理数据。你的程序应该接受一个文件，并与用户交互来查询单词。使用 vector、 map 和 set 容器来保存来自文件的数据并生成查询结果。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <set>
+#include <string>
+
+using namespace std;
+
+void queryWord(const vector<string>& lines, const map<string, set<int>>& wordMap) {
+	cout << "Enter the word you want to query: ";
+	string word;
+	cin >> word;
+
+	auto it = wordMap.find(word);
+	if (it != wordMap.end()) {
+		cout << word << " occurs " << it->second.size() << " times." << endl;
+		for (auto lineNo : it->second) {
+			cout << "\t(line " << lineNo + 1 << ") " << lines[lineNo] << endl;
+		}
+	} else {
+		cout << word << " does not occur." << endl;
+	}
+}
+
+int main() {
+	ifstream file;
+	string filename;
+	cout << "Enter the filename: ";
+	cin >> filename;
+
+	file.open(filename);
+	if (!file) {
+		cerr << "Failed to open the file." << endl;
+		return -1;
+	}
+
+	vector<string> lines;
+	map<string, set<int>> wordMap;
+	string line;
+	int lineNo = 0;
+
+	while (getline(file, line)) {
+		lines.push_back(line);
+		istringstream lineStream(line);
+		string word;
+
+		set<string> uniqueWordsInLine; // 每行只计算一个单词一次
+		while (lineStream >> word) {
+			uniqueWordsInLine.insert(word);
+		}
+
+		for (const auto& uniqueWord : uniqueWordsInLine) {
+			wordMap[uniqueWord].insert(lineNo);
+		}
+
+		++lineNo;
+	}
+	file.close();
+
+	// 与用户交互
+	char ch;
+	do {
+		queryWord(lines, wordMap);
+		cout << "Do you want to query another word? (y/n) ";
+		cin >> ch;
+	} while (ch != 'n');
+
+	return 0;
+}
+```
+## 练习 12.29：
+### 我们曾经用 do while 循环来编写管理用户交互的循环（参见 5.4.4 节，第169页)。用do while重写本节程序,解释你倾向于哪个版本,为什么。
+答：
+```
+void runQueries(ifstream &infile)
+{
+	TextQuery tq(infile);
+	string s;
+	do {
+		cout << "enter word to look for, or q to quit: ";
+		if (!(cin >> s)) break;
+		if (s == "q") break;
+		print(cout, tq.query(s)) << endl;
+	} while (true);
+}
+```
+* 我倾向于原始的while版本，因为它更加明确和直观。
+## 练习 12.30:
+### 定义你自己版本的TextQuery和QueryResult类,并执行12.3.1节(第 431页)中的runQueries函数。
+答：
+```
+void runQueries(ifstream &infile){
+	// infile是一个ifstream,指向我们要处理的文件
+	TextQuery tq(infile); // 保存文件并建立查询 map
+	// 与用户交互：提示用户输入要查询的单词，完成查询并打印结果
+	while (true) {
+		cout << "enter word to look for, or q to quit: ";
+		string s;
+		// 若遇到文件尾或用户输入了'q' 时循环终止
+		if (!(cin >> s) || s == "q") break;
+		// 指向查询并打印结果
+		print(cout, tq.query(s)) << endl;
+	}
+}
+
+int main() {
+	ifstream ifs("example.txt");
+	runQueries(ifs);
+
+	return 0;
+}
+```
+## 练习 12.31：
+### 如果用 vector 代替 set 保存行号，会有什么差别？哪种方法更好？为什么？
+答：
+* 如果单词在一行内多次出现，vector会存储多个相同的行号，违反了设计要求的“行号无重复”。set 更好，不需要额外的去重复设计。
+## 练习 12.32:
+### 重写TextQuery和QueryResult类,用StrBlob代替vector<string> 保存输入文件。
+答：
+```
+class QueryResult; // 前向声明
+class TextQuery {
+public:
+	using line_no = vector<string>::size_type;
+	TextQuery(ifstream&);
+	QueryResult query(const string&) const;
+private:
+	StrBlob file; // 输入文件
+									 // 每个单词到它所在的行号的集合的映射
+	map<string, shared_ptr<set<line_no>>> wm;
+};
+
+class QueryResult {
+	friend std::ostream& print(ostream&, const QueryResult&);
+public:
+	QueryResult(string s, shared_ptr<set<TextQuery::line_no>> p,
+		StrBlob f) : sought(s), lines(p), file(f) { }
+private:
+	string sought; // 查询单词
+	shared_ptr<set<TextQuery::line_no>> lines; // 出现的行号
+	StrBlob file; // 输入文件
+};
+
+// 读取输入文件并建立单词到行号的映射
+TextQuery::TextQuery(ifstream &is)  {
+	string text;
+	while (getline(is, text)) { // 对文件中每一行
+		file.push_back(text); // 保存此行文本
+		int n = file.size() - 1; // 当前行号
+		istringstream line(text); // 将行文本分解为单词
+		string word;
+		while (line >> word) { // 对行中每个单词
+							   // 如果单词不在 wm中，以之为下标在wm中添加一项
+			auto &lines = wm[word]; // lines 是一个 shared_ptr
+			if (!lines) // 在我们第一次遇到这个单词时，此指针为空
+				lines.reset(new set<line_no>); // 分配一个新的 set
+			lines->insert(n); // 将此行号插入 set 中
+		}
+	}
+}
+
+QueryResult TextQuery::query(const string &sought) const {
+	// 如果未找到 sought，我们将返回一个指向此 set 的指针
+	static shared_ptr<set<line_no>> nodata(new set<line_no>);
+	// 使用 find 而不是下标运算符来查找单词，避免将单词添加到 wm 中！
+	auto loc = wm.find(sought);
+	if (loc == wm.end()) {
+		return QueryResult(sought, nodata, file); // 未找到
+	} else {
+		return QueryResult(sought, loc->second, file);
+	}
+}
+
+
+ostream &print(ostream & os, const QueryResult &qr) {
+	// 如果找到了单词,打印出现次数和所有出现的位置
+	os << qr.sought << " occurs " << qr.lines->size() << " " << "times" << endl;
+	// 打印单词出现的每一行
+	for (auto num : *qr.lines) { // 对 set 中每个单词
+		auto p = qr.file.cbegin();
+								 // 避免行号从 0 开始给用户带来的困惑
+		os << "\t(line " << num + 1 << ") " << p.deref() << endl;
+	}
+	return os;
+}
+```
+## 练习 12.33:
+### 在第15章中我们将扩展查询系统,在QueryResult类中将会需要一些额外的成员。添加名为begin和end的成员,返回一个迭代器,指向一个给定查询返回的行号的set中的位置。再添加一个名为get_file的成员,返回一个shared_ptr, 指向QueryResult对象中的文件。
+答：
+```
+class QueryResult {
+	friend std::ostream& print(std::ostream&, const QueryResult&);
+public:
+	QueryResult(string s, shared_ptr<set<TextQuery::line_no>> p,
+		shared_ptr<vector<string>> f) : sought(s), lines(p), file(f) { }
+	set<TextQuery::line_no>::iterator begin() const { return lines->begin(); }
+	set<TextQuery::line_no>::iterator end() const { return lines->end(); }
+	shared_ptr<vector<string>> get_file() const { return file; }
+private:
+	string sought; // 查询单词
+	shared_ptr<set<TextQuery::line_no>> lines; // 出现的行号
+	shared_ptr<vector<string>> file; // 输入文件
+};
+```
