@@ -257,7 +257,7 @@ void f(destination &d){
 ### 如果你试图拷贝或赋值unique_ptr,编译器并不总是能给出易于理解的错误信息。编写包含这种错误的程序,观察编译器如何诊断这种错误。
 答：
 ```
-// unique_ptr的拷贝构造函数和赋值操作符都被删除了，所以不支持这两种操作。但是unique_ptr提供了移动构造函数和移动赋值操作符。
+// unique_ptr的拷贝构造函数和拷贝赋值操作符都被删除了，所以不支持这两种操作。但是unique_ptr提供了移动构造函数和移动赋值操作符。
 	int *p = new int(9);
 	unique_ptr<int> up(p);
 	unique_ptr<int> up2;
