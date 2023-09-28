@@ -96,3 +96,114 @@ private:
 	int i;
 };
 ```
+## 练习13.9:
+### 析构函数是什么?合成析构函数完成什么工作?什么时候会生成合成析构函数？
+答：
+* 析构函数是一个特殊的成员函数，它在一个对象的生命周期结束时自动被调用。析构函数的名称与类名相同，但前面加上了一个波浪符~，并且它不接受任何参数，也没有返回类型。
+* 合成析构函数是编译器自动为类生成的析构函数。合成析构函数确保类的所有非静态成员对象都会被正确地销毁。但合成析构函数不会释放对象可能拥有的动态分配的内存，这种内存管理应由程序员手动处理。
+* 当一个类没有显式定义析构函数时，编译器会自动为这个类生成一个合成析构函数。
+## 练习 13.10:
+### 当一个StrBlob 对象销毁时会发生什么？一个 StrBlobPtr 对象销毁时呢？
+答：
+* 当类对象被销毁时析构函数会被调用，析构函数体首先执行，随后它的所有成员和基类的析构函数按逆序（与构造顺序相反）被调用。最后，对象所占的内存会被释放。
+## 练习 13.11:
+### 为前面练习中的HasPtr类添加一个析构函数。
+答：
+```
+class HasPtr {
+public:
+	// 构造函数
+	HasPtr(const std::string &s = std::string()) :ps(new std::string(s)), i(0) { }
+	// 拷贝构造函数
+	HasPtr(const HasPtr& hp) :ps(new std::string(*hp.ps)), i(hp.i) { }
+	// 拷贝赋值运算符
+	HasPtr& operator=(const HasPtr& rhs) {
+		if (this != &rhs) {  // 检查自我赋值
+			delete ps;	// 删除当前字符串
+			ps = new std::string(*rhs.ps);	// 从rhs分配新字符串
+			i = rhs.i;
+		}
+		return *this;
+	}
+	// 析构函数
+	~HasPtr() {
+		delete ps;	// 手动释放动态分配的内存
+	}
+private:
+	std::string *ps;
+	int i;
+};
+```
+## 练习 13.12：
+### 在下面的代码片段中会发生几次析构函数调用？
+```
+bool fcn(const Sales_data *trans, Sales_data accum)
+{
+ Sales_data item1(*trans), item2(accum);
+ return item1.isbn() != item2.isbn();
+}
+```
+答：
+* 三次。accum、item1 和 item2 会因离开作用域的销毁而调用析构函数。
+## 练习 13.13：
+### 理解拷贝控制成员和构造函数的一个好方法是定义一个简单的类，为该类定义这些成员，每个成员都打印出自己的名字：
+```
+struct X {
+X() {std::cout << "X()" << std::endl;}
+X(const X&) {std::cout << "X(const X&)" <<std::endl;}
+};
+```
+### 给 X 添加拷贝赋值运算符和析构函数，并编写一个程序以不同方式使用 X 的对象：将它们作为非引用和引用参数传递；动态分配它们；将它们存放于容器中；诸如此类。观察程序的输出，直到你确认理解了什么时候会使用拷贝控制成员，以及为什么会使用它们。当你观察程序输出时，记住编译器可以略过对拷贝构造函数的调用。
+答：
+```
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+struct X {
+	X() { std::cout << "X()" << std::endl; }
+	X(const X&) { std::cout << "X(const X&)" << std::endl; }
+	X& operator=(const X&) {
+		std::cout << "X& operator=(const X&)" << std::endl;
+		return *this;
+	}
+	~X() { std::cout << "~X()" << std::endl; }
+};
+
+void f1(X x) { }
+void f2(X &x) { }
+void f3(const X &x) { }
+
+int main() {
+	std::cout << "Directly create an object:" << std::endl;
+	X x1;
+
+	std::cout << "\nCopy initialize an object:" << std::endl;
+	X x2 = x1;
+
+	std::cout << "\nAssign an object:" << std::endl;
+	X x3;
+	x3 = x1;
+
+	std::cout << "\nPass an object by value:" << std::endl;
+	f1(x1);
+
+	std::cout << "\nPass an object by reference:" << std::endl;
+	f2(x1);
+
+	std::cout << "\nPass an object by const reference:" << std::endl;
+	f3(x1);
+
+	std::cout << "\nDynamically allocate objects:" << std::endl;
+	X* px = new X;
+	delete px;
+
+	std::cout << "\nStore objects in a container:" << std::endl;
+	std::vector<X> vec;
+	vec.push_back(x1);
+
+	std::cout << "\nEnd of main()" << std::endl;
+	return 0;
+}
+```
