@@ -3,7 +3,7 @@
 答：
 * 当一个对象用另一个同类型的对象初始化时。
 * 当一个函数的参数是类的对象，并通过值传递。
-* 当函数返回一个类的对象。
+* 当函数按值返回一个类的对象。
 * 其他需要复制同类型对象的情况。
 ## 练习 13.2：
 ### 解释为什么下面的声明是非法的：
@@ -204,6 +204,60 @@ int main() {
 	vec.push_back(x1);
 
 	std::cout << "\nEnd of main()" << std::endl;
+	return 0;
+}
+```
+## 练习 13.14：
+### 假定 numbered 是一个类，它有一个默认构造函数，能为每个对象生成一个唯一的序号,保存在名为mysn的数据成员中。 假定numbered使用合成的拷贝控制成员，并给定如下函数：
+```
+void f (numbered s) { cout << s.mysn << endl; }
+```
+### 则下面代码输出什么内容？
+```
+numbered a, b = a, c = b;
+f(a); f(b); f(c);
+```
+答：
+* 三条输出的内容相同。
+## 练习 13.15:
+### 假定numbered定义了一个拷贝构造函数,能生成一个新的序号。 这会改变上一题中调用的输出结果吗？ 如果会改变，为什么？ 新的输出结果是什么？
+答：
+* 会改变。因为新定义的拷贝构造函数保证了拷贝发生时也能生成一个新的序号。新的输出结果是函数f的局部numbered对象的序号。
+## 练习 13.16：
+### 如果 f 中的参数是 const numbered&，将会怎样？这会改变输出结果吗？如果会改变，为什么？新的输出结果是什么？
+答：
+* 将会按引用传参。会改变输出结果。因为按引用传参不会创建新的numbered对象。新的输出结果是调用f()前 a、b、c的序号。
+## 练习 13.17：
+### 分别编写前三题中所描述的 numbered 和 f，验证你是否正确预测了输出结果。
+答：
+```
+#include <iostream>
+
+using namespace std;
+
+class numbered {
+public:
+	// 默认构造函数
+	numbered() : mysn(unique++) {}
+	// 拷贝构造函数
+	// numbered(const numbered& n) : mysn(unique++) {}
+	// 返回对象的序号
+	int get_mysn() const { return mysn; }
+private:
+	int mysn;               // 保存对象的序号
+	static int unique;      // 静态数据成员，用于生成唯一序号
+};
+
+// 初始化静态数据成员
+int numbered::unique = 9;
+
+void f(numbered s) { cout << s.get_mysn() << endl; }
+//void f(const numbered &s) { cout << s.get_mysn() << endl; }
+
+int main() {
+	numbered a, b = a, c = b;
+	f(a); f(b); f(c);
+
 	return 0;
 }
 ```
