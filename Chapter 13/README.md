@@ -261,3 +261,63 @@ int main() {
 	return 0;
 }
 ```
+## 练习 13.18:
+### 定义一个Employee类,它包含雇员的姓名和唯一的雇员证号。 为这个类定义默认构造函数，以及接受一个表示雇员姓名的 string的构造函数。 每个构造函数应该通过递增一个static数据成员来生成一个唯一的证号。
+答：
+```
+#include <iostream>
+#include <string>
+
+class Employee {
+public:
+	// 默认构造函数
+	Employee() : name(""), id(unique_id++) {}
+
+	// 接受一个表示雇员姓名的 string 的构造函数
+	Employee(const std::string& s) : name(s), id(unique_id++) {}
+
+	// 获取姓名和ID的成员函数
+	std::string getName() const { return name; }
+	int getId() const { return id; }
+
+private:
+	std::string name;
+	int id;
+
+	// 静态数据成员，用于生成唯一的证号
+	static int unique_id;
+};
+
+// 初始化静态数据成员
+int Employee::unique_id = 0;
+
+int main() {
+	Employee e1, e2("John");
+	std::cout << e1.getName() << ": " << e1.getId() << std::endl; // : 0
+	std::cout << e2.getName() << ": " << e2.getId() << std::endl; // John: 1
+
+	return 0;
+}
+```
+## 练习 13.19：
+### 你的Employee类需要定义它自己的拷贝控制成员吗？如果需要，为什么？如果不需要,为什么？实现你认为Employee需要的拷贝控制成员。
+答：
+* 为了保证为每个雇员分配一个唯一的证号，应该禁止拷贝构造和拷贝赋值。
+```
+class Employee {
+public:
+    // ... [其他成员如前]
+
+    // 删除拷贝构造函数和拷贝赋值运算符
+    Employee(const Employee&) = delete;
+    Employee& operator=(const Employee&) = delete;
+};
+```
+## 练习 13.20：
+### 解释当我们拷贝、赋值或销毁 TextQuery 和 QueryResult 类(参见 12.3 节,第430页)对象时会发生什么。
+答：
+* TextQuery 和 QueryResult 类使用的是合成版本拷贝控制成员，当拷贝、赋值时会进行浅拷贝。当销毁时合成析构函数不会释放动态分配的内存，不过这两个类管理动态资源的指针都是智能指针，智能指针的析构函数会负责释放动态分配的内存。
+## 练习 13.21：
+### 你认为 TextQuery 和 QueryResult 类需要定义它们自己版本的拷贝控制成员吗?如果需要,为什么?如果不需要,为什么?实现你认为这两个类需要的拷贝,控制操作。
+答：
+* 不需要，使用合成版本的拷贝控制成员并不会产生问题。
