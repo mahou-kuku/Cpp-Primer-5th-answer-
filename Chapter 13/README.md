@@ -127,7 +127,7 @@ public:
 	}
 	// 析构函数
 	~HasPtr() {
-		delete ps;	// 手动释放动态分配的内存
+		delete ps;	// 释放动态分配的内存
 	}
 private:
 	std::string *ps;
@@ -321,3 +321,31 @@ public:
 ### 你认为 TextQuery 和 QueryResult 类需要定义它们自己版本的拷贝控制成员吗?如果需要,为什么?如果不需要,为什么?实现你认为这两个类需要的拷贝,控制操作。
 答：
 * 不需要，使用合成版本的拷贝控制成员并不会产生问题。
+## 练习 13.22：
+### 假定我们希望 HasPtr 的行为像一个值。即，对于对象所指向的 string 成员，每个对象都有一份自己的拷贝。我们将在下一节介绍拷贝控制成员的定义。但是，你已经学习了定义这些成员所需的所有知识。在继续学习下一节之前，为 HasPtr 编写拷贝构造函数和拷贝赋值运算符。
+答：
+```
+class HasPtr {
+public:
+	// 构造函数
+	HasPtr(const std::string &s = std::string()) :ps(new std::string(s)), i(0) { }
+	// 拷贝构造函数
+	HasPtr(const HasPtr& hp) :ps(new std::string(*hp.ps)), i(hp.i) { }
+	// 拷贝赋值运算符
+	HasPtr& operator=(const HasPtr& rhs) {
+		if (this != &rhs) {  // 检查自我赋值
+			delete ps;	// 删除当前字符串
+			ps = new std::string(*rhs.ps);	// 从rhs分配新字符串
+			i = rhs.i;
+		}
+		return *this;
+	}
+	// 析构函数
+	~HasPtr() {
+		delete ps;	// 释放动态分配的内存
+	}
+private:
+	std::string *ps;
+	int i;
+};
+```
