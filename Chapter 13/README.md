@@ -84,11 +84,10 @@ public:
 	HasPtr(const HasPtr& hp) :ps(new std::string(*hp.ps)), i(hp.i) { }
 	// 拷贝赋值运算符
 	HasPtr& operator=(const HasPtr& rhs) {
-		if (this != &rhs) {  // 检查自我赋值
-			delete ps;	// 删除当前字符串
-			ps = new std::string(*rhs.ps);	// 从rhs分配新字符串
-			i = rhs.i;
-		}
+		auto newp = new std::string(*rhs.ps);
+		delete ps;
+		ps = newp;
+		i = rhs.i;
 		return *this;
 	}
 private:
@@ -118,16 +117,15 @@ public:
 	HasPtr(const HasPtr& hp) :ps(new std::string(*hp.ps)), i(hp.i) { }
 	// 拷贝赋值运算符
 	HasPtr& operator=(const HasPtr& rhs) {
-		if (this != &rhs) {  // 检查自我赋值
-			delete ps;	// 删除当前字符串
-			ps = new std::string(*rhs.ps);	// 从rhs分配新字符串
-			i = rhs.i;
-		}
+		auto newp = new std::string(*rhs.ps);
+		delete ps;
+		ps = newp;
+		i = rhs.i;
 		return *this;
 	}
 	// 析构函数
 	~HasPtr() {
-		delete ps;	// 释放动态分配的内存
+		delete ps;
 	}
 private:
 	std::string *ps;
@@ -333,19 +331,47 @@ public:
 	HasPtr(const HasPtr& hp) :ps(new std::string(*hp.ps)), i(hp.i) { }
 	// 拷贝赋值运算符
 	HasPtr& operator=(const HasPtr& rhs) {
-		if (this != &rhs) {  // 检查自我赋值
-			delete ps;	// 删除当前字符串
-			ps = new std::string(*rhs.ps);	// 从rhs分配新字符串
-			i = rhs.i;
-		}
+		auto newp = new std::string(*rhs.ps);
+		delete ps;
+		ps = newp;
+		i = rhs.i;
 		return *this;
 	}
 	// 析构函数
 	~HasPtr() {
-		delete ps;	// 释放动态分配的内存
+		delete ps;
 	}
 private:
 	std::string *ps;
 	int i;
+};
+```
+## 练习 13.23：
+### 比较上一节练习中你编写的拷贝控制成员和这一节中的代码。 确定你理解上了你的代码和我们的代码之间的差异(如果有的话)。
+答：
+* 需要注意的是异常安全的问题，当new抛出bad_alloc异常时，已经终止了当前的函数执行流程，处理异常时不能简单地从该函数的中间某处重新开始。而是从更高的层次，例如对象的赋值a = b;这样的语句重新开始执行。要避免由异常而导致的问题，而不是在异常发生后再尝试修复它。
+## 练习 13.24：
+### 如果本节中的 HasPtr 版本未定义析构函数，将会发生什么？如果未定义拷贝构造函数，将会发生什么？
+答：
+* 未定义析构函数将发生内存泄露，未定义拷贝构造函数在复制同类型对象时将共享动态分配的内存，但在销毁对象时会产生访问无效内存、造成多次释放的未定义行为。
+## 练习 13.25:
+### 假定希望定义strBlob的类值版本,而且希望继续使用shared_ptr,这样我们的strBlobPtr 类就仍能使用指向 vector的weak_ptr了。 你修改后的类将需要一个拷贝构造函数和一个拷贝赋值运算符,但不需要析构函数。 解释拷贝构造函数和拷贝赋值运算符必须要做什么。 解释为什么不需要析构函数。
+答：
+* 拷贝构造函数和拷贝赋值运算符需要重新动态分配内存，拷贝右侧运算对象内的动态对象。strBlob指向动态对象的指针是智能指针，所以可以使用合成析构函数，智能指针的析构函数会在合适的时机释放内存。
+## 练习 13.26:
+### 对上一题中描述的StrBlob类,编写你自己的版本。
+答：
+```
+class StrBlob {
+public:
+	// ... [其他成员如前]
+
+	// 拷贝构造函数
+	StrBlob(const StrBlob& sb) :data(make_shared<vector<string>>(*sb.data)) { }
+	// 拷贝赋值运算符
+	StrBlob& operator=(const StrBlob& sb) {
+		data = make_shared<vector<string>>(*sb.data);
+		return *this;
+	}
 };
 ```
