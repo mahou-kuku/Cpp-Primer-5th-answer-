@@ -375,3 +375,125 @@ public:
 	}
 };
 ```
+## 练习 13.27：
+### 定义你自己的使用引用计数版本的 HasPtr。
+答：
+```
+class HasPtr {
+public:
+	HasPtr(const string &s = string()) : data(new string(s)), i(0), ref_count(new int(1)) {}
+
+	HasPtr(const HasPtr& rhs) : data(rhs.data), i(rhs.i), ref_count(rhs.ref_count) {
+		++(*ref_count); // 增加引用计数
+	}
+
+	HasPtr& operator=(const HasPtr& rhs) {
+		++(*rhs.ref_count);  // 首先，处理赋值对象的引用计数
+		release();  // 释放当前对象的资源（如果适当的话）
+		data = rhs.data;
+		i = rhs.i;
+		ref_count = rhs.ref_count;
+		return *this;
+	}
+
+	~HasPtr() {
+		release();
+	}
+
+private:
+	string* data;
+	int i;
+	int* ref_count;
+
+	void release() {
+		if (--(*ref_count) == 0) {
+			delete data;
+			delete ref_count;
+		}
+	}
+};
+```
+## 练习 13.28：
+### 给定下面的类，为其实现一个默认构造函数和必要的拷贝控制成员。
+```
+(a)
+class TreeNode {
+private:
+ std::string value;
+ int count;
+ TreeNode *left;
+ TreeNode *right;
+};
+(b)
+class BinStrTree {
+private:
+ TreeNode *root;
+};
+```
+答：
+```
+(a)
+class TreeNode {
+public:
+	TreeNode() : value(std::string()), count(0), left(nullptr), right(nullptr) {}
+	TreeNode(const TreeNode& tn) : value(tn.value), count(tn.count),
+		left(tn.left ? new TreeNode(*tn.left) : nullptr),
+		right(tn.right ? new TreeNode(*tn.right) : nullptr) {}
+	TreeNode& operator=(const TreeNode&);
+	~TreeNode();
+
+private:
+	std::string value;
+	int count;
+	TreeNode* left;
+	TreeNode* right;
+};
+
+TreeNode& TreeNode::operator=(const TreeNode& rhs) {
+	if (&rhs == this) {
+		return *this;
+	}
+	TreeNode* newLeft = rhs.left ? new TreeNode(*rhs.left) : nullptr;
+	TreeNode* newRight = rhs.right ? new TreeNode(*rhs.right) : nullptr;
+
+	delete left;
+	delete right;
+
+	left = newLeft;
+	right = newRight;
+	value = rhs.value;
+	count = rhs.count;
+
+	return *this;
+}
+
+TreeNode::~TreeNode() {
+	delete left;
+	delete right;
+}
+
+(b)
+class BinStrTree {
+public:
+	BinStrTree() : root(new TreeNode()) {}
+	BinStrTree(const BinStrTree& bst) : root(new TreeNode(*bst.root)) {}
+	BinStrTree& operator=(const BinStrTree&);
+	~BinStrTree();
+
+private:
+	TreeNode* root;
+};
+
+BinStrTree& BinStrTree::operator=(const BinStrTree& rhs) {
+	if (&rhs != this) {
+		TreeNode* newRoot = new TreeNode(*rhs.root);
+		delete root;
+		root = newRoot;
+	}
+	return *this;
+}
+
+BinStrTree::~BinStrTree() {
+	delete root;
+}
+```
