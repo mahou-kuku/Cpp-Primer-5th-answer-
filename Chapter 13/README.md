@@ -497,3 +497,132 @@ BinStrTree::~BinStrTree() {
 	delete root;
 }
 ```
+## 练习 13.29：
+### 解释 swap(HasPtr&, HasPtr&)中对 swap 的调用不会导致递归循环。
+答：
+* 两种swap的形参列表不同。
+## 练习 13.30：
+### 为你的类值版本的 HasPtr 编写 swap 函数，并测试它。 为你的 swap 函数添加一个打印语句，指出函数什么时候执行。
+答：
+```
+#include <iostream>
+#include <string>
+#include <algorithm>
+
+class HasPtr {
+public:
+	// 构造函数
+	HasPtr(const std::string &s = std::string()) : ps(new std::string(s)), i(0) { }
+	// 拷贝构造函数
+	HasPtr(const HasPtr& rhs) : ps(new std::string(*rhs.ps)), i(rhs.i) { }
+	// 拷贝赋值运算符
+	HasPtr& operator=(const HasPtr& rhs) {
+		auto newp = new std::string(*rhs.ps);
+		delete ps;
+		ps = newp;
+		i = rhs.i;
+		return *this;
+	}
+	// 析构函数
+	~HasPtr() {
+		delete ps;
+	}
+	// 友元声明，使得非成员函数swap可以访问类的私有部分
+	friend void swap(HasPtr&, HasPtr&);
+
+private:
+	std::string *ps;
+	int i;
+};
+
+// 自定义的swap函数
+void swap(HasPtr& lhs, HasPtr& rhs) {
+	std::cout << "Executing custom swap function for HasPtr.\n";
+	using std::swap;
+	swap(lhs.ps, rhs.ps);
+	swap(lhs.i, rhs.i);
+}
+
+int main() {
+	HasPtr hp1("Test1");
+	HasPtr hp2("Test2");
+	swap(hp1, hp2);
+
+	return 0;
+}
+```
+## 练习 13.31:
+### 为你的HasPtr类定义一个<运算符,并定义一个HasPtr的vector为这个vector添加一些元素,并对它执行sort。 注意何时会调用swap。
+答：
+* std::sort 的实现目的是为了高效排序，而不是保证特定的交换机制。当为特定类型提供了自定义的 swap 时，某些情况下它可能会被 std::sort 使用，但并不保证一定会。
+```
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+
+class HasPtr {
+public:
+	// 构造函数
+	HasPtr(const char* s) : ps(new std::string(s)), i(0) { }
+	HasPtr(const std::string &s = std::string()) :ps(new std::string(s)), i(0) { }
+	// 拷贝构造函数
+	HasPtr(const HasPtr& rhs) :ps(new std::string(*rhs.ps)), i(rhs.i) { }
+	// 拷贝赋值运算符
+	HasPtr& operator=(const HasPtr& rhs) {
+		auto newp = new std::string(*rhs.ps);
+		delete ps;
+		ps = newp;
+		i = rhs.i;
+		return *this;
+	}
+	// < 运算符
+	bool operator<(const HasPtr& rhs) const {
+		return *ps < *rhs.ps;
+	}
+	// 析构函数
+	~HasPtr() {
+		delete ps;
+	}
+
+	// 为了观察swap的调用
+	friend void swap(HasPtr& lhs, HasPtr& rhs);
+
+//private:
+	std::string *ps;
+	int i;
+};
+
+// 自定义swap
+inline void swap(HasPtr& lhs, HasPtr& rhs) {
+	using std::swap;
+	swap(lhs.ps, rhs.ps);
+	swap(lhs.i, rhs.i);
+	std::cout << "swap is called!" << std::endl;
+}
+
+int main() {
+	std::vector<HasPtr> vec = { "Cherry", "Apple", "Banana", "Grape", "Orange" };
+	std::sort(vec.begin(), vec.end());
+
+	return 0;
+}
+```
+## 练习 13.32:
+### 类指针的HasPtr版本会从swap函数受益吗?如果会,得到了什么益处?如果不是，为什么？
+答：
+* swap函数对指针类HasPtr也是有益处的，首先调用swap可以简化两个对象的交换操作，提高了效率并避免为创建临时变量的资源分配和释放。
+* 以swap函数实现拷贝并替换技术的拷贝赋值运算符虽然对性能没有影响，但在简洁性、安全性和可维护性上也都有所提升。
+```
+//标准的交换操作大致如下：
+HasPtr temp = a; // 调用拷贝构造函数
+a = b;           // 调用拷贝赋值操作符
+b = temp;        // 调用拷贝赋值操作符
+
+//而 swap(a,b) 函数内部：
+friend void swap(HasPtr& a, HasPtr& b) {
+    std::swap(a.data, b.data);
+    std::swap(a.i, b.i);
+    std::swap(a.ref_count, b.ref_count);
+}
+```
