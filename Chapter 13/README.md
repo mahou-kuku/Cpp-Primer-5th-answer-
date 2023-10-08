@@ -783,3 +783,235 @@ void Folder::remove_to_Message(){
 ### 我们并未使用拷贝和交换方式来设计Message的赋值运算符。你认为其原因是什么？
 答：
 * 当前的swap函数实现过于耦合同时作用于Message和Folder对象，不适合用来实现Message的拷贝赋值运算符。
+## 练习 13.39：
+### 编写你自己版本的 strVec，包括自己版本的 reserve、capacity（参 见9.4节,第318页)和resize (参见9.3.5节,第314页)。
+答：
+```
+#define _SCL_SECURE_NO_WARNINGS
+#include <string>
+#include <memory>
+
+using namespace std;
+
+// 类似vector类内存分配策略的简化实现
+class StrVec {
+public:
+	StrVec() : elements(nullptr), first_free(nullptr), cap(nullptr) {} //allocator 成员进行默认初始化
+	StrVec(const StrVec&); // 拷贝构造函数
+	StrVec &operator=(const StrVec&); // 拷贝赋值运算符
+	~StrVec(); // 析构函数
+	void push_back(const string&); // 拷贝元素
+	size_t size() const { return first_free - elements; }
+	size_t capacity() const { return cap - elements; }
+	string *begin() const { return elements; }
+	string *end() const { return first_free; }
+	void reserve(size_t n);
+	void resize(size_t n, const string& s);
+private:
+	allocator<string> alloc; // 分配元素
+	// 被添加元素的函数所使用
+	void chk_n_alloc() { if (size() == capacity()) reallocate(); }
+	// 工具函数，被拷贝构造函数、赋值运算符和析构函数所使用
+	pair<string*, string*> alloc_n_copy(const string*, const string*);
+	void free(); // 销毁元素并释放内存
+	void reallocate(); // 获得更多内存并拷贝已有元素
+	string *elements; // 指向数组首元素的指针
+	string *first_free; // 指向数组第一个空闲元素的指针
+	string *cap; // 指向数组尾后位置的指针
+};
+
+void StrVec::push_back(const string& s) {
+	chk_n_alloc(); // 确保有空间容纳新元素
+				   // 在 first_free 指向的元素中构造 s 的副本
+	alloc.construct(first_free++, s);
+}
+
+pair<string*, string*> StrVec::alloc_n_copy(const string *b, const string *e) {
+	// 分配空间保存给定范围中的元素
+	auto data = alloc.allocate(e - b);
+	// 初始化并返回一个 pair，该 pair 由 data 和 uninitialized_copy 的返回值构成
+	return{ data, uninitialized_copy(b, e , data) };
+}
+
+void StrVec::free() {
+	// 不能传递给deallocate一个空指针,如果elements为0,函数什么也不做
+	if (elements) {
+		// 逆序销毁旧元素
+		for (auto p = first_free; p != elements; /* 空 */) {
+			alloc.destroy(--p);
+			alloc.deallocate(elements, cap - elements);
+		}
+	}
+}
+
+StrVec::StrVec(const StrVec &s) {
+	// 调用 alloc_n_copy分配空间以容纳与 s 中一样多的元素
+	auto newdata = alloc_n_copy(s.begin(), s.end());
+	elements = newdata.first;
+	first_free = cap = newdata.second;
+}
+
+StrVec::~StrVec() { free(); }
+
+StrVec &StrVec::operator=(const StrVec &rhs) {
+	// 调用 alloc_n_copy分配内存,大小与rhs中元素占用空间一样多
+	auto data = alloc_n_copy(rhs.begin(), rhs.end());
+	free();
+	elements = data.first;
+	first_free = cap = data.second;
+	return *this;
+}
+
+void StrVec::reallocate() {
+	// 我们将分配当前大小两倍的内存空间
+	auto newcapacity = size() ? 2 * size() : 1;
+	// 分配新内存
+	auto newdata = alloc.allocate(newcapacity);
+	// 将数据从旧内存移动到新内存
+	auto dest = newdata; // 指向新数组中下一个空闲位置
+	auto elem = elements; // 指向旧数组中下一个元素
+	for (size_t i = 0; i != size(); ++i) {
+		alloc.construct(dest++, move(*elem++));
+	}
+	free(); // 一旦我们移动完元素就释放旧内存空间
+	// 更新我们的数据结构，执行新元素
+	elements = newdata;
+	first_free = dest;
+	cap = elements + newcapacity;
+}
+
+void StrVec::reserve(size_t n) {
+	if (n <= capacity()) return;  // 不需要重新分配
+	auto newdata = alloc.allocate(n);
+	auto dest = newdata;
+	auto elem = elements;
+	for (size_t i = 0; i != size(); ++i) {
+		alloc.construct(dest++, move(*elem++));
+	}
+	free();
+	elements = newdata;
+	first_free = dest;
+	cap = elements + n;
+}
+
+void StrVec::resize(size_t n, const string& s = string()) {
+	if (n < size()) {
+		while (first_free != elements + n) {
+			alloc.destroy(--first_free);
+		}
+	} else if (n > size()) {
+		while (size() != n) {
+			push_back(s);
+		}
+	}
+}
+```
+## 练习 13.40:
+### 为你的StrVec类添加一个构造函数,它接受一个initializer_list <string>参数。
+答：
+```
+class StrVec {
+public:
+    StrVec(initializer_list<string> il);
+    // ... 其他成员和函数 ...
+};
+
+StrVec::StrVec(initializer_list<string> il) : elements(nullptr), first_free(nullptr), cap(nullptr) {
+    for (const auto &s : il) {
+        push_back(s);
+    }
+}
+```
+## 练习 13.41：
+### 在 push_back 中，我们为什么在 construct 调用中使用前置递增运算？如果使用后置递增运算的话，会发生什么？
+答：
+* push_back 中使用的是后置递增运算符，如果换为前置递增运算会无法在first_free一开始指向的空间构造对象，并且会在动态分配的内存空间外构造对象。
+## 练习 13.42：
+### 在你的 TextQuery 和 QueryResult 类（参见 12.3 节，第 431 页）中用你的 StrVec 类代替 vector<string>，以此来测试你的 strVec 类。
+答：
+* 直接把vector<string>替换为StrVec即可。
+## 练习 13.43:重写 free 成员,用 for_each 和 lambda (参见 10.3.2 节,第346 页)来 代替for循环destroy元素。你更倾向于哪种实现,为什么?
+答：
+```
+for_each(elements, first_free, [this](std::string &s){ alloc.destroy(&s); });
+```
+* 都可以，for_each负责了迭代部分让代码更加简洁，不过原版对destroy的指针参数的由来更为直观。
+## 练习 13.44：
+### 编写标准库 string 类的简化版本，命名为 String。你的类应该至少有一个默认构造函数和一个接受C风格字符串指针参数的构造函数。使用allocator为你的 String 类分配所需内存。
+答：
+```
+#define _SCL_SECURE_NO_WARNINGS
+#include <memory>
+#include <algorithm>
+#include <iostream>
+
+class String {
+public:
+	// 默认构造函数
+	String() : elements(nullptr), first_free(nullptr), cap(nullptr) {}
+
+	// 接受C风格字符串的构造函数
+	String(const char* cstr) {
+		auto data = alloc_n_copy(cstr, cstr + std::strlen(cstr));
+		elements = data.first;
+		first_free = cap = data.second;
+	}
+
+	// 拷贝构造函数
+	String(const String& s) {
+		auto data = alloc_n_copy(s.begin(), s.end());
+		elements = data.first;
+		first_free = cap = data.second;
+	}
+
+	// 析构函数
+	~String() {
+		free();
+	}
+
+	// 拷贝赋值运算符
+	String& operator=(const String& s) {
+		auto data = alloc_n_copy(s.begin(), s.end());
+		free();
+		elements = data.first;
+		first_free = cap = data.second;
+		return *this;
+	}
+
+	// 工具函数
+	char* begin() const { return elements; }
+	char* end() const { return first_free; }
+
+private:
+	std::allocator<char> alloc;
+
+	char* elements;
+	char* first_free;
+	char* cap;
+
+	// 工具函数
+	std::pair<char*, char*> alloc_n_copy(const char* b, const char* e) {
+		auto data = alloc.allocate(e - b);
+		return{ data, std::uninitialized_copy(b, e, data) };
+	}
+
+	void free() {
+		if (elements) {
+			for (auto p = first_free; p != elements; ) {
+				alloc.destroy(--p);
+			}
+			alloc.deallocate(elements, cap - elements);
+		}
+	}
+};
+
+int main() {
+	String s("Hello");
+	std::cout << s.begin() << std::endl;
+
+	String t = s;
+	std::cout << t.begin() << std::endl;
+
+	return 0;
+}
+```
