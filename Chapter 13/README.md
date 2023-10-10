@@ -948,11 +948,11 @@ for_each(elements, first_free, [this](std::string &s){ alloc.destroy(&s); });
 class String {
 public:
 	// 默认构造函数
-	String() : elements(nullptr), first_free(nullptr), cap(nullptr) {}
+	String() : String("") {}
 
 	// 接受C风格字符串的构造函数
 	String(const char* cstr) {
-		auto data = alloc_n_copy(cstr, cstr + std::strlen(cstr));
+		auto data = alloc_n_copy(cstr, cstr + std::strlen(cstr)+1);
 		elements = data.first;
 		first_free = cap = data.second;
 	}
@@ -1011,6 +1011,65 @@ int main() {
 
 	String t = s;
 	std::cout << t.begin() << std::endl;
+
+	return 0;
+}
+```
+## 练习 13.45:
+### 解释右值引用和左值引用的区别。
+答：
+* 左值引用使用 & 绑定到左值上，而右值引用使用 && 绑定到右值上。
+* 左值引用用于需要对象的别名或需要修改其状态的场景，而右值引用用于移动资源、优化临时对象的拷贝成本等场景。
+## 练习 13.46：
+### 什么类型的引用可以绑定到下面的初始化器上？
+```
+int f();
+vector<int> vi(100);
+int? r1 = f();
+int? r2 = vi[0];
+int? r3 = r1;
+int? r4 = vi[0] * f();
+```
+答：
+```
+	int f();
+	vector<int> vi(100);
+	int && r1 = f();
+	int & r2 = vi[0];
+	int & r3 = r1;
+	int && r4 = vi[0] * f();
+```
+## 练习 13.47:
+### 对你在练习13.44 (13.5节,第470页)中定义的string类,为它的拷贝构造函数和拷贝赋值运算符添加一条语句，在每次函数执行时打印一条信息。
+答：
+```
+	// 拷贝构造函数
+	String(const String& s) {
+		auto data = alloc_n_copy(s.begin(), s.end());
+		elements = data.first;
+		first_free = cap = data.second;
+		std::cout << "String(const String& s)" << std::endl;
+	}
+
+	// 拷贝赋值运算符
+	String& operator=(const String& s) {
+		auto data = alloc_n_copy(s.begin(), s.end());
+		free();
+		elements = data.first;
+		first_free = cap = data.second;
+		std::cout << "String& operator=(const String& s)" << std::endl;
+		return *this;
+	}
+```
+## 练习 13.48：
+### 定义一个 vector<String>并在其上多次调用 push_back。 运行你的程 序，并观察 String 被拷贝了多少次。
+答：
+```
+int main() {
+	String s("Hello");
+	std::vector<String> vec;
+	vec.push_back(s);
+	vec.push_back("World");
 
 	return 0;
 }
