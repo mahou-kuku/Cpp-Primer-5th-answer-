@@ -839,8 +839,8 @@ void StrVec::free() {
 		// 逆序销毁旧元素
 		for (auto p = first_free; p != elements; /* 空 */) {
 			alloc.destroy(--p);
-			alloc.deallocate(elements, cap - elements);
 		}
+			alloc.deallocate(elements, cap - elements);
 	}
 }
 
