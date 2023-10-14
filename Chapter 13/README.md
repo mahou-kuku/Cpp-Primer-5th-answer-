@@ -1074,3 +1074,481 @@ int main() {
 	return 0;
 }
 ```
+## 练习 13.49:
+### 为你的strVec、 String和Message类添加一个移动构造函数和一个移动赋值运算符。
+答：
+* Message:
+```
+#include <iostream>
+#include <string>
+#include <set>
+
+using namespace std;
+
+class Folder;
+
+class Message {
+	friend class Folder;
+	friend void swap(Message &, Message &);
+public:
+	// folders被隐式初始化为空集合
+	explicit Message(const std::string &str = "") : contents(str) { }
+	// 拷贝控制成员,用来管理指向本Message的指针
+	Message(const Message&); // 拷贝构造函数
+	Message(Message &&m) noexcept; // 移动构造函数
+	Message& operator=(const Message&); // 拷贝赋值运算符
+	Message& operator=(Message &&rhs) noexcept; // 移动赋值运算符
+	~Message(); // 析构函数
+				// 从给定 Folder 集合中添加/删除本 Message
+	void save(Folder&);
+	void remove(Folder&);
+	void addFol(Folder* pFol) { folders.insert(pFol); }
+	void remFol(Folder* pFol) { folders.erase(pFol); }
+private:
+	std::string contents; // 实际消息文本
+	std::set<Folder*> folders; // 包含本 Message 的 Folder
+							   // 拷贝构造函数、拷贝赋值运算符和析构函数所使用的工具函数
+							   // 将本Message添加到指向参数的Folder中
+	void add_to_Folders(const Message&);
+	// 从 folders 中的每个 Folder 中删除本 Message
+	void remove_from_Folders();
+};
+
+class Folder {
+	friend class Message;
+public:
+	Folder() = default;
+	Folder(const Folder&);
+	Folder(Folder &&f) noexcept;
+	Folder& operator=(const Folder&);
+	Folder& operator=(Folder &&rhs) noexcept;
+	~Folder();
+	void addMsg(Message* pMsg) { messages.insert(pMsg); }
+	void remMsg(Message* pMsg) { messages.erase(pMsg); }
+private:
+	std::set<Message*> messages;
+	void add_to_Message();
+	void remove_to_Message();
+};
+
+Message::Message(const Message &m) : contents(m.contents), folders(m.folders) {
+	add_to_Folders(m); // 将本消息添加到指向m的Folder中
+}
+
+Message& Message::operator=(const Message &rhs) {
+	// 通过先删除指针再插入它们来处理自赋值情况
+	remove_from_Folders(); // 更新已有 Folder
+	contents = rhs.contents; // 从 rhs 拷贝消息内容
+	folders = rhs.folders; // 从rhs拷贝Folder指针
+	add_to_Folders(rhs); // 将本 Message 添加到那些 Folder 中
+	return *this;
+}
+
+Message::~Message() {
+	remove_from_Folders();
+}
+
+void Message::save(Folder &f) {
+	folders.insert(&f); // 将给定Folder添加到我们的Folder列表中
+	f.addMsg(this); // 将本Message添加到f的Message集合中
+}
+
+void Message::remove(Folder &f) {
+	folders.erase(&f); // 将给定Folder从我们的Folder列表中删除
+	f.remMsg(this); // 将本 Message 从 f 的 Message 集合中删除
+}
+
+// 将本Message添加到指向m的Folder中
+void Message::add_to_Folders(const Message &m) {
+	for (auto f : m.folders) { // 对每个包含m 的 Folder
+		f->addMsg(this); // 向该Folder添加一个指向本Message的指针
+	}
+}
+
+// 从对应的Folder中删除本Message
+void Message::remove_from_Folders()
+{
+	for (auto f : folders) { // 对 folders 中每个指针
+		f->remMsg(this); // 从该 Folder 中删除本 Message
+	}
+}
+
+void swap(Message &lhs, Message &rhs) {
+	using std::swap; // 在本例中严格来说并不需要，但这是一个好习惯
+					 // 将每个消息的指针从它（原来）所在 Folder 中删除
+	for (auto f : lhs.folders) {
+		f->remMsg(&lhs);
+	}
+	for (auto f : rhs.folders) {
+		f->remMsg(&rhs);
+	}
+	// 交换 contents 和 Folder 指针 set
+	swap(lhs.folders, rhs.folders); // 使用swap (set&, set&)
+	swap(lhs.contents, rhs.contents); // swap(string&, string&)
+									  // 将每个Message的指针添加到它的(新) Folder中
+	for (auto f : lhs.folders) {
+		f->addMsg(&lhs);
+	}
+	for (auto f : rhs.folders) {
+		f->addMsg(&rhs);
+	}
+}
+
+Message::Message(Message &&m) noexcept
+	: contents(std::move(m.contents)), folders(std::move(m.folders)) {
+	// 更新 folders 中的每个 Folder 以指向新的 Message
+	for (auto f : folders) {
+		f->remMsg(&m);
+		f->addMsg(this);
+	}
+	m.folders.clear(); // 确保移动后的源对象处于有效状态
+}
+
+Message& Message::operator=(Message &&rhs) noexcept {
+	if (this != &rhs) { // 检查自赋值
+		remove_from_Folders();
+		contents = std::move(rhs.contents);
+		folders = std::move(rhs.folders);
+		for (auto f : folders) {
+			f->remMsg(&rhs);
+			f->addMsg(this);
+		}
+		rhs.folders.clear();
+	}
+	return *this;
+}
+
+
+Folder::Folder(const Folder& rhs) :messages(rhs.messages) {
+	add_to_Message();
+}
+
+Folder& Folder::operator=(const Folder& rhs) {
+	remove_to_Message();
+	messages = rhs.messages;
+	add_to_Message();
+	return *this;
+}
+
+Folder::~Folder() {
+	remove_to_Message();
+}
+
+void Folder::add_to_Message() {
+	for (auto m : messages) {
+		m->addFol(this);
+	}
+}
+
+void Folder::remove_to_Message() {
+	for (auto m : messages) {
+		m->remFol(this);
+	}
+}
+
+Folder::Folder(Folder &&f) noexcept
+	: messages(std::move(f.messages)) {
+	// 更新 messages 中的每个 Message 以指向新的 Folder
+	for (auto m : messages) {
+		m->remFol(&f);
+		m->addFol(this);
+	}
+	f.messages.clear(); // 确保移动后的源对象处于有效状态
+}
+
+Folder& Folder::operator=(Folder &&rhs) noexcept {
+	if (this != &rhs) { // 检查自赋值
+		remove_to_Message();
+		messages = std::move(rhs.messages);
+		for (auto m : messages) {
+			m->remFol(&rhs);
+			m->addFol(this);
+		}
+		rhs.messages.clear();
+	}
+	return *this;
+}
+```
+* strVec:
+```
+#define _SCL_SECURE_NO_WARNINGS
+#include <string>
+#include <memory>
+
+using namespace std;
+
+// 类似vector类内存分配策略的简化实现
+class StrVec {
+public:
+	StrVec() : elements(nullptr), first_free(nullptr), cap(nullptr) {} //allocator 成员进行默认初始化
+	StrVec(const StrVec&); // 拷贝构造函数
+	StrVec(StrVec &&s) noexcept; // 移动构造函数
+	StrVec &operator=(const StrVec&); // 拷贝赋值运算符
+	StrVec& operator = (StrVec &&rhs) noexcept; // 拷移动赋值运算符
+	~StrVec(); // 析构函数
+	void push_back(const string&); // 拷贝元素
+	size_t size() const { return first_free - elements; }
+	size_t capacity() const { return cap - elements; }
+	string *begin() const { return elements; }
+	string *end() const { return first_free; }
+	void reserve(size_t n);
+	void resize(size_t n, const string& s);
+private:
+	allocator<string> alloc; // 分配元素
+	// 被添加元素的函数所使用
+	void chk_n_alloc() { if (size() == capacity()) reallocate(); }
+	// 工具函数，被拷贝构造函数、赋值运算符和析构函数所使用
+	pair<string*, string*> alloc_n_copy(const string*, const string*);
+	void free(); // 销毁元素并释放内存
+	void reallocate(); // 获得更多内存并拷贝已有元素
+	string *elements; // 指向数组首元素的指针
+	string *first_free; // 指向数组第一个空闲元素的指针
+	string *cap; // 指向数组尾后位置的指针
+};
+
+void StrVec::push_back(const string& s) {
+	chk_n_alloc(); // 确保有空间容纳新元素
+	// 在 first_free 指向的元素中构造 s 的副本
+	alloc.construct(first_free++, s);
+}
+
+pair<string*, string*> StrVec::alloc_n_copy(const string *b, const string *e) {
+	// 分配空间保存给定范围中的元素
+	auto data = alloc.allocate(e - b);
+	// 初始化并返回一个 pair，该 pair 由 data 和 uninitialized_copy 的返回值构成
+	return{ data, uninitialized_copy(b, e , data) };
+}
+
+void StrVec::free() {
+	// 不能传递给deallocate一个空指针,如果elements为0,函数什么也不做
+	if (elements) {
+		// 逆序销毁旧元素
+		for (auto p = first_free; p != elements; /* 空 */) {
+			alloc.destroy(--p);
+		}
+		alloc.deallocate(elements, cap - elements);
+	}
+}
+
+StrVec::StrVec(const StrVec &s) {
+	// 调用 alloc_n_copy分配空间以容纳与 s 中一样多的元素
+	auto newdata = alloc_n_copy(s.begin(), s.end());
+	elements = newdata.first;
+	first_free = cap = newdata.second;
+}
+
+StrVec::~StrVec() { free(); }
+
+StrVec &StrVec::operator=(const StrVec &rhs) {
+	// 调用 alloc_n_copy分配内存,大小与rhs中元素占用空间一样多
+	auto data = alloc_n_copy(rhs.begin(), rhs.end());
+	free();
+	elements = data.first;
+	first_free = cap = data.second;
+	return *this;
+}
+
+void StrVec::reallocate() {
+	// 我们将分配当前大小两倍的内存空间
+	auto newcapacity = size() ? 2 * size() : 1;
+	// 分配新内存
+	auto newdata = alloc.allocate(newcapacity);
+	// 将数据从旧内存移动到新内存
+	auto dest = newdata; // 指向新数组中下一个空闲位置
+	auto elem = elements; // 指向旧数组中下一个元素
+	for (size_t i = 0; i != size(); ++i) {
+		alloc.construct(dest++, move(*elem++));
+	}
+	free(); // 一旦我们移动完元素就释放旧内存空间
+			// 更新我们的数据结构，执行新元素
+	elements = newdata;
+	first_free = dest;
+	cap = elements + newcapacity;
+}
+
+void StrVec::reserve(size_t n) {
+	if (n <= capacity()) return;  // 不需要重新分配
+	auto newdata = alloc.allocate(n);
+	auto dest = newdata;
+	auto elem = elements;
+	for (size_t i = 0; i != size(); ++i) {
+		alloc.construct(dest++, move(*elem++));
+	}
+	free();
+	elements = newdata;
+	first_free = dest;
+	cap = elements + n;
+}
+
+void StrVec::resize(size_t n, const string& s = string()) {
+	if (n < size()) {
+		while (first_free != elements + n) {
+			alloc.destroy(--first_free);
+		}
+	} else if (n > size()) {
+		while (size() != n) {
+			push_back(s);
+		}
+	}
+}
+
+StrVec::StrVec(StrVec &&s) noexcept : elements(s.elements), first_free(s.first_free), cap(s.cap) {
+	s.elements = s.first_free = s.cap = nullptr;
+}
+
+StrVec& StrVec::operator = (StrVec &&rhs) noexcept {
+	if (this != &rhs) {
+		free();
+		elements = rhs.elements;
+		first_free = rhs.first_free;
+		cap = rhs.cap;
+		rhs.elements = rhs.first_free = rhs.cap = nullptr;
+	}
+	return *this;
+}
+```
+## 练习 13.50：
+### 在你的 String 类的移动操作中添加打印语句，并重新运行 13.6.1 节 （第473 页)的练习 13.48 中的程序，它使用了一个 vector<String>，观察什么时候会避免拷贝。
+答：
+```
+#define _SCL_SECURE_NO_WARNINGS
+#include <memory>
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+class String {
+public:
+	// 默认构造函数
+	String() : String("") {}
+
+	// 接受C风格字符串的构造函数
+	String(const char* cstr) {
+		auto data = alloc_n_copy(cstr, cstr + std::strlen(cstr) + 1);
+		elements = data.first;
+		first_free = cap = data.second;
+	}
+
+	// 拷贝构造函数
+	String(const String& s) {
+		auto data = alloc_n_copy(s.begin(), s.end());
+		elements = data.first;
+		first_free = cap = data.second;
+	}
+
+	// 移动构造函数
+	String(String &&s) noexcept : elements(s.elements), first_free(s.first_free), cap(s.cap) {
+		s.elements = s.first_free = s.cap = nullptr; // 确保移动后的源对象是安全的
+		std::cout << "Move Constructor Called" << std::endl;
+	}
+
+	// 析构函数
+	~String() {
+		free();
+	}
+
+	// 拷贝赋值运算符
+	String& operator=(const String& s) {
+		auto data = alloc_n_copy(s.begin(), s.end());
+		free();
+		elements = data.first;
+		first_free = cap = data.second;
+		return *this;
+	}
+
+	// 移动赋值运算符
+	String& operator=(String &&rhs) noexcept {
+		if (this != &rhs) {
+			free(); // 释放现有的资源
+			elements = rhs.elements;
+			first_free = rhs.first_free;
+			cap = rhs.cap;
+			rhs.elements = rhs.first_free = rhs.cap = nullptr; // 使rhs安全
+		}
+		std::cout << "Move Assignment Operator Called" << std::endl;
+		return *this;
+	}
+
+	// 工具函数
+	char* begin() const { return elements; }
+	char* end() const { return first_free; }
+
+private:
+	std::allocator<char> alloc;
+
+	char* elements;
+	char* first_free;
+	char* cap;
+
+	// 工具函数
+	std::pair<char*, char*> alloc_n_copy(const char* b, const char* e) {
+		auto data = alloc.allocate(e - b);
+		return{ data, std::uninitialized_copy(b, e, data) };
+	}
+
+	void free() {
+		if (elements) {
+			for (auto p = first_free; p != elements; ) {
+				alloc.destroy(--p);
+			}
+			alloc.deallocate(elements, cap - elements);
+		}
+	}
+};
+
+
+int main() {
+	String s("Hello");
+	std::vector<String> vec;
+	vec.push_back(s);
+	vec.push_back("World");
+
+	system("pause");
+	return 0;
+}
+```
+## 练习 13.51:
+### 虽然unique_ptr不能拷贝,但我们在12.1.5节(第418页)中编写了一个clone函数，它以值方式返回一个 unique_ptr。解释为什么函数是合法的，以及为什么它能正确工作。
+答：
+* 函数按值返回的对象是一个右值，对右值unique_ptr的拷贝将调用unique_ptr的移动构造函数。
+## 练习 13.52:
+### 详细解释第478 页中的 HasPtr 对象的赋值发生了什么?特别是,一步一步描述 hp、hp2以及HasPtr 的赋值运算符中的参数 rhs的值发生了什么变化。
+答：
+* hp = hp2;这一行代码进行了以下操作：
+* 由于hp2是左值，调用operator=函数时，将使用拷贝构造函数为rhs创建一个新的HasPtr对象。rhs.ps现在指向一个新的string对象，该对象的内容与hp2.ps指向的对象相同。
+* 赋值运算符使用swap函数交换*this（即hp）和rhs的内容。因此，hp的ps和rhs的ps交换了指针，所以现在hp.ps指向rhs.ps原先指向的那个string对象，而rhs.ps现在指向hp原来所指向的string对象。
+* 函数结束时，rhs（拷贝的对象）的析构函数被调用，rhs.ps指向的string对象会被删除，但由于hp.ps和rhs.ps已经交换了，所以实际上是原hp的string对象被删除。
+* hp = std::move(hp2);这一行代码进行了以下操作：
+* std::move(hp2)将hp2转换为右值引用，这意味着可以从hp2中移走资源。赋值运算符使用移动构造函数为rhs创建一个新的HasPtr对象。因此，rhs.ps现在直接获取了hp2.ps的指针值，并且hp2.ps被设置为nullptr。
+* 然后，同样使用swap函数交换*this（即hp）和rhs的内容。因此，hp.ps和rhs.ps交换了指针。这次，hp.ps将直接指向hp2原先所指向的string对象，而rhs.ps则获取了hp原来的指针。
+* 函数结束时，rhs（移动的对象）的析构函数被调用，rhs.ps指向的string对象会被删除，但由于hp.ps和rhs.ps已经交换了，所以实际上是原hp的string对象被删除。
+## 练习 13.53:
+### 从底层效率的角度看, HasPtr的赋值运算符并不理想,解释为什么。为HasPtr实现一个拷贝赋值运算符和一个移动赋值运算符,并比较你的新的移动赋值运算符中执行的操作和拷贝并交换版本中执行的操作。
+答：
+* 临时对象的创建：每次调用operator=时，都会创建一个临时HasPtr对象作为函数参数rhs。这意味着进行了额外的内存分配和释放，增加了运行时间。
+* 拷贝操作的开销：对于左值的情况，创建rhs的过程中会调用拷贝构造函数，从而执行一个完整的HasPtr拷贝操作。
+* 交换操作的开销：在函数体内部，使用swap进行交换虽然本身开销不大，但仍增加了一些运行时间。
+```
+//拷贝赋值运算符
+HasPtr& operator=(const HasPtr &rhs) {
+    auto newp = new std::string(*rhs.ps); // 拷贝底层string
+    delete ps; // 释放旧的内存
+    ps = newp; // 更新ps指针
+    i = rhs.i;
+    return *this;
+}
+//移动赋值运算符
+HasPtr& operator=(HasPtr &&rhs) noexcept {
+    if (this != &rhs) {
+        delete ps; // 释放当前对象的内存
+        ps = rhs.ps; // 移动rhs的数据
+        i = rhs.i;
+        rhs.ps = nullptr; // 使rhs进入一个安全状态
+    }
+    return *this;
+}
+```
+## 练习 13.54：
+### 如果我们为 HasPtr 定义了移动赋值运算符，但未改变拷贝并交换运算符，会发生什么？编写代码验证你的答案。
+答：
+* 会使编译器会知道应该选择拷贝并交换的版本还是专门的移动赋值运算符，因此会产生“operator =”不明确的二义性编译错误。
