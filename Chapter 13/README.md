@@ -1552,3 +1552,63 @@ HasPtr& operator=(HasPtr &&rhs) noexcept {
 ### 如果我们为 HasPtr 定义了移动赋值运算符，但未改变拷贝并交换运算符，会发生什么？编写代码验证你的答案。
 答：
 * 会使编译器会知道应该选择拷贝并交换的版本还是专门的移动赋值运算符，因此会产生“operator =”不明确的二义性编译错误。
+## 练习 3.55:
+### 为你的 strBlob添加一个右值引用版本的 push_back。
+答：
+```
+void push_back(string &&t) { data->push_back(std::move(t)); }
+```
+### 练习 13.56:
+### 如果sorted定义如下,会发生什么:
+```
+Foo Foo::sorted() const & {
+ Foo ret(*this);
+ return ret.sorted();
+}
+```
+答：
+* ret是个左值将调用Foo sorted() const &; 自身，会导致无限递归。
+## 练习 13.57：
+### 如果 sorted 定义如下，会发生什么：
+```
+Foo Foo::sorted() const & { return Foo(*this).sorted(); }
+```
+答：
+* 会在返回时创建一个临时Foo对象，这是一个右值，所以会调用Foo sorted() &&；
+## 练习 13.58:
+### 编写新版本的Foo类,其sorted函数中有打印语句,测试这个类,来验证你对前两题的答案是否正确。
+答：
+```
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Foo {
+public:
+	Foo sorted() && ; // 可用于可改变的右值
+	Foo sorted() const &; // 可用于任何类型的 Foo
+	// Foo 的其他成员的定义
+private:
+	vector<int> data;
+};
+// 本对象为右值，因此可以原址排序
+Foo Foo::sorted() &&{
+	cout << "&&sorted called" << endl;
+	sort(data.begin(), data.end()); return *this;
+}
+// 本对象是 const 或是一个左值，哪种情况我们都不能对其进行原址排序
+Foo Foo::sorted() const & {
+	cout << "const &sorted called" << endl;
+	return Foo(*this).sorted();
+}
+
+int main() {
+	Foo f;
+	f.sorted();
+	Foo().sorted();
+
+	return 0;
+}
+```
