@@ -166,3 +166,33 @@ bool operator!=(const Object& lhs, const Object& rhs) {
 	return !(lhs == rhs);
 }
 ```
+## 练习 14.6：
+### 为你的 Sales data 类定义输出运算符。
+答：
+```
+// 输出
+std::ostream& operator<<(std::ostream& os, const Sales_data& item) {
+	os << item.isbn() << " " << item.units_sold << " " << item.revenue << " " << item.avg_price();
+	return os;
+}
+```
+## 练习 14.7:
+### 你在13.5 节的练习(第 470 页)中曾经编写了一个String类，为它定义一个输出运算符。
+答：
+```
+// 输出运算符
+std::ostream& operator<<(std::ostream &os, const String &str){
+	os << str.begin();
+	return os;
+}
+```
+## 练习 14.8:
+### 你在7.5.1节的练习7.40 (第261页)中曾经选择并编写了一个类,为它定义一个输出运算符。
+答：
+```
+// 输出运算符
+std::ostream& operator<<(std::ostream& os, const Object& obj) {
+	os << "ID: " << obj.getId() << ", Name: " << obj.getName();
+	return os;
+}
+```
