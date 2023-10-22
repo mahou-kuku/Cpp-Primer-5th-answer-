@@ -196,3 +196,45 @@ std::ostream& operator<<(std::ostream& os, const Object& obj) {
 	return os;
 }
 ```
+## 练习 14.9:
+### 为你的Sales_data类定义输入运算符。
+答：
+```
+// 输入
+std::istream& operator>>(std::istream& is, Sales_data& item) {
+	double price = 0.0;
+	is >> item.bookNo >> item.units_sold >> price;
+	if (is) {
+		item.revenue = item.units_sold * price;
+	} else {
+		item = Sales_data();
+	}
+	return is;
+}
+```
+## 练习 14.10：
+### 对于 Sales_data 的输入运算符来说如果给定了下面的输入将发生什么情况？
+```
+(a) 0-201-99999-9 10 24.95
+(b) 10 24.95 0-210-99999-9
+```
+答：
+```
+(a) 正常执行 。
+(b) 将.95读入price ，检测输入流的状态并不能防止这种输入错误。
+```
+## 练习 14.11：
+### 下面的 Sales_data 输入运算符存在错误吗？如果有，请指出来。对于这个输入运算符如果仍然给定上个练习的输入将发生什么情况？
+```
+istream& operator>>(istream& in, Sales_data& s)
+{
+ double price; in >> s.bookNo >> s.units_sold >> price;
+ s.revenue = s.units_sold * price; return in;
+}
+```
+答：
+* 输入检测变得更差了。给这个运算符输入上个练习的数据，所产生的结果是相同的。
+## 练习 14.12:
+### 你在 7.5.1 节的练习 7.40 (第261页)中曾经选择并编写了一个类，为它定义一个输入运算符并确保该运算符可以处理输入错误。
+答：
+* 除非有特定的理由，否则可能不需要自定义赋值运算符。
