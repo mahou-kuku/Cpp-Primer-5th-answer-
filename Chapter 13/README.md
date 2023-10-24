@@ -981,7 +981,7 @@ public:
 	// 工具函数
 	char* begin() const { return elements; }
 	char* end() const { return first_free; }
-
+	size_t size() const { return first_free - elements; }
 private:
 	std::allocator<char> alloc;
 
@@ -1472,7 +1472,7 @@ public:
 	// 工具函数
 	char* begin() const { return elements; }
 	char* end() const { return first_free; }
-
+	size_t size() const { return first_free - elements; }
 private:
 	std::allocator<char> alloc;
 
