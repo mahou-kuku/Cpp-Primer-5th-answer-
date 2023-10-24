@@ -249,6 +249,49 @@ istream& operator>>(istream& in, Sales_data& s)
 * 维护性：如果需要改变加法的行为，只需在一个地方修改。
 * 一致性：确保加法和复合加法的行为始终保持一致。
 ## 练习 14.15：
-### 你在 7.5.1 节的练习 7.40 (第261 页)中曾经选择并编写了一个类，你认为.它应该含有其他算术运算符吗?如果是,请实现它们;如果不是,解释原因。
+### 你在 7.5.1 节的练习 7.40 (第261 页)中曾经选择并编写了一个类，你认为它应该含有其他算术运算符吗?如果是,请实现它们;如果不是,解释原因。
 答：
 * 除非有特定的理由，否则可能不需要自定义算术运算符。
+## 练习 14.16：
+### 为你的 strBlob 类（参见 12.1.1 节，第 405 页)、StrBlobPtr 类（参见12.1.6节,第421页)、StrVec类(参见13.5节,第465页)和String类(参见13.5节,第470页)分别定义相等运算符和不相等运算符。
+答：
+```
+//StrBlob
+bool operator==(const StrBlob &lhs, const StrBlob &rhs) {
+	return lhs.data == rhs.data;
+}
+bool operator!=(const StrBlob &lhs, const StrBlob &rhs){
+	return !(lhs == rhs);
+}
+//StrBlobPtr
+bool operator==(const StrBlobPtr &lhs, const StrBlobPtr &rhs){
+	auto lshSp = lhs.wptr.lock();
+	auto rhsSp = rhs.wptr.lock();
+	if (lshSp && rhsSp && lshSp == rhsSp) {
+		return lhs.curr == rhs.curr;
+	}
+	return false;
+}
+bool operator!=(const StrBlobPtr &lhs, const StrBlobPtr &rhs){
+	return !(lhs == rhs);
+}
+//StrVec
+bool operator==(const StrVec &lhs, const StrVec &rhs){
+	return (lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+bool operator!=(const StrVec &lhs, const StrVec &rhs){
+	return !(lhs == rhs);
+}
+//String
+bool operator==(const String &lhs, const String &rhs){
+	return (lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+
+bool operator!=(const String &lhs, const String &rhs){
+	return !(lhs == rhs);
+}
+```
+## 练习 14.17：
+### 你在 7.5.1 节的练习 7.40（第 261 页）中曾经选择并编写了一个类，你认为它应该含有相等运算符吗？如果是，请实现它；如果不是,解释原因。
+答：
+* 不需要，Object类的每个对象ID唯一。
