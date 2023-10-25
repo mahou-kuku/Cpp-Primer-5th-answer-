@@ -294,4 +294,85 @@ bool operator!=(const String &lhs, const String &rhs){
 ## 练习 14.17：
 ### 你在 7.5.1 节的练习 7.40（第 261 页）中曾经选择并编写了一个类，你认为它应该含有相等运算符吗？如果是，请实现它；如果不是,解释原因。
 答：
-* 不需要，Object类的每个对象ID唯一。
+```
+bool operator==(const Object& lhs, const Object& rhs) {
+    return lhs.getId() == rhs.getId();
+}
+```
+## 练习 14.18:
+### 为你的StrBlob类、StrBlobPtr类、StrVec类和String类定义关系运算符。
+答：
+```
+//StrBlob
+bool operator<(const StrBlob& lhs, const StrBlob& rhs) {
+	return std::lexicographical_compare(lhs.data->begin(), lhs.data->end(), rhs.data->begin(), rhs.data->end());
+}
+
+bool operator<=(const StrBlob& lhs, const StrBlob& rhs) {
+	return !(rhs < lhs);
+}
+
+bool operator>(const StrBlob& lhs, const StrBlob& rhs) {
+	return rhs < lhs;
+}
+
+bool operator>=(const StrBlob& lhs, const StrBlob& rhs) {
+	return !(lhs < rhs);
+}
+//StrBlobPtr
+bool operator<(const StrBlobPtr& lhs, const StrBlobPtr& rhs) {
+	return lhs.curr < rhs.curr;
+}
+
+bool operator<=(const StrBlobPtr& lhs, const StrBlobPtr& rhs) {
+	return !(rhs < lhs);
+}
+
+bool operator>(const StrBlobPtr& lhs, const StrBlobPtr& rhs) {
+	return rhs < lhs;
+}
+
+bool operator>=(const StrBlobPtr& lhs, const StrBlobPtr& rhs) {
+	return !(lhs < rhs);
+}
+//StrVec
+bool operator<(const StrVec& lhs, const StrVec& rhs) {
+	return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+bool operator<=(const StrVec& lhs, const StrVec& rhs) {
+	return !(rhs < lhs);
+}
+
+bool operator>(const StrVec& lhs, const StrVec& rhs) {
+	return rhs < lhs;
+}
+
+bool operator>=(const StrVec& lhs, const StrVec& rhs) {
+	return !(lhs < rhs);
+}
+//String
+bool operator<(const String& lhs, const String& rhs) {
+	return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+bool operator<=(const String& lhs, const String& rhs) {
+	return !(rhs < lhs);
+}
+
+bool operator>(const String& lhs, const String& rhs) {
+	return rhs < lhs;
+}
+
+bool operator>=(const String& lhs, const String& rhs) {
+	return !(lhs < rhs);
+}
+```
+### 练习 14.19:
+### 你在7.5.1节的练习7.40 (第261页)中曾经选择并编写了一个类,你认为它应该含有关系运算符吗?如果是,请实现它;如果不是,解释原因。
+答：
+```
+bool operator<(const Object& lhs, const Object& rhs) {
+    return lhs.getId() < rhs.getId();
+}
+```
