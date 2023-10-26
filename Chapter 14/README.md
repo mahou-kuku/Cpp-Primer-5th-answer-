@@ -256,14 +256,14 @@ istream& operator>>(istream& in, Sales_data& s)
 ### 为你的 strBlob 类（参见 12.1.1 节，第 405 页)、StrBlobPtr 类（参见12.1.6节,第421页)、StrVec类(参见13.5节,第465页)和String类(参见13.5节,第470页)分别定义相等运算符和不相等运算符。
 答：
 ```
-//StrBlob
+// StrBlob
 bool operator==(const StrBlob &lhs, const StrBlob &rhs) {
 	return lhs.data == rhs.data;
 }
 bool operator!=(const StrBlob &lhs, const StrBlob &rhs){
 	return !(lhs == rhs);
 }
-//StrBlobPtr
+// StrBlobPtr
 bool operator==(const StrBlobPtr &lhs, const StrBlobPtr &rhs){
 	auto lshSp = lhs.wptr.lock();
 	auto rhsSp = rhs.wptr.lock();
@@ -275,14 +275,14 @@ bool operator==(const StrBlobPtr &lhs, const StrBlobPtr &rhs){
 bool operator!=(const StrBlobPtr &lhs, const StrBlobPtr &rhs){
 	return !(lhs == rhs);
 }
-//StrVec
+// StrVec
 bool operator==(const StrVec &lhs, const StrVec &rhs){
 	return (lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 bool operator!=(const StrVec &lhs, const StrVec &rhs){
 	return !(lhs == rhs);
 }
-//String
+// String
 bool operator==(const String &lhs, const String &rhs){
 	return (lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
@@ -303,7 +303,7 @@ bool operator==(const Object& lhs, const Object& rhs) {
 ### 为你的StrBlob类、StrBlobPtr类、StrVec类和String类定义关系运算符。
 答：
 ```
-//StrBlob
+// StrBlob
 bool operator<(const StrBlob& lhs, const StrBlob& rhs) {
 	return std::lexicographical_compare(lhs.data->begin(), lhs.data->end(), rhs.data->begin(), rhs.data->end());
 }
@@ -319,7 +319,7 @@ bool operator>(const StrBlob& lhs, const StrBlob& rhs) {
 bool operator>=(const StrBlob& lhs, const StrBlob& rhs) {
 	return !(lhs < rhs);
 }
-//StrBlobPtr
+// StrBlobPtr
 bool operator<(const StrBlobPtr& lhs, const StrBlobPtr& rhs) {
 	return lhs.curr < rhs.curr;
 }
@@ -335,7 +335,7 @@ bool operator>(const StrBlobPtr& lhs, const StrBlobPtr& rhs) {
 bool operator>=(const StrBlobPtr& lhs, const StrBlobPtr& rhs) {
 	return !(lhs < rhs);
 }
-//StrVec
+// StrVec
 bool operator<(const StrVec& lhs, const StrVec& rhs) {
 	return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
@@ -351,7 +351,7 @@ bool operator>(const StrVec& lhs, const StrVec& rhs) {
 bool operator>=(const StrVec& lhs, const StrVec& rhs) {
 	return !(lhs < rhs);
 }
-//String
+// String
 bool operator<(const String& lhs, const String& rhs) {
 	return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
@@ -374,5 +374,91 @@ bool operator>=(const String& lhs, const String& rhs) {
 ```
 bool operator<(const Object& lhs, const Object& rhs) {
     return lhs.getId() < rhs.getId();
+}
+```
+## 练习 14.20:
+### 为你的Sales_data类定义加法和复合赋值运算符。
+答：
+```
+// 加法
+Sales_data operator+(const Sales_data& lhs, const Sales_data& rhs) {
+	Sales_data sum = lhs;
+	sum += rhs;
+	return sum;
+}
+
+// 复合赋值
+Sales_data& Sales_data::operator+=(const Sales_data& rhs) {
+	units_sold += rhs.units_sold;
+	revenue += rhs.revenue;
+	return *this;
+```
+## 练习 14.21：
+### 编写 Sales_data 类的+和+=运算符，使得+执行实际的加法操作而+=调用+。相比于14.3 节（第 497 页）和 14.4 节（第 500 页)对这两个运算符的定义，本题的定义有何缺点？试讨论之。
+答：
+```
+// 加法
+Sales_data& Sales_data::operator+=(const Sales_data &rhs) {
+	*this = *this + rhs;
+	return *this;
+}
+// 复合赋值
+Sales_data operator+(const Sales_data &lhs, const Sales_data &rhs) {
+	return Sales_data(lhs.isbn(), lhs.units_sold + rhs.units_sold, lhs.avg_price() + rhs.avg_price());
+}
+```
+* 效率问题：在operator+=中，\*this + rhs会创建一个临时Sales_data对象，然后将这个临时对象的内容复制到*this。这意味着在每次调用operator+=时都会有额外的对象创建和销毁，而这些都是不必要的。
+## 练习 14.22:
+### 定义赋值运算符的一个新版本，使得我们能把一个表示 ISBN 的 string赋给一个 Sales_data 对象。
+答：
+```
+Sales_data& Sales_data::operator=(const std::string &newBookNo){
+	bookNo = newBookNo;
+	return *this;
+}
+```
+## 练习 14.23:
+### 为你的StrVec类定义一个initializer_list赋值运算符。
+答：
+```
+StrVec &StrVec::operator=(initializer_list<string> il){
+	// alloc_n_copy 分配内存空间并从给定范围内拷贝元素
+	auto data = alloc_n_copy(il.begin(), il.end());
+	free(); // 销毁对象中的元素并释放内存空间
+	elements = data.first; // 更新数据成员使其指向新空间
+	first_free = cap = data.second;
+	return *this;
+}
+```
+## 练习 14.24:
+### 你在 7.5.1节的练习7.40 (第261页)中曾经选择并编写了一个类，你认为它应该含有拷贝赋值和移动赋值运算符吗?如果是,请实现它们。
+答：
+```
+// 拷贝赋值运算符
+Object& Object::operator=(const Object& other) {
+	if (this != &other) {  // 避免自赋值
+		name = other.name;
+		// 不改变id
+	}
+        return *this;
+}
+// 移动赋值运算符
+Object& Object::operator=(Object&& other) noexcept {
+	if (this != &other) {  // 避免自赋值
+		name = std::move(other.name);
+		// 不改变id
+		other.name = "Unnamed";
+	}
+	return *this;
+}
+```
+## 练习 14.25:
+### 上题的这个类还需要定义其他赋值运算符吗?如果是,请实现它们;同时说明运算对象应该是什么类型并解释原因。
+答：
+```
+// 使用string 作为参数的赋值运算符，更改Object的name
+Object& Object::operator=(const std::string &newName){
+	name = newName;
+	return *this;
 }
 ```
