@@ -478,13 +478,13 @@ const string& StrBlob::operator[](size_t n) const{
 }
 // StrBlobPtr
 string& StrBlobPtr::operator[](size_t n){
-	auto p = check(n, "[] out of range.");
-	return p->at(n);
+	auto p = check(n + curr, "[] out of range.");
+	return p->at(n + curr);
 }
 
 const string& StrBlobPtr::operator[](size_t n) const{
-	auto p = check(n, "[] out of range.");
-	return p->at(n);
+	auto p = check(n + curr, "[] out of range.");
+	return p->at(n + curr);
 }
 // StrVec
 std::string& StrVec::operator[](std::size_t n) { return elements[n]; }
