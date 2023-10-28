@@ -462,3 +462,34 @@ Object& Object::operator=(const std::string &newName){
 	return *this;
 }
 ```
+## 练习 14.26:
+### 为你的StrBlob类、StrBlobPtr类、StrVec类和String类定义下标运算符。
+答：
+```
+// StrBlob
+string& StrBlob::operator[](size_t n){
+	check(n, "[] out of range");
+	return data->at(n);
+}
+
+const string& StrBlob::operator[](size_t n) const{
+	check(n, "[] out of range");
+	return data->at(n);
+}
+// StrBlobPtr
+string& StrBlobPtr::operator[](size_t n){
+	auto p = check(n, "[] out of range.");
+	return p->at(n);
+}
+
+const string& StrBlobPtr::operator[](size_t n) const{
+	auto p = check(n, "[] out of range.");
+	return p->at(n);
+}
+// StrVec
+std::string& StrVec::operator[](std::size_t n) { return elements[n]; }
+const std::string& StrVec::operator[](std::size_t n) const { return elements[n]; }
+// String
+char& String::operator[](std::size_t n) { return elements[n]; }
+const char& String::operator[](std::size_t n) const { return elements[n]; }
+```
