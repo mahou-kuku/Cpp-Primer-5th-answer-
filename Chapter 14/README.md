@@ -104,7 +104,7 @@ Sales_data& Sales_data::operator+=(const Sales_data& rhs) {
 (a) % ：取模运算符通常是对内建数值类型进行操作，但如果在类中有合适的语义，它可能是一个成员。
 (b) %= ：赋值运算符的扩展，通常应该是类的成员。
 (c) ++ ：自增运算符需要改变对象的状态，应该是类的成员。
-(d) -> ：箭头运算符用于指针和迭代器类似的对象，应该是类的成员。
+(d) -> ：箭头运算符必须是类的成员。
 (e) << ：这是输出流的插入运算符。通常，至少有一个操作数不是类类型（例如std::ostream），所以这应该是非成员函数。
 (f) && ：逻辑与运算符。如果在类中有合适的语义，它可以是成员。但通常，它应该是非成员函数。
 (g) == ：相等运算符通常应该是非成员函数以支持交换操作数的对称性，即a == b和b == a应该有相同的含义。
@@ -493,3 +493,74 @@ const std::string& StrVec::operator[](std::size_t n) const { return elements[n];
 char& String::operator[](std::size_t n) { return elements[n]; }
 const char& String::operator[](std::size_t n) const { return elements[n]; }
 ```
+## 练习 14.27：
+### 为你的 StrBlobPtr 类添加递增和递减运算符。
+答：
+```
+StrBlobPtr& StrBlobPtr::operator++(){
+	// 如果 curr 已经指向了容器的尾后位置，则无法递增它
+	check(curr, "increment past end of StrBlobPtr");
+	++curr; // 将curr在当前状态下向前移动一个元素
+	return *this;
+}
+StrBlobPtr& StrBlobPtr::operator--(){
+	// 如果 curr 是 0，则继续递减它将产生一个无效下标
+	--curr; // 将curr在当前状态下向后移动一个元素
+	check(curr, "decrement past begin of StrBlobPtr");
+	return *this;
+}
+
+StrBlobPtr StrBlobPtr::operator++(int) {
+	// 此处无须检查有效性,调用前置递增运算时才需要检查
+	StrBlobPtr ret = *this; // 记录当前的值
+	++*this; // 向前移动一个元素，前置++需要检查递增的有效性
+	return ret; // 返回之前记录的状态
+}
+StrBlobPtr StrBlobPtr::operator--(int) {
+	// 此处无须检查有效性,调用前置递减运算时才需要检查
+	StrBlobPtr ret = *this; // 记录当前的值
+	--*this; // 向前移动一个元素，前置--需要检查递增的有效性
+	return ret; // 返回之前记录的状态
+}
+```
+## 练习 14.28:
+### 为你的StrBlobPtr类添加加法和减法运算符,使其可以实现指针的算术运算(参见3.5.3节,第106页)。
+答：
+```
+StrBlobPtr& StrBlobPtr::operator+=(size_t n){
+	curr += n;
+	check(curr, "increment past end of StrBlobPtr");
+	return *this;
+}
+
+StrBlobPtr& StrBlobPtr::operator-=(size_t n){
+	curr -= n;
+	check(curr, "decrement past begin of StrBlobPtr");
+	return *this;
+}
+
+StrBlobPtr StrBlobPtr::operator+(size_t n) const{
+	StrBlobPtr ret = *this;
+	ret += n;
+	return ret;
+}
+
+StrBlobPtr StrBlobPtr::operator-(size_t n) const{
+	StrBlobPtr ret = *this;
+	ret -= n;
+	return ret;
+}
+
+ptrdiff_t operator-(const StrBlobPtr&lhs,const StrBlobPtr& rhs) {
+	auto lshSp = lhs.wptr.lock();
+	auto rhsSp = rhs.wptr.lock();
+	if (lshSp != rhsSp) {
+		throw std::runtime_error("Different base addresses");
+	}
+	return lhs.curr - rhs.curr;
+}
+```
+## 练习 14.29:
+### 为什么不定义const版本的递增和递减运算符?
+答：
+* 因为递增和递减运算符需要修改对象本身。
