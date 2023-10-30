@@ -564,3 +564,44 @@ ptrdiff_t operator-(const StrBlobPtr&lhs,const StrBlobPtr& rhs) {
 ### 为什么不定义const版本的递增和递减运算符?
 答：
 * 因为递增和递减运算符需要修改对象本身。
+## 练习 14.30:
+### 为你的 StrBlobPtr类和在 12.1.6 节练习12.22 (第423 页)中定义的ConstStrBlobPtr类分别添加解引用运算符和箭头运算符。注意：因为ConstStrBlobPtr 的数据成员指向 const vector,所以ConstStrBlobPtr 中的运算符必须返回常量引用。
+答：
+```
+// StrBlobPtr
+std::string& StrBlobPtr::operator*() const {
+	auto p = check(curr, "dereference past end");
+	return (*p)[curr];		// （*p)是对象所指的 vector
+} 
+std::string* StrBlobPtr::operator->() const{ // 将实际工作委托给解引用运算符
+	return & this->operator*();
+}
+// ConstStrBlobPtr
+const std::string& ConstStrBlobPtr::operator*() const {
+	auto p = check(curr, "dereference past end");
+	return (*p)[curr];
+} 
+const std::string* ConstStrBlobPtr::operator->() const{
+	return & this->operator*();
+}
+```
+## 练习 14.31：
+### 我们的 StrBlobPtr 类没有定义拷贝构造函数、赋值运算符及析构函数，为什么？
+答：
+* 使用合成版本的拷贝控制成员不会产生问题。
+## 练习 14.32：
+### 定义一个类令其含有指向StrBlobPtr对象的指针，为这个类定义重载的箭头运算符。
+答：
+```
+class Wrapper {
+public:
+	Wrapper() = default;
+	Wrapper(StrBlobPtr* sbp) :pSBP(sbp) {}
+	//返回StrBlobPtr对象的operator->()会自动调用StrBlobPtr的operator->()
+	StrBlobPtr operator->() const {
+		return *pSBP;
+	}
+private:
+	StrBlobPtr* pSBP=nullptr;
+};
+```
