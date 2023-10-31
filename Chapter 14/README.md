@@ -605,3 +605,106 @@ private:
 	StrBlobPtr* pSBP=nullptr;
 };
 ```
+## 练习 14.33：
+### 一个重载的函数调用运算符应该接受几个运算对象？
+答： 
+* 一个重载的函数调用运算符可以接受任意数量的运算对象（包括零个）。具体数量取决于你如何定义该运算符。
+## 练习 14.34：
+### 定义一个函数对象类，令其执行 if-then-else 的操作：该类的调用运算符接受三个形参,它首先检查第一个形参;如果成功返回第二个形参的值;如果不成功返回第三个形参的值。
+答：
+```
+class IfThenElse {
+public:
+	int operator()(const bool condition, const int ifTrue, const int ifFalse) const {
+		if (condition) {
+			return ifTrue;
+		} else {
+			return ifFalse;
+		}
+	}
+};
+```
+## 练习 14.35：
+### 编写一个类似于 PrintString 的类，令其从 istream 中读取一行输入， 然后返回一个表示我们所读内容的 string。如果读取失败，返回空 string。
+答：
+```
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class InputString {
+public:
+	InputString(istream &input = cin) : is(input) { }
+	string operator()() const {
+		string str;
+		getline(is, str);
+		if (is) {
+			return str;
+		} else {
+			return "";
+		}
+	}
+private:
+	istream &is;
+};
+```
+## 练习 14.36:
+### 使用前一个练习定义的类读取标准输入,将每一行保存为vector的一个元素。
+答：
+```
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class InputString {
+public:
+	InputString(istream &input = cin) : is(input) { }
+	vector<string> operator()() const {
+		vector<string> vec;
+		string str;
+		while (getline(is, str)) {
+			vec.push_back(str);
+		}
+		return vec;
+	}
+private:
+	istream &is;
+};
+```
+## 练习 14.37：
+### 编写一个类令其检查两个值是否相等。使用该对象及标准库算法编写程序，令其替换某个序列中具有给定值的所有实例。
+答：
+```
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+class Equal {
+public:
+	Equal(const int& v) : value(v) {}
+
+	bool operator()(const int& elem) const {
+		return elem == value;
+	}
+
+private:
+	int value;
+};
+
+int main() {
+	std::vector<int> vec = { 1, 2, 3, 4, 3, 5, 3 };
+	int valueToCheck = 3;
+	int valueToReplaceWith = 9;
+
+	std::replace_if(vec.begin(), vec.end(), Equal(valueToCheck), valueToReplaceWith);
+
+	for (int i : vec) {
+		std::cout << i << " ";
+	}
+
+	return 0;
+}
+```
