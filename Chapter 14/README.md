@@ -708,3 +708,170 @@ int main() {
 	return 0;
 }
 ```
+## 练习 14.38:
+### 编写一个类令其检查某个给定的 string对象的长度是否与一个阈值相等。 使用该对象编写程序,统计并报告在输入的文件中长度为1的单词有多少个、长度为2的单词有多少个、……、长度为10的单词又有多少个。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+class IsLength {
+public:
+	IsLength(int len) : length(len) {}
+
+	bool operator()(const std::string& str) const {
+		return str.length() == length;
+	}
+
+private:
+	int length;
+};
+
+int main() {
+	std::ifstream file("example.txt");
+	if (!file) {
+		std::cerr << "Cannot open file." << std::endl;
+		return 1;
+	}
+
+	std::vector<int> counts(10, 0);
+	std::string word;
+
+	while (file >> word) {
+		for (int i = 1; i <= 10; ++i) {
+			if (IsLength(i)(word)) {
+				counts[i - 1]++;
+				break;
+			}
+		}
+	}
+
+	for (int i = 1; i <= 10; ++i) {
+		std::cout << "Words of length " << i << ": " << counts[i - 1] << std::endl;
+	}
+
+	return 0;
+}
+```
+## 练习 14.39：
+### 修改上一题的程序令其报告长度在 1 至9之间的单词有多少个、长度在 10以上的单词又有多少个。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+class IsLength {
+public:
+	IsLength(int len) : length(len) {}
+
+	bool operator()(const std::string& str) const {
+		return length >= 10 ? str.length() >= length : str.length() == length;
+	}
+
+private:
+	int length;
+};
+
+int main() {
+	std::ifstream file("example.txt");
+	if (!file) {
+		std::cerr << "Cannot open file." << std::endl;
+		return 1;
+	}
+
+	std::vector<int> counts(9, 0); // 用于存储长度1到9的单词数量
+	int count10plus = 0;           // 用于存储长度10以上的单词数量
+	std::string word;
+
+	while (file >> word) {
+		bool counted = false;
+		for (int i = 1; i <= 9; ++i) {
+			if (IsLength(i)(word)) {
+				counts[i - 1]++;
+				counted = true;
+				break;
+			}
+		}
+		if (!counted && IsLength(10)(word)) {
+			count10plus++;
+		}
+	}
+
+	for (int i = 1; i <= 9; ++i) {
+		std::cout << "Words of length " << i << ": " << counts[i - 1] << std::endl;
+	}
+	std::cout << "Words of length 10 and above: " << count10plus << std::endl;
+
+	return 0;
+}
+```
+## 练习 14.40：
+### 重新编写 10.3.2 节（第 349 页）的 biggies 函数，使用函数对象类替换其中的 lambda 表达式。
+答：
+```
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class IsShorter {
+public:
+	bool operator()(const string& a, const string& b) const {
+		return a.size() < b.size();
+	}
+};
+
+class GE {
+private:
+	vector<string>::size_type sz;
+public:
+	GE(vector<string>::size_type sz) : sz(sz) {}
+	bool operator()(const string& a) const {
+		return a.size() >= sz;
+	}
+};
+
+class Print{
+public:
+	void operator()(const string &s) { cout << s << " "; }
+};
+
+void elimDups(vector<string> &words){
+	sort(words.begin(), words.end());
+	auto end_unique = unique(words.begin(), words.end());
+	words.erase(end_unique, words.end());
+}
+
+void biggies(vector<string> &words,vector<string>::size_type sz){
+	elimDups(words); 
+	stable_sort(words.begin(), words.end(),IsShorter());
+	auto wc = find_if(words.begin(), words.end(), GE(sz));
+	auto count = words.end() - wc;
+	cout << count << " " << (count>1? "words": "word") << " of length " << sz << " or longer" << endl;
+	for_each(wc, words.end(), Print());
+	cout << endl;
+}
+int main() {
+	vector<string> words = { "abc","abcd","abcde" };
+	biggies(words, 4);
+
+	return 0;
+}
+```
+## 练习 14.41:
+### 你认为C++11新标准为什么要增加lambda?对于你自己来说,什么情况下会使用lambda,什么情况下会使用类？
+答：
+* C++11 新标准增加 Lambda 主要是为了提供一种更方便、更灵活的方式来定义和使用匿名函数对象。
+* 使用 Lambda 的情况：
+  当需要一个简单的函数对象，特别是只用一次的情况。
+  在使用标准库算法，需要传递自定义的比较函数、条件函数等，这使得代码更加紧凑和易于阅读。
+  当需要一个闭包来捕获和使用当前作用域中的变量。
+* 使用类代替 Lambda 的情况：
+  当需要重用该函数对象，或者它足够复杂，使得将其作为一个完整的类更有意义。
+  当函数对象需要维护自己的状态或需要多于一个调用运算符时。
