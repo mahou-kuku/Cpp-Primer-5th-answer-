@@ -875,3 +875,48 @@ int main() {
 * 使用类代替 Lambda 的情况：
 * 当需要重用该函数对象，或者它足够复杂，使得将其作为一个完整的类更有意义。
 * 当函数对象需要维护自己的状态或需要多于一个调用运算符时。
+## 练习 14.42:
+### 使用标准库函数对象及适配器定义一条表达式,令其
+```
+(a)统计大于1024的值有多少个。
+(b)找到第一个不等于pooh的字符串。
+(c)将所有的值乘以2。
+```
+答：
+```
+(a)
+auto count = std::count_if(vec.begin(), vec.end(), std::bind(std::greater<int>(), _1, 1024));
+(b)
+auto it = std::find_if(vec.begin(), vec.end(), std::bind(std::not_equal_to<std::string>(), _1, "pooh"));
+(c)
+std::transform(vec.begin(), vec.end(), vec.begin(), std::bind(std::multiplies<int>(), _1, 2));
+```
+## 练习 14.43：
+### 使用标准库函数对象判断一个给定的 int 值是否能被 int 容器中的所有元素整除。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <functional>
+
+bool isDivisibleByAll(int number, const std::vector<int>& container) {	
+	return std::all_of(container.begin(), container.end(), [number](int divisor) {
+		std::modulus<int> mod;
+		return divisor != 0 && mod(number, divisor) == 0;
+	});
+}
+
+int main() {
+	std::vector<int> container = { 2, 3, 4 }; // 示例容器
+	int number = 12; // 需要检查的数字
+
+	if (isDivisibleByAll(number, container)) {
+		std::cout << number << " can be divided by all elements in the container." << std::endl;
+	} else {
+		std::cout << number << " cannot be divided by all elements in the container." << std::endl;
+	}
+
+	return 0;
+}
+```
