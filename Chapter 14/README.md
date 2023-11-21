@@ -920,3 +920,51 @@ int main() {
 	return 0;
 }
 ```
+## 练习 14.44：
+### 编写一个简单的桌面计算器使其能处理二元运算。
+答：
+```
+#include <iostream>
+#include <string>
+#include <functional>
+#include <map>
+
+using namespace std;
+
+// 普通函数
+int add(int i, int j) { return i + j; }
+// lambda，其产生一个未命名的函数对象类
+auto mod = [](int i, int j) { return i % j; };
+// 函数对象类
+struct divide {
+	int operator()(int denominator, int divisor) {return denominator / divisor; }
+};
+
+int main() {
+	map<string, function<int(int, int)>> binops = {
+		{ "+", add }, // 函数指针
+		{ "-", minus<int>() }, // 标准库函数对象
+		{ "/", divide() }, // 用户定义的函数对象
+		{ "*", [](int i, int j) { return i * j; } }, // 未命名的 lambda
+		{ "%", mod } }; // 命名了的lambda 对象
+
+	// 与用户交互部分
+	string op;
+	int lhs, rhs;
+	while (true) {
+		cout << "Enter an expression (for example, 3 + 4) and enter 'q' to quit: ";
+		cin >> lhs;
+		if (cin.fail()) {
+			break; // 非数字输入，退出循环
+		}
+		cin >> op >> rhs;
+		if (binops.find(op) != binops.end()) {
+			cout << "Result: " << binops[op](lhs, rhs) << endl;
+		} else {
+			cout << "Unknown operator: " << op << endl;
+		}
+	}
+
+	return 0;
+}
+```
