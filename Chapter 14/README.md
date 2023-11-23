@@ -968,3 +968,90 @@ int main() {
 	return 0;
 }
 ```
+## 练习 14.45:
+### 编写类型转换运算符将一个Sales_data对象分别转换成 string和 double,你认为这些运算符的返回值应该是什么？
+答：
+```
+#include <iostream>
+#include <string>
+
+class Sales_data {
+	friend std::istream& operator>>(std::istream&, Sales_data&);   // 输入
+	friend std::ostream& operator<<(std::ostream&, const Sales_data&); // 输出
+	friend Sales_data operator+(const Sales_data&, const Sales_data&);  // 加法
+
+public:
+	Sales_data(const std::string &s, unsigned n, double p) : bookNo(s), units_sold(n), revenue(n*p) { }
+	Sales_data() : Sales_data("", 0, 0.0f) { }
+	Sales_data(const std::string &s) : Sales_data(s, 0, 0.0f) { }
+	Sales_data(std::istream &is) { is >> *this; }
+
+	Sales_data& operator+=(const Sales_data&); // 复合赋值
+	operator std::string() const { return bookNo; }	// string 类型转换
+	explicit operator double() const { return revenue; }	// double 类型转换
+
+	std::string isbn() const { return bookNo; }
+
+private:
+	inline double avg_price() const {
+		return units_sold ? revenue / units_sold : 0;
+	}
+
+	std::string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+};
+```
+## 练习 14.46：
+### 你认为应该为 Sales_data 类定义上面两种类型转换运算符吗？应该把它们声明成 explicit 的吗？为什么？
+答：
+* 转换成 string
+* 可能的理由：Sales_data 对象可能被转换为 string 来表示其 bookNo，也就是书籍的 ISBN 号。如果 bookNo 是 Sales_data 的主要标识或最重要的属性，这样的转换是有意义的。
+* 是否应该是 explicit：如果将 Sales_data 隐式转换为 string 可能导致代码的含义不明确或易于误解，那么应该将这个运算符声明为 explicit。这样，只有在显式需要 string 表示时，才能进行转换。
+* 转换成 double
+* 可能的理由：将 Sales_data 转换为 double 可能意味着返回其 revenue 或 avg_price()。这在某些财务或统计上下文中可能是有意义的。
+* 是否应该是 explicit：这种转换更可能需要被声明为 explicit，因为将一个复杂对象隐式转换为 double 可能会导致混淆。例如，不清楚转换后的 double 是指 revenue、avg_price() 还是其他内容。
+## 练习 14.47：
+### 说明下面这两个类型转换运算符的区别。
+```
+struct Integral {
+	operator const int();
+	operator int() const;
+};
+```
+答：
+```
+struct Integral {
+	operator const int();	// 转换为 const int
+	operator int() const;	// 转换为 int 的const类型转换运算符
+};
+```
+## 练习 14.48:
+### 你在 7.5.1 节的练习7.40 (第261页)中曾经选择并编写了一个类，你认为它应该含有向bool的类型转换运算符吗?如果是,解释原因并说明该运算符是否应该是explicit的;如果不是,也请解释原因。
+答：
+* 基于 Object 类的当前定义，它似乎并不直接与“有效性”或类似的概念相关联。除非有额外的上下文说明何时一个 Object 应该被视为“无效”或“不成立”，否则添加向 bool 的转换可能不是必要的。
+## 练习 14.49:
+### 为上一题提到的类定义一个转换目标是bool的类型转换运算符,先不用在意这么做是否应该。
+答：
+```
+class Object {
+public:
+	// 有时需要能够创建无属性的对象，因此提供一个默认构造函数是合理的
+	Object() : id(counter++), name("Unnamed") {}
+	// 也可能想要在创建对象时就给予它一个名字，所以提供一个接受名字的构造函数也是合理的
+	Object(const std::string& name) : id(counter++), name(name) {}
+	// bool类型转换运算符
+	explicit operator bool() const { return name == "Unnamed" ? false : true; }
+	// 获取对象的ID和名字的函数
+	int getId() const { return id; }
+	const std::string& getName() const { return name; }
+	// 修改对象名字的函数
+	void setName(const std::string& newName) { name = newName; }
+private:
+	static int counter;  // 静态成员，用于生成唯一的ID
+	int id;             // 每个对象的唯一ID
+	std::string name;   // 对象的名字
+};
+// 初始化静态成员
+int Object::counter = 0;
+```
