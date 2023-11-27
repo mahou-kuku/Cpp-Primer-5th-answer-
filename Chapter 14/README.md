@@ -1055,3 +1055,36 @@ private:
 // 初始化静态成员
 int Object::counter = 0;
 ```
+## 练习 14.50：
+### 在初始化 ex1 和 ex2 的过程中，可能用到哪些类类型的转换序列呢?说明初始化是否正确并解释原因。
+```
+struct LongDouble {
+	LongDouble(double = 0.0);
+	operator double();
+	operator float();
+};
+LongDouble ldObj;
+int ex1 = ldObj;
+float ex2 = ldObj;
+```
+答：
+* ex2 会调用 operator float() ，ex1 会产生二义性错误。
+## 练习 14.51：
+### 在调用 calc 的过程中，可能用到哪些类型转换序列呢？说明最佳可行函数是如何被选出来的。
+```
+void calc(int);
+void calc(LongDouble);
+double dval;
+calc(dval); // 哪个 calc?
+```
+答：
+* 本人的编译器会调用void calc(int) 。
+* 为了确定最佳匹配,编译器将实参类型到形参类型的转换划分成几个等级,具体排序如下所示：
+* 1.精确匹配，包括以下情况： 
+* 实参类型和形参类型相同。
+* 实参从数组类型或函数类型转换成对应的指针类型。
+* 向实参添加顶层 const 或者从实参中删除顶层 const。
+* 2.通过 const 转换实现的匹配。
+* 3.通过类型提升实现的匹配。
+* 4.通过算术类型转换或指针转换实现的匹配。
+* 5.通过类类型转换实现的匹配。
