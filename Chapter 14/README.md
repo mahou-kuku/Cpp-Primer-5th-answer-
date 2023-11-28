@@ -1088,3 +1088,49 @@ calc(dval); // 哪个 calc?
 * 3.通过类型提升实现的匹配。
 * 4.通过算术类型转换或指针转换实现的匹配。
 * 5.通过类类型转换实现的匹配。
+## 练习 14.52:
+### 在下面的加法表达式中分别选用了哪个operator+？列出候选函数、可行函数及为每个可行函数的实参执行的类型转换:
+```
+struct LongDouble {
+ // 用于演示的成员 operator+；在通常情况下+是个非成员
+ LongDouble operator+(const SmallInt&);
+ // 其他成员与 14.9.2 节（第 521 页）一致
+};
+LongDouble operator+(LongDouble&, double);
+SmallInt si;
+LongDouble ld;
+ld = si + ld;
+ld = ld + si;
+```
+答：
+* ld = si + ld 选用了内置的加法运算符，但是ld的两个内置类型转换运算符会导致二义性。ld = ld + si 选用了LongDouble operator+(const SmallInt&)。
+
+* 表达式 si + ld 的候选函数：
+* 内置加法运算符
+* SmallInt operator+(const SmallInt&, const SmallInt&);
+* LongDouble operator+(LongDouble&, double);
+* 表达式 si + ld 的可行函数和类型转换：
+* 由于 C++ 不允许连续的两次用户定义的隐式转换，所以只有内置加法运算符是可行函数，使用SmallInt 和 LongDouble 各自的内置类型转换运算符分别对两个实参进行类型转换。
+
+* 表达式 ld + si 的候选函数：
+* LongDouble operator+(const SmallInt&);
+* SmallInt operator+(const SmallInt&, const SmallInt&);
+* LongDouble operator+(LongDouble&, double);
+* 内置加法运算符
+* 表达式 ld + si 的可行函数和类型转换：
+* LongDouble operator+(const SmallInt&); 精确匹配不需要对实参进行类型转换。
+* LongDouble operator+(LongDouble&, double); 实参 si 需要从 SmallInt 转换为 int，然后通过 int 到 double 的标准转换实现类型转换。
+* 内置加法运算符，使用SmallInt 和 LongDouble 各自的内置类型转换运算符分别对两个实参进行类型转换。
+## 练习 14.53:
+### 假设我们已经定义了如第522页所示的SmallInt,判断下面的加法表达式是否合法。如果合法,使用了哪个加法运算符?如果不合法,应该怎样修改代码才能法使其合法？
+```
+SmallInt s1;
+double d = s1 + 3.14;
+```
+答：
+* 不合法，有二义性错误。
+* 修改为：
+```
+SmallInt s1;
+double d = s1.operator int() + 3.14;
+```
