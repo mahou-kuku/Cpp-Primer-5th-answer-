@@ -179,3 +179,66 @@ A* a2 = &c;
 ### 回忆我们在8.1节(第279页)进行的讨论,解释第284页中将ifstream 传递给Sales data的read函数的程序是如何工作的。
 答：
 * 因为我们可以将基类的指针或引用绑定到派生类对象上。
+## 练习 15.11:
+### 为你的Quote类体系添加一个名为debug的虚函数,令其分别显示每个类的数据成员。
+答：
+```
+class Quote {
+public:
+    // ... 其他成员保持不变 ...
+
+    virtual void debug() const {
+        std::cout << "Quote - bookNo: " << bookNo << ", price: " << price << std::endl;
+    }
+};
+
+class Bulk_quote : public Quote {
+public:
+    // ... 其他成员保持不变 ...
+
+    void debug() const override {
+        Quote::debug(); // 显示基类部分的信息
+        std::cout << "Bulk_quote - min_qty: " << min_qty << ", discount: " << discount << std::endl;
+    }
+};
+```
+## 练习 15.12：
+### 有必要将一个成员函数同时声明成 override 和 final 吗？ 为什么？
+答：
+* 将一个成员函数同时声明为 override 和 final 是完全合理的，因为这两个关键字各自有其独特的用途和意义。override 关键字可以捕获潜在的函数类型错误，final 关键字用于阻止进一步的覆盖。
+## 练习 15.13:
+### 给定下面的类,解释每个print函数的机理:
+```
+class base {
+public:
+	string name() { return basename; }
+	virtual void print(ostream &os) { os << basename; }
+private:
+	string basename;
+};
+class derived : public base {
+public:
+	void print(ostream &os) { print(os); os << " " << i; }
+private:
+	int i;
+};
+```
+### 在上述代码中存在问题吗？如果有，你该如何修改它？
+答：
+* 应该给派生类的虚函数体内的基类虚函数调用加上作用域运算符：
+```
+void print(ostream &os) { base::print(os); os << " " << i; }
+```
+## 练习 15.14：
+### 给定上一题中的类以及下面这些对象，说明在运行时调用哪个函数：
+```
+base bobj; 	base *bp1 = &bobj; 	base &br1 = bobj;
+derived dobj; 	base *bp2 = &dobj; 	base &br2 = dobj;
+(a)bobj.print();	(b)dobj.print();	(c)bp1->name();
+(d)bp2->name();		(e)br1.print();		(f)br2.print();
+```
+答：
+```
+(a)base::print		(b)derived::print	(c)base::name
+(d)base::name		(e)base::print		(f)derived::print
+```
