@@ -242,3 +242,79 @@ derived dobj; 	base *bp2 = &dobj; 	base &br2 = dobj;
 (a)base::print		(b)derived::print	(c)base::name
 (d)base::name		(e)base::print		(f)derived::print
 ```
+## 练习 15.15:
+### 定义你自己的Disc_quote和Bulk_quote
+答：
+```
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Quote {
+public:
+	Quote() = default;
+	Quote(const std::string &book, double sales_price) : bookNo(book), price(sales_price) { }
+	std::string isbn() const { return bookNo; }
+	// 返回给定数量的书籍的销售总额
+	// 派生类负责改写并使用不同的折扣计算算法
+	virtual double net_price(std::size_t n) const { return n * price; }
+	virtual ~Quote() = default; // 对析构函数进行动态绑定
+private:
+	std::string bookNo; // 书籍的 ISBN 编号
+protected:
+	double price = 0.0; // 代表普通状态下不打折的价格
+};
+
+// 用于保存折扣值和购买量的类,派生类使用这些数据可以实现不同的价格策略
+class Disc_quote : public Quote {
+public:
+	Disc_quote() = default; 
+	Disc_quote(const std::string& book, double price, std::size_t qty, double disc) : 
+		Quote(book, price),quantity(qty), discount(disc) { } 
+	double net_price(std::size_t) const = 0;
+protected:
+	std::size_t quantity = 0; // 折扣适用的购买量
+	double discount = 0.0; // 表示折扣的小数值
+};
+
+class Bulk_quote : public Disc_quote { // Bulk_quote 继承自 Quote
+public:
+	Bulk_quote() = default;
+	Bulk_quote(const std::string& book, double price, std::size_t qty, double disc) :
+		Disc_quote(book, price, qty, disc) { }
+	// 覆盖基类的函数版本以实现基于大量购买的折扣政策
+	double net_price(std::size_t) const override;
+};
+
+double Bulk_quote::net_price(size_t cnt) const {
+	if (cnt >= quantity) {
+		return cnt * (1 - discount) * price;
+	} else {
+		return cnt * price;
+	}
+}
+```
+## 练习 15.16：
+### 改写你在 15.2.2 节（第 533 页）练习中编写的数量受限的折扣策略，令其继承 Disc_quote。
+答：
+```
+class LimitedDiscount : public Disc_quote {
+public:
+	LimitedDiscount() = default;
+	LimitedDiscount(const std::string& book, double price, std::size_t qty, double disc) :
+		Disc_quote(book, price, qty, disc) { }
+	double net_price(size_t limit) const {
+		if (limit <= quantity) {
+			return limit * price * (1 - discount);
+		} else {
+			return quantity * price * (1 - discount) + (limit - quantity) * price;
+		}
+	}
+};
+
+```
+## 练习 15.17：
+### 尝试定义一个 Disc_quote 的对象，看看编译器给出的错误信息是什么？
+答：
+* “Disc_quote”: 不能实例化抽象类
