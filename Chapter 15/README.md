@@ -318,3 +318,191 @@ public:
 ### 尝试定义一个 Disc_quote 的对象，看看编译器给出的错误信息是什么？
 答：
 * “Disc_quote”: 不能实例化抽象类
+## 练习 15.18:
+### 假设给定了第543页和第544页的类,同时已知每个对象的类型如注释所示,判断下面的哪些赋值语句是合法的。解释那些不合法的语句为什么不被允许:
+```
+Base *p = &d1; // d1 has type Pub_Derv
+p = &d2; // d2 has type Priv_Derv
+p = &d3; // d3 has type Prot_Derv
+p = &dd1; // dd1 has type Derived_from_Public
+p = &dd2; // dd2 has type Derived_from_Private
+p = &dd3; // dd3 has type Derived_from_Protected
+```
+答：
+```
+Base *p = &d1; // 合法
+p = &d2; // 不合法
+p = &d3; // 不合法
+p = &dd1; // 合法
+p = &dd2; // 不合法
+p = &dd3; //不合法
+```
+* 派生类到基类的指针转换的可行性取决于继承的类型。公有继承允许这种转换，而私有和受保护继承则不允许，除非这种转换发生在派生类或其友元的内部。
+## 练习 15.19：
+### 假设543页和544页的每个类都有如下形式的成员函数：
+```
+void memfcn(Base &b) { b = *this; }
+```
+### 对于每个类，分别判断上面的函数是否合法。
+答：
+* Derived_from_Private 类的void memfcn(Base &b)不合法。
+## 练习 15.20:
+### 编写代码检验你对前面两题的回答是否正确。
+答：
+```
+class Base {
+public:
+	void memfcn(Base &b) { b = *this; }
+	void pub_mem();
+protected:
+	int prot_mem; 
+private:
+	char priv_mem;
+};
+
+struct Pub_Derv : public Base {
+	void memfcn(Base &b) { b = *this; }
+};
+struct Prot_Derv : protected Base {
+	void memfcn(Base &b) { b = *this; }
+};
+struct Priv_Derv : private Base {
+	void memfcn(Base &b) { b = *this; }
+};
+
+struct Derived_from_Public : public Pub_Derv {
+	void memfcn(Base &b) { b = *this; }
+};
+struct Derived_from_Protected : public Prot_Derv {
+	void memfcn(Base &b) { b = *this; }
+};
+struct Derived_from_Private : public Priv_Derv {
+	void memfcn(Base &b) { b = *this; }	// 编译错误
+};
+```
+## 练习 15.21：
+### 从下面这些一般性抽象概念中任选一个（或者选一个你自己的)，将其对应的一组类型组织成一个继承体系:
+(a)图形文件格式(如gif、tiff、jpeg、 bmp)
+(b)图形基元(如方格、圆、球、圆锥)
+(c) C++语言中的类型(如类、函数、成员函数)
+答：
+```
+class GraphicFile {
+public:
+	virtual ~GraphicFile() {}
+
+	virtual void open() = 0; // 打开文件的纯虚函数
+	virtual void close() = 0; // 关闭文件的纯虚函数
+	virtual void display() = 0; // 显示图像的纯虚函数
+
+	// 可以添加更多通用的方法和成员变量
+};
+
+class JPEG : public GraphicFile {
+public:
+	void open() override {
+		// 实现打开 GIF 文件的逻辑
+	}
+
+	void close() override {
+		// 实现关闭 GIF 文件的逻辑
+	}
+
+	void display() override {
+		// 实现显示 GIF 图像的逻辑
+	}
+};
+
+class BMP : public GraphicFile {
+public:
+	void open() override {
+		// 实现打开 BMP 文件的逻辑
+	}
+
+	void close() override {
+		// 实现关闭 BMP 文件的逻辑
+	}
+
+	void display() override {
+		// 实现显示 BMP 图像的逻辑
+	}
+};
+
+int main() {
+	GraphicFile *file = new JPEG();
+	file->open();
+	file->display();
+	file->close();
+
+	delete file; // 记得释放资源
+
+	return 0;
+}
+```
+## 练习 15.22：
+### 对于你在上一题中选择的类，为其添加合适的虚函数及公有成员和受保护的成员。
+答：
+```
+class GraphicFile {
+public:
+	virtual ~GraphicFile() {}
+
+	virtual void open() = 0; // 打开文件的纯虚函数
+	virtual void close() = 0; // 关闭文件的纯虚函数
+	virtual void display() = 0; // 显示图像的纯虚函数
+	// 公有成员函数：获取文件名
+	std::string getFileName() const {
+		return fileName;
+	}
+protected:
+	std::string fileName; // 文件名
+	int width;            // 图像宽度
+	int height;           // 图像高度
+
+	// 受保护的成员函数：设置图像尺寸
+	void setDimensions(int w, int h) {
+		width = w;
+		height = h;
+	}
+};
+
+class JPEG : public GraphicFile {
+public:
+	void open() override {
+		// 实现打开 GIF 文件的逻辑
+	}
+
+	void close() override {
+		// 实现关闭 GIF 文件的逻辑
+	}
+
+	void display() override {
+		// 实现显示 GIF 图像的逻辑
+	}
+	// 添加一个公有函数来设置图像尺寸
+	void setSize(int width, int height) {
+		// 可以在这里添加更多逻辑，比如检查尺寸的有效性
+		setDimensions(width, height); // 调用基类的受保护方法
+	}
+};
+
+class BMP : public GraphicFile {
+public:
+	void open() override {
+		// 实现打开 BMP 文件的逻辑
+	}
+
+	void close() override {
+		// 实现关闭 BMP 文件的逻辑
+	}
+
+	void display() override {
+		// 实现显示 BMP 图像的逻辑
+	}
+
+	void setSize(int width, int height) {
+		// 可以在这里添加更多逻辑，比如检查尺寸的有效性
+		setDimensions(width, height);
+	}
+};
+```
