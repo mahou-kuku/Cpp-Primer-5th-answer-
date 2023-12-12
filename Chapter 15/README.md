@@ -523,3 +523,100 @@ public:
 ### 我们为什么为Disc_quote定义一个默认构造函数? 如果去除掉该构造函数的话会对 Bulk_quote 的行为产生什么影响？
 答：
 * 因为Disc_quote还有其他构造函数，编译器不会再隐式地提供合成版本。如果去掉Disc_quote的默认构造函数，会导致Bulk_quote中申请合成默认构造函数的语句失效。
+## 练习 15.26:
+### 定义Quote和Bulk_quote的拷贝控制成员,令其与合成的版本行为一致。为这些成员以及其他构造函数添加打印状态的语句，使得我们能够知道正在运行哪个程序。使用这些类编写程序,预测程序将创建和销毁哪些对象。重复实验,不断比较你的预测和实际输出结果是否相同,直到预测完全准确再结束。
+答：
+```
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Quote {
+public:
+	// 构造函数
+	Quote() { cout << "Quote: default constructor\n"; }
+	Quote(const std::string &book, double sales_price) : bookNo(book), price(sales_price) {
+		cout << "Quote: constructor taking string and double\n";
+	}
+	// 拷贝构造函数
+	Quote(const Quote& q) : bookNo(q.bookNo), price(q.price) {
+		cout << "Quote: copy constructor\n";
+	}
+	// 拷贝赋值运算符
+	Quote& operator=(const Quote& rhs) {
+		if (this != &rhs) {
+			bookNo = rhs.bookNo;
+			price = rhs.price;
+		}
+		cout << "Quote: copy assignment operator\n";
+		return *this;
+	}
+	// 析构函数
+	virtual ~Quote() {
+		cout << "Quote: destructor\n";
+	}
+
+	std::string isbn() const { return bookNo; }
+	virtual double net_price(std::size_t n) const { return n * price; }
+private:
+	std::string bookNo;
+protected:
+	double price = 0.0;
+};
+
+class Disc_quote : public Quote {
+public:
+	Disc_quote() = default; 
+	Disc_quote(const std::string& book, double price, std::size_t qty, double disc) : 
+		Quote(book, price),quantity(qty), discount(disc) { } 
+	double net_price(std::size_t) const = 0;
+protected:
+	std::size_t quantity = 0;
+	double discount = 0.0;
+};
+
+class Bulk_quote : public Disc_quote { // Bulk_quote 继承自 Quote
+public:
+	// 构造函数
+	Bulk_quote() { cout << "Bulk_quote: default constructor\n"; }
+	Bulk_quote(const std::string& book, double price, std::size_t qty, double disc)
+		: Disc_quote(book, price, qty, disc) {
+		cout << "Bulk_quote: constructor taking string, double, size_t, and double\n";
+	}
+	// 拷贝构造函数
+	Bulk_quote(const Bulk_quote& bq) : Disc_quote(bq) {
+		cout << "Bulk_quote: copy constructor\n";
+	}
+	// 拷贝赋值运算符
+	Bulk_quote& operator=(const Bulk_quote& rhs) {
+		Disc_quote::operator=(rhs);
+		cout << "Bulk_quote: copy assignment operator\n";
+		return *this;
+	}
+	// 析构函数
+	~Bulk_quote() override {
+		cout << "Bulk_quote: destructor\n";
+	}
+	double net_price(std::size_t cnt) const override {
+		if (cnt >= quantity) {
+			return cnt * (1 - discount) * price;
+		} else {
+			return cnt * price;
+		}
+	}
+};
+
+int main() {
+	Quote q;
+	Bulk_quote bq;
+
+	Quote q2 = q; // 使用 Quote 的拷贝构造函数
+	Bulk_quote bq2 = bq; // 使用 Bulk_quote 的拷贝构造函数
+
+	q2 = q; // 使用 Quote 的拷贝赋值运算符
+	bq2 = bq; // 使用 Bulk_quote 的拷贝赋值运算符
+
+	return 0;
+}
+```
