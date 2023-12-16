@@ -278,7 +278,7 @@ protected:
 	double discount = 0.0; // 表示折扣的小数值
 };
 
-class Bulk_quote : public Disc_quote { // Bulk_quote 继承自 Quote
+class Bulk_quote : public Disc_quote { // Bulk_quote 继承自 Disc_quote
 public:
 	Bulk_quote() = default;
 	Bulk_quote(const std::string& book, double price, std::size_t qty, double disc) :
@@ -522,7 +522,7 @@ public:
 ## 练习 15.25:
 ### 我们为什么为Disc_quote定义一个默认构造函数? 如果去除掉该构造函数的话会对 Bulk_quote 的行为产生什么影响？
 答：
-* 因为Disc_quote还有其他构造函数，编译器不会再隐式地提供合成版本。如果去掉Disc_quote的默认构造函数，会导致Bulk_quote中申请合成默认构造函数的语句失效。
+* 因为Disc_quote还有其他构造函数，编译器不会再隐式地提供合成版本。如果去掉Disc_quote的默认构造函数，会导致Bulk_quote中请求合成默认构造函数的语句失效。
 ## 练习 15.26:
 ### 定义Quote和Bulk_quote的拷贝控制成员,令其与合成的版本行为一致。为这些成员以及其他构造函数添加打印状态的语句，使得我们能够知道正在运行哪个程序。使用这些类编写程序,预测程序将创建和销毁哪些对象。重复实验,不断比较你的预测和实际输出结果是否相同,直到预测完全准确再结束。
 答：
@@ -576,7 +576,7 @@ protected:
 	double discount = 0.0;
 };
 
-class Bulk_quote : public Disc_quote { // Bulk_quote 继承自 Quote
+class Bulk_quote : public Disc_quote { // Bulk_quote 继承自 Disc_quote
 public:
 	// 构造函数
 	Bulk_quote() { cout << "Bulk_quote: default constructor\n"; }
@@ -619,4 +619,18 @@ int main() {
 
 	return 0;
 }
+```
+## 练习 15.27:
+### 重新定义你的Bulk quote类,令其继承构造函数。
+答：
+```
+class Bulk_quote : public Disc_quote { // Bulk_quote 继承自 Disc_quote
+	using Disc_quote::Disc_quote;
+public:
+	//Bulk_quote() = default;
+	//Bulk_quote(const std::string& book, double price, std::size_t qty, double disc) :
+	//	Disc_quote(book, price, qty, disc) { }
+	// 覆盖基类的函数版本以实现基于大量购买的折扣政策
+	double net_price(std::size_t) const override;
+};
 ```
