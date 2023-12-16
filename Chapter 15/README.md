@@ -634,3 +634,42 @@ public:
 	double net_price(std::size_t) const override;
 };
 ```
+## 练习 15.28:
+### 定义一个存放Quote对象的vector,将Bulk_quote对象传入其中。  计算 vector中所有元素总的 net_price。
+答：
+```
+int main() {
+	vector<Quote> vec;
+	for (int i = 0; i != 10; ++i) {
+		vec.push_back(Bulk_quote("ABC", 10, 10, 0.5));
+	}
+
+	double total = 0;
+	for (const auto&q : vec) {
+		total += q.net_price(20);
+	}
+	cout << total << endl;
+
+	return 0;
+}
+```
+## 练习 15.29:
+### 再运行一次你的程序,这次传入Quote对象的shared_ptr。如果这次计算出的总额与之前的程序不一致，解释为什么；如果一致，也请说明原因。
+答：
+* 不一致，使用Quote对象的shared_ptr调用虚函数会发生动态绑定，根据实际的动态类型来决定调用哪个版本的函数。
+```
+int main() {
+	vector<shared_ptr<Quote>> vec;
+	for (int i = 0; i != 10; ++i) {
+		vec.push_back(make_shared<Bulk_quote>(Bulk_quote("ABC", 10, 10, 0.5)));
+	}
+
+	double total = 0;
+	for (const auto&q : vec) {
+		total += q->net_price(20);
+	}
+	cout << total << endl;
+
+	return 0;
+}
+```
