@@ -673,3 +673,115 @@ int main() {
 	return 0;
 }
 ```
+## 练习 15.30：
+### 编写你自己的 Basket 类，用它计算上一个练习中交易记录的总价格。
+答：
+```
+#include <iostream>
+#include <string>
+#include <memory>
+#include <set>
+
+using namespace std;
+
+class Quote {
+public:
+	Quote() = default;
+	Quote(const std::string &book, double sales_price) : bookNo(book), price(sales_price) { }
+	std::string isbn() const { return bookNo; }
+	virtual ~Quote() = default; // 对析构函数进行动态绑定
+	// 返回给定数量的书籍的销售总额
+	// 派生类负责改写并使用不同的折扣计算算法
+	virtual double net_price(std::size_t n) const { return n * price; }
+	// 该虚函数返回当前对象的一份动态分配的拷贝
+	virtual Quote* clone() const & { return new Quote(*this); }
+	virtual Quote* clone() && {return new Quote(std::move(*this)); }
+private:
+	std::string bookNo; // 书籍的 ISBN 编号
+protected:
+	double price = 0.0; // 代表普通状态下不打折的价格
+};
+
+// 用于保存折扣值和购买量的类,派生类使用这些数据可以实现不同的价格策略
+class Disc_quote : public Quote {
+public:
+	Disc_quote() = default;
+	Disc_quote(const std::string& book, double price, std::size_t qty, double disc) :
+		Quote(book, price), quantity(qty), discount(disc) { }
+	double net_price(std::size_t) const = 0;
+protected:
+	std::size_t quantity = 0; // 折扣适用的购买量
+	double discount = 0.0; // 表示折扣的小数值
+};
+
+class Bulk_quote : public Disc_quote { // Bulk_quote 继承自 Disc_Quote
+	using Disc_quote::Disc_quote;
+public:
+	// 覆盖基类的函数版本以实现基于大量购买的折扣政策
+	double net_price(std::size_t cnt) const override {
+		if (cnt >= quantity) {
+			return cnt * (1 - discount) * price;
+		} else {
+			return cnt * price;
+		}
+	}
+	// 该虚函数返回当前对象的一份动态分配的拷贝
+	Bulk_quote* clone() const & { return new Bulk_quote(*this); }
+	Bulk_quote* clone() && {return new Bulk_quote(std::move(*this)); }
+};
+
+// 计算并打印销售给定数量的某种书籍所得的费用
+double print_total(ostream &os, const Quote &item, size_t n) {
+	// 根据传入item形参的对象类型调用Quote::net_price
+	// 或者 Bulk_quote::net_price
+	double ret = item.net_price(n);
+	os << "ISBN: " << item.isbn() // 调用 Quote：：isbn
+		<< " # sold: " << n << " total due: " << ret << endl;
+	return ret;
+}
+
+class Basket {
+public:
+	// Basket 使用合成的默认构造函数和拷贝控制成员
+	void add_item(const Quote& sale) { // 拷贝给定的对象
+		items.insert(std::shared_ptr<Quote>(sale.clone()));
+	}
+	void add_item(Quote&& sale) { // 移动给定的对象
+		items.insert(std::shared_ptr<Quote>(std::move(sale).clone()));
+	}
+	// 打印每本书的总价和购物篮中所有书的总价
+	double total_receipt(std::ostream&) const;
+private:
+	// 该函数用于比较 shared_ptr，multiset 成员会用到它
+	static bool compare(const std::shared_ptr<Quote> &lhs,
+		const std::shared_ptr<Quote> &rhs) {
+		return lhs->isbn() < rhs->isbn();
+	}
+	// multiset 保存多个报价，按照 compare 成员排序
+	std::multiset<std::shared_ptr<Quote>, decltype(compare)*> items{ compare };
+};
+
+double Basket::total_receipt(ostream &os) const {
+	double sum = 0.0; // 保存实时计算出的总价格
+	// iter 指向ISBN相同的一批元素中的第一个
+	// upper_bound 返回一个迭代器，该迭代器指向这批元素的尾后位置
+	for (auto iter = items.cbegin(); iter != items.cend(); iter = items.upper_bound(*iter)) {
+		// 我们知道在当前的 Basket 中至少有一个该关键字的元素
+		// 打印该书籍对应的项目
+		sum += print_total(os, **iter, items.count(*iter));
+	}
+	os << "Total Sale: " << sum << endl; // 打印最终的总价格
+	return sum;
+}
+
+int main() {
+	Basket bsk;
+	bsk.add_item(Quote("123", 45));
+	bsk.add_item(Bulk_quote("345", 45, 3, .15));
+	bsk.add_item(Bulk_quote("345", 45, 3, .15));
+	bsk.add_item(Bulk_quote("345", 45, 3, .15));
+	bsk.total_receipt(cout);
+
+	return 0;
+}
+```
