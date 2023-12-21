@@ -785,3 +785,24 @@ int main() {
 	return 0;
 }
 ```
+## 练习 15.31:
+### 已知s1、 s2、s3和 s4都是 string,判断下面的表达式分别创建了什么样的对象：
+```
+(a) Query(s1) | Query(s2) & ~ Query(s3);
+(b) Query(s1) | (Query(s2) & ~ Query(s3));
+(c) (Query(s1) & (Query(s2)) | (Query(s3) & Query(s4)));
+```
+答：
+```
+(a) NotQuery、WordQuery、AndQuery、OrQuery 。
+(b) NotQuery、WordQuery、AndQuery、OrQuery 。
+(c) WordQuery、AndQuery、OrQuery 。
+```
+## 练习 15.32：
+### 当一个 Query 类型的对象被拷贝、移动、赋值或销毁时，将分别发生什么？
+答：
+* 将分别调用合成版本的拷贝、移动、赋值或析构函数。
+## 练习 15.33:
+### 当一个Query_base类型的对象被拷贝、移动、赋值或销毁时，将分别发生什么？
+答：
+* Query_base是一个抽象基类，不能直接创建一个抽象基类的对象。
