@@ -805,4 +805,74 @@ int main() {
 ## 练习 15.33:
 ### 当一个Query_base类型的对象被拷贝、移动、赋值或销毁时，将分别发生什么？
 答：
-* Query_base是一个抽象基类，不能直接创建一个抽象基类的对象。
+* Query_base是一个抽象基类，不能创建一个抽象基类的对象。
+## 练习 15.34：
+### 针对图 15.3（第 565 页）构建的表达式：
+```
+(a)列举出在处理表达式的过程中执行的所有构造函数。
+(b)列举出cout<<q所调用的rep
+(c)列举出q.eval()所调用的eval
+```
+答：
+```
+(a)Query(const std::string&)
+   WordQuery(const std::string&)
+   Query_base()
+   AndQuery(const Query&, const Query&)
+   BinaryQuery(const Query&, const Query&, std::string)
+   Query(std::shared_ptr<Query_base>)
+   OrQuery(const Query&, const Query&)
+
+(b)BinaryQuery的rep。
+(c)OrQuery的eval。
+```
+## 练习 15.35：
+### 实现 Query 类和 Query_base 类，其中需要定义 rep 而无须定义 eval。
+答：
+```
+// 这是一个抽象基类，具体的查询类型从中派生，所有成员都是private的
+class Query_base {
+	friend class Query;
+protected:
+	using line_no = TextQuery::line_no; // 用于 eval 函数
+	virtual ~Query_base() = default;
+private:
+	// eval 返回与当前 Query 匹配的 QueryResult
+	virtual QueryResult eval(const TextQuery&) const = 0;
+	// rep 是表示查询的一个 string
+	virtual std::string rep() const = 0;
+};
+
+// 这是一个管理Query_base继承体系的接口类
+class Query {
+	// 这些运算符需要访问接受shared_ptr的构造函数，而该函数是私有的
+	friend Query operator~(const Query &);
+	friend Query operator|(const Query&, const Query&);
+	friend Query operator&(const Query&, const Query&);
+public:
+	Query(const std::string&); // 构建一个新的 WordQuery
+	// 接口函数：调用对应的 Query_base 操作
+	QueryResult eval(const TextQuery &t) const ;
+	std::string rep() const { return q->rep(); }
+private:
+	Query(std::shared_ptr<Query_base> query) : q(query) { }
+	std::shared_ptr<Query_base> q;
+};
+```
+## 练习 15.36:
+### 在构造函数和rep成员中添加打印语句,运行你的代码以检验你对本节第一个练习中(a)、(b)两小题的回答是否正确。
+答：
+* 当然正确。
+## 练习 15.37:
+### 如果在派生类中含有shared_ptr<Query_base>类型的成员而非Query 类型的成员,则你的类需要做出怎样的改变?
+答：
+* 需要将相应函数的形参改为shared_ptr<Query_base>，对eval、rep的调用改为用->运算符调用，以及修改~、&、|重载运算符的形参、返回类型。
+## 练习 15.38：
+### 下面的声明合法吗？如果不合法，请解释原因；如果合法，请指出该声明的含义。
+```
+BinaryQuery a = Query("fiery") & Query("bird");
+AndQuery b = Query("fiery") & Query("bird");
+OrQuery c = Query("fiery") & Query("bird");
+```
+答：
+* 都不合法，BinaryQuery是抽象类，不能创建一个抽象基类对象。无法从“Query”转换为“AndQuery”或“OrQuery” 。
