@@ -862,7 +862,7 @@ private:
 ## 练习 15.36:
 ### 在构造函数和rep成员中添加打印语句,运行你的代码以检验你对本节第一个练习中(a)、(b)两小题的回答是否正确。
 答：
-* 当然正确。
+* 正确。
 ## 练习 15.37:
 ### 如果在派生类中含有shared_ptr<Query_base>类型的成员而非Query 类型的成员,则你的类需要做出怎样的改变?
 答：
@@ -876,3 +876,419 @@ OrQuery c = Query("fiery") & Query("bird");
 ```
 答：
 * 都不合法，BinaryQuery是抽象类，不能创建一个抽象基类对象。无法从“Query”转换为“AndQuery”或“OrQuery” 。
+## 练习 15.39:
+### 实现Query类和Query_base类,求图15.3 (第565页)中表达式的值并打印相关信息,验证你的程序是否正确。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <set>
+#include <string>
+#include <memory>
+#include <algorithm>
+#include <iterator>
+
+using namespace std;
+
+class QueryResult; // 前向声明
+class TextQuery {
+public:
+	using line_no = vector<string>::size_type;
+	TextQuery(ifstream&);
+	QueryResult query(const string&) const;
+private:
+	shared_ptr<vector<string>> file; // 输入文件
+									 // 每个单词到它所在的行号的集合的映射
+	map<string, shared_ptr<set<line_no>>> wm;
+};
+
+class QueryResult {
+	friend std::ostream& print(std::ostream&, const QueryResult&);
+public:
+	QueryResult(string s, shared_ptr<set<TextQuery::line_no>> p,
+		shared_ptr<vector<string>> f) : sought(s), lines(p), file(f) { }
+	set<TextQuery::line_no>::iterator begin() const { return lines->begin(); }
+	set<TextQuery::line_no>::iterator end() const { return lines->end(); }
+	shared_ptr<vector<string>> get_file() const { return file; }
+private:
+	string sought; // 查询单词
+	shared_ptr<set<TextQuery::line_no>> lines; // 出现的行号
+	shared_ptr<vector<string>> file; // 输入文件
+};
+
+// 读取输入文件并建立单词到行号的映射
+TextQuery::TextQuery(ifstream &is) : file(new vector<string>) {
+	string text;
+	while (getline(is, text)) { // 对文件中每一行
+		file->push_back(text); // 保存此行文本
+		int n = file->size() - 1; // 当前行号
+		istringstream line(text); // 将行文本分解为单词
+		string word;
+		while (line >> word) { // 对行中每个单词
+							   // 如果单词不在 wm中，以之为下标在wm中添加一项
+			auto &lines = wm[word]; // lines 是一个 shared_ptr
+			if (!lines) // 在我们第一次遇到这个单词时，此指针为空
+				lines.reset(new set<line_no>); // 分配一个新的 set
+			lines->insert(n); // 将此行号插入 set 中
+		}
+	}
+}
+
+QueryResult TextQuery::query(const string &sought) const {
+	// 如果未找到 sought，我们将返回一个指向此 set 的指针
+	static shared_ptr<set<line_no>> nodata(new set<line_no>);
+	// 使用 find 而不是下标运算符来查找单词，避免将单词添加到 wm 中！
+	auto loc = wm.find(sought);
+	if (loc == wm.end()) {
+		return QueryResult(sought, nodata, file); // 未找到
+	} else {
+		return QueryResult(sought, loc->second, file);
+	}
+}
+
+ostream &print(ostream & os, const QueryResult &qr) {
+	// 如果找到了单词,打印出现次数和所有出现的位置
+	os << qr.sought << " occurs " << qr.lines->size() << " " << "times" << endl;
+	// 打印单词出现的每一行
+	for (auto num : *qr.lines) { // 对 set 中每个单词
+								 // 避免行号从 0 开始给用户带来的困惑
+		os << "\t(line " << num + 1 << ") " << *(qr.file->begin() + num) << endl;
+	}
+	return os;
+}
+
+// 这是一个抽象基类，具体的查询类型从中派生，所有成员都是private的
+class Query_base {
+	friend class Query;
+protected:
+	using line_no = TextQuery::line_no; // 用于 eval 函数
+	virtual ~Query_base() = default;
+private:
+	// eval 返回与当前 Query 匹配的 QueryResult
+	virtual QueryResult eval(const TextQuery&) const = 0;
+	// rep 是表示查询的一个 string
+	virtual std::string rep() const = 0;
+};
+
+// 这是一个管理Query_base继承体系的接口类
+class Query {
+	// 这些运算符需要访问接受shared_ptr的构造函数，而该函数是私有的
+	friend Query operator~(const Query &);
+	friend Query operator|(const Query&, const Query&);
+	friend Query operator&(const Query&, const Query&);
+public:
+	Query(const std::string&); // 构建一个新的 WordQuery
+	// 接口函数：调用对应的 Query_base 操作
+	QueryResult eval(const TextQuery &t) const { return q->eval(t); }
+	std::string rep() const { return q->rep(); }
+private:
+	Query(std::shared_ptr<Query_base> query) : q(query) { }
+	std::shared_ptr<Query_base> q;
+};
+
+class WordQuery : public Query_base {
+	friend class Query; // Query使用WordQuery构造函数
+	WordQuery(const std::string &s) : query_word(s) { }
+	// 具体的类：WordQuery 将定义所有继承而来的纯虚函数
+	QueryResult eval(const TextQuery &t) const { return t.query(query_word); }
+	std::string rep() const { return query_word; }
+	std::string query_word; // 要查找的单词
+};
+
+// 能定义接受string的Query构造函数了
+inline Query::Query(const std::string &s) : q(new WordQuery(s)) { }
+
+class NotQuery : public Query_base {
+	friend Query operator~(const Query &)
+		; NotQuery(const Query &q) : query(q) { }
+	// 具体的类：NotQuery 将定义所有继承而来的纯虚函数
+	std::string rep() const { return "~(" + query.rep() + ")"; }
+	// 返回运算对象的结果set中不存在的行
+	QueryResult eval(const TextQuery& text) const {
+		// 通过Query运算对象对 eval 进行虚调用
+		auto result = query.eval(text);
+		// 开始时结果 set 为空
+		auto ret_lines = make_shared<set<line_no>>();
+		// 我们必须在运算对象出现的所有行中进行迭代
+		auto beg = result.begin(), end = result.end();
+		// 对于输入文件的每一行，如果该行不在 result 当中，则将其添加到 ret_lines
+		auto sz = result.get_file()->size();
+		for (size_t n = 0; n != sz; ++n) {
+			// 如果我们还没有处理完 result 的所有行
+			// 检查当前行是否存在
+			if (beg == end || *beg != n) {
+				ret_lines->insert(n); // 如果不在 result当中,添加这一行
+			} else if (beg != end) {
+				++beg; // 否则继续获取result的下一行(如果有的话)
+			}
+		} return QueryResult(rep(), ret_lines, result.get_file());
+	}
+	Query query;
+};
+inline Query operator~(const Query &operand) {
+	return std::shared_ptr<Query_base>(new NotQuery(operand));
+}
+
+class BinaryQuery : public Query_base {
+protected:
+	BinaryQuery(const Query &l, const Query &r, std::string s) :
+		lhs(l), rhs(r), opSym(s) { }
+	// 抽象类:BinaryQuery 不定义 eval
+	std::string rep() const {
+		return "(" + lhs.rep() + " " + opSym + " " + rhs.rep() + ")";
+	}
+	Query lhs, rhs; // 左侧和右侧运算对象
+	std::string opSym; // 运算符的名字
+};
+
+class AndQuery : public BinaryQuery {
+	friend Query operator& (const Query&, const Query&);
+	AndQuery(const Query &left, const Query &right) : BinaryQuery(left, right, "&") { }
+	// 具体的类: AndQuery继承了rep并且定义了其他纯虚函数
+	// 返回运算对象查询结果 set 的交集
+	QueryResult eval(const TextQuery& text) const {
+		// 通过Query运算对象进行的虚调用,以获得运算对象的查询结果set
+		auto left = lhs.eval(text), right = rhs.eval(text);
+		// 保存 left 和 right 交集的 set
+		auto ret_lines = make_shared<set<line_no>>();
+		// 将两个范围的交集写入一个目的迭代器中
+		// 本次调用的目的迭代器向ret添加元素
+		set_intersection(left.begin(), left.end(), right.begin(), right.end(),
+			inserter(*ret_lines, ret_lines->begin()));
+		return QueryResult(rep(), ret_lines, left.get_file());
+	}
+};
+inline Query operator&(const Query &lhs, const Query &rhs) {
+	return std::shared_ptr<Query_base>(new AndQuery(lhs, rhs));
+}
+
+class OrQuery : public BinaryQuery {
+	friend Query operator|(const Query&, const Query&);
+	OrQuery(const Query &left, const Query &right) : BinaryQuery(left, right, "|") { }
+	// 返回运算对象查询结果set的并集
+	QueryResult eval(const TextQuery& text) const {
+		// 通过Query成员1hs和rhs进行的虚调用
+		// 调用 eval 返回每个运算对象的 QueryResult
+		auto right = rhs.eval(text), left = lhs.eval(text);
+		// 将左侧运算对象的行号拷贝到结果 set 中
+		auto ret_lines = make_shared<set<line_no>>(left.begin(), left.end());
+		// 插入右侧运算对象所得的行号
+		ret_lines->insert(right.begin(), right.end());
+		// 返回一个新的 QueryResult，它表示 lhs 和 rhs 的并集
+		return QueryResult(rep(), ret_lines, left.get_file());
+	}
+};
+inline Query operator|(const Query &lhs, const Query &rhs) {
+	return std::shared_ptr<Query_base>(new OrQuery(lhs, rhs));
+}
+
+std::ostream& operator<<(std::ostream &os, const QueryResult &qr){
+	return print(cout, qr);
+}
+
+int main() {
+	ifstream ifs("example.txt");
+	TextQuery tq(ifs);
+	Query q = Query("fiery") & Query("bird") | Query("wind");
+	auto qr = q.eval(tq);
+	cout << qr << endl;
+
+	return 0;
+}
+```
+## 练习 15.40：
+### 在 OrQuery 的 eval 函数中，如果 rhs 成员返回的是空集将发生什么？如果 lhs 是空集呢？如果 1hs 和 rhs 都是空集又将发生什么？
+答：
+* rhs 成员返回的是空集则只打印左侧侧运算对象的查询结果，lhs为空集则单独打印查询右侧运算对象，都是空集则查询结果将为0。
+## 练习 15.41：
+### 重新实现你的类，这次使用指向 Query_base 的内置指针而非shared_ptr。请注意，做出上述改动后你的类将不能再使用合成的拷贝控制成员。
+答：
+```
+// 这是一个抽象基类，具体的查询类型从中派生，所有成员都是private的
+class Query_base {
+	friend class Query;
+protected:
+	using line_no = TextQuery::line_no; // 用于 eval 函数
+	virtual ~Query_base() = default;
+private:
+	// eval 返回与当前 Query 匹配的 QueryResult
+	virtual QueryResult eval(const TextQuery&) const = 0;
+	// rep 是表示查询的一个 string
+	virtual std::string rep() const = 0;
+	// 为了支持深拷贝和正确地复制多态对象，在所有派生类中对其进行覆盖。
+	virtual Query_base* clone() const = 0;
+};
+
+class Query {
+	friend Query operator~(const Query &);
+	friend Query operator|(const Query&, const Query&);
+	friend Query operator&(const Query&, const Query&);
+
+public:
+	Query(const std::string &s); // 构建一个新的 WordQuery
+	Query(const Query &other); // 拷贝构造函数
+	Query& operator=(const Query &other); // 拷贝赋值运算符
+	~Query(); // 析构函数
+
+			  // 接口函数：调用对应的 Query_base 操作
+	QueryResult eval(const TextQuery &t) const { return q->eval(t); }
+	std::string rep() const { return q->rep(); }
+
+private:
+	Query(Query_base* query) : q(query) { }
+	Query_base *q;
+};
+Query::Query(const Query &other) : q(nullptr) {
+	if (other.q) {
+		q = other.q->clone();
+	}
+}
+
+Query& Query::operator=(const Query &other) {
+	if (&other != this) {
+		delete q;
+		q = other.q ? other.q->clone() : nullptr;
+	}
+	return *this;
+}
+
+Query::~Query() {
+	delete q;
+}
+
+class WordQuery : public Query_base {
+	friend class Query; // Query使用WordQuery构造函数
+	WordQuery(const std::string &s) : query_word(s) { }
+	// 具体的类：WordQuery 将定义所有继承而来的纯虚函数
+	QueryResult eval(const TextQuery &t) const { return t.query(query_word); }
+	std::string rep() const { return query_word; }
+	WordQuery* clone() const override { return new WordQuery(*this); }
+	std::string query_word; // 要查找的单词
+};
+
+// 能定义接受string的Query构造函数了
+inline Query::Query(const std::string &s) : q(new WordQuery(s)) { }
+
+class NotQuery : public Query_base {
+	friend Query operator~(const Query &)
+		; NotQuery(const Query &q) : query(q) { }
+	// 具体的类：NotQuery 将定义所有继承而来的纯虚函数
+	std::string rep() const { return "~(" + query.rep() + ")"; }
+	// 返回运算对象的结果set中不存在的行
+	QueryResult eval(const TextQuery& text) const {
+		// 通过Query运算对象对 eval 进行虚调用
+		auto result = query.eval(text);
+		// 开始时结果 set 为空
+		auto ret_lines = make_shared<set<line_no>>();
+		// 我们必须在运算对象出现的所有行中进行迭代
+		auto beg = result.begin(), end = result.end();
+		// 对于输入文件的每一行，如果该行不在 result 当中，则将其添加到 ret_lines
+		auto sz = result.get_file()->size();
+		for (size_t n = 0; n != sz; ++n) {
+			// 如果我们还没有处理完 result 的所有行
+			// 检查当前行是否存在
+			if (beg == end || *beg != n) {
+				ret_lines->insert(n); // 如果不在 result当中,添加这一行
+			} else if (beg != end) {
+				++beg; // 否则继续获取result的下一行(如果有的话)
+			}
+		} return QueryResult(rep(), ret_lines, result.get_file());
+	}
+	NotQuery* clone() const override { return new NotQuery(*this); }
+	Query query;
+};
+inline Query operator~(const Query &operand) {
+	return new NotQuery(operand);
+}
+
+class BinaryQuery : public Query_base {
+protected:
+	BinaryQuery(const Query &l, const Query &r, std::string s) :
+		lhs(l), rhs(r), opSym(s) { }
+	// 抽象类:BinaryQuery 不定义 eval
+	std::string rep() const {
+		return "(" + lhs.rep() + " " + opSym + " " + rhs.rep() + ")";
+	}
+	Query lhs, rhs; // 左侧和右侧运算对象
+	std::string opSym; // 运算符的名字
+};
+
+class AndQuery : public BinaryQuery {
+	friend Query operator& (const Query&, const Query&);
+	AndQuery(const Query &left, const Query &right) : BinaryQuery(left, right, "&") { }
+	// 具体的类: AndQuery继承了rep并且定义了其他纯虚函数
+	// 返回运算对象查询结果 set 的交集
+	QueryResult eval(const TextQuery& text) const {
+		// 通过Query运算对象进行的虚调用,以获得运算对象的查询结果set
+		auto left = lhs.eval(text), right = rhs.eval(text);
+		// 保存 left 和 right 交集的 set
+		auto ret_lines = make_shared<set<line_no>>();
+		// 将两个范围的交集写入一个目的迭代器中
+		// 本次调用的目的迭代器向ret添加元素
+		set_intersection(left.begin(), left.end(), right.begin(), right.end(),
+			inserter(*ret_lines, ret_lines->begin()));
+		return QueryResult(rep(), ret_lines, left.get_file());
+	}
+	AndQuery* clone() const override { return new AndQuery(*this); }
+};
+inline Query operator&(const Query &lhs, const Query &rhs) {
+	return new AndQuery(lhs, rhs);
+}
+
+class OrQuery : public BinaryQuery {
+	friend Query operator|(const Query&, const Query&);
+	OrQuery(const Query &left, const Query &right) : BinaryQuery(left, right, "|") { }
+	// 返回运算对象查询结果set的并集
+	QueryResult eval(const TextQuery& text) const {
+		// 通过Query成员1hs和rhs进行的虚调用
+		// 调用 eval 返回每个运算对象的 QueryResult
+		auto right = rhs.eval(text), left = lhs.eval(text);
+		// 将左侧运算对象的行号拷贝到结果 set 中
+		auto ret_lines = make_shared<set<line_no>>(left.begin(), left.end());
+		// 插入右侧运算对象所得的行号
+		ret_lines->insert(right.begin(), right.end());
+		// 返回一个新的 QueryResult，它表示 lhs 和 rhs 的并集
+		return QueryResult(rep(), ret_lines, left.get_file());
+	}
+	OrQuery* clone() const override { return new OrQuery(*this); }
+};
+inline Query operator|(const Query &lhs, const Query &rhs) {
+	return new OrQuery(lhs, rhs);
+}
+```
+## 练习 15.42：
+### 从下面的几种改进中选择一种，设计并实现它：
+```
+(a)按句子查询并打印单词,而不再是按行打印。
+(b)引入一个历史系统,用户可以按编号查阅之前的某个查询,并可以在其中增加内容或者将其与其他查询组合。
+(c)允许用户对结果做出限制,比如从给定范围的行中挑出匹配的进行显示。
+```
+答：
+```
+// (a) 替换TextQuery的构造函数
+// 读取输入文件并建立单词到行号的映射
+TextQuery::TextQuery(ifstream &is) : file(new vector<string>) {
+	string line, sentence;
+	line_no lineNo = 0;
+	while (getline(is, line)) { // 逐行读取文本
+		sentence += line + " "; // 将行添加到当前句子中
+		// 检查当前句子是否结束
+		if (line.find('.') != string::npos || line.find('!') != string::npos || line.find('?') != string::npos) {
+			file->push_back(sentence); // 保存当前句子
+			istringstream sentenceStream(sentence);
+			string word;
+			while (sentenceStream >> word) {
+				auto &lines = wm[word];
+				if (!lines)
+					lines.reset(new set<line_no>);
+				lines->insert(lineNo);
+			}
+			++lineNo;
+			sentence.clear(); // 清空当前句子，准备下一个句子
+		}
+	}
+}
+```
