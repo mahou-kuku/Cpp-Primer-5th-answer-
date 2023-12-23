@@ -1002,8 +1002,8 @@ class WordQuery : public Query_base {
 inline Query::Query(const std::string &s) : q(new WordQuery(s)) { }
 
 class NotQuery : public Query_base {
-	friend Query operator~(const Query &)
-		; NotQuery(const Query &q) : query(q) { }
+	friend Query operator~(const Query &); 
+	NotQuery(const Query &q) : query(q) { }
 	// 具体的类：NotQuery 将定义所有继承而来的纯虚函数
 	std::string rep() const { return "~(" + query.rep() + ")"; }
 	// 返回运算对象的结果set中不存在的行
@@ -1173,8 +1173,8 @@ class WordQuery : public Query_base {
 inline Query::Query(const std::string &s) : q(new WordQuery(s)) { }
 
 class NotQuery : public Query_base {
-	friend Query operator~(const Query &)
-		; NotQuery(const Query &q) : query(q) { }
+	friend Query operator~(const Query &); 
+	NotQuery(const Query &q) : query(q) { }
 	// 具体的类：NotQuery 将定义所有继承而来的纯虚函数
 	std::string rep() const { return "~(" + query.rep() + ")"; }
 	// 返回运算对象的结果set中不存在的行
