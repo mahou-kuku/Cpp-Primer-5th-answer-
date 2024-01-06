@@ -471,7 +471,6 @@ void Vec<T>::resize(size_t n, const T& t) {
 * (c) 非法：inline 关键字应该放在模板声明之后。更正：template <typename T> inline T foo(T, unsigned int*);
 * (d) 非法：缺少函数返回类型。更正：template <typename T> T f4(T, T);
 * (e) 合法：但可能会导致混淆或误解。编译器会将模板中的 Ctype 视为一个独立的模板类型参数，与外部的 typedef 定义的 Ctype 无关。
-```
 ## 练习 16.19:
 ### 编写函数,接受一个容器的引用,打印容器中的元素。使用容器的size_type和 size 成员来控制打印元素的循环。
 答：
