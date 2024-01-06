@@ -451,3 +451,50 @@ void Vec<T>::resize(size_t n, const T& t) {
 	}
 }
 ```
+## 练习 16.17：
+### 声明为 typename 的类型参数和声明为 class 的类型参数有什么不同(如果有的话）？ 什么时候必须使用 typename?
+答：
+* 在模板参数列表中，这两个关键字的含义相同，可以互换使用。当我们希望通知编译器一个名字表示类型时，必须使用关键字 typename，而不能使用 class。
+## 练习 16.18:
+### 解释下面每个函数模板声明并指出它们是否非法。 更正你发现的每个错误。
+```
+(a) template <typename T, U, typename V> void f1(T, U, V);
+(b) template <typename T> T f2(int &T);
+(c) inline template <typename T> T foo(T, unsigned int*);
+(d) template <typename T> f4(T, T);
+(e) typedef char Ctype;
+ 	template <typename Ctype> Ctype f5(Ctype a);
+```
+答：
+* (a) 非法：类型参数 U 没有被明确指定为 typename 或 class。更正：template <typename T, typename U, typename V> void f1(T, U, V);
+* (b) 非法：函数参数名不应该使用类型模板参数的名字。更正：template <typename T> T f2(int &val);
+* (c) 非法：inline 关键字应该放在模板声明之后。更正：template <typename T> inline T foo(T, unsigned int*);
+* (d) 非法：缺少函数返回类型。更正：template <typename T> T f4(T, T);
+* (e) 合法：但可能会导致混淆或误解。编译器会将模板中的 Ctype 视为一个独立的模板类型参数，与外部的 typedef 定义的 Ctype 无关。
+```
+## 练习 16.19:
+### 编写函数,接受一个容器的引用,打印容器中的元素。使用容器的size_type和 size 成员来控制打印元素的循环。
+答：
+```
+// 对于list，这种索引访问是不适用的。
+template <typename Container>
+void printContainer(const Container& c) {
+	// 使用容器的 size_type 来控制循环
+	typename Container::size_type i = 0;
+	auto size = c.size();
+	for (; i < size; ++i) {
+		std::cout << c[i] << " ";
+	}
+}
+```
+### 练习 16.20:
+### 重写上一题的函数,使用begin和end返回的迭代器来控制循环。
+答：
+```
+template <typename Container>
+void printContainer(const Container& c) {
+	for (auto it = c.begin(); it != c.end(); ++it) {
+		std::cout << *it << " ";
+	}
+}
+```
