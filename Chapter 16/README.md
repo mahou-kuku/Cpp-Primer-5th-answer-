@@ -497,3 +497,38 @@ void printContainer(const Container& c) {
 	}
 }
 ```
+## 练习 16.21：
+### 编写你自己的 DebugDelete 版本。
+答：
+```
+// 函数对象类，对给定指针执行 delete
+class DebugDelete {
+public:
+	DebugDelete(std::ostream &s = std::cerr) : os(s) { }
+	// 与任何函数模板相同,T的类型由编译器推断
+	template <typename T> void operator()(T *p) const {
+		os << "deleting unique_ptr" << std::endl; delete p;
+	}
+private:
+	std::ostream &os;
+};
+```
+## 练习 16.22:
+### 修改 12.3 节（第 430 页）中你的 TextQuery 程序，令 shared_ptr 成员使用DebugDelete作为它们的删除器（参见 12.1.4 节，第415 页)。
+答：
+```
+// 初始化shared_ptr数据成员时提供DebugDelete对象即可
+TextQuery::TextQuery(ifstream &is) : file(new vector<string>, DebugDelete()) {/* . . . */}
+```
+## 练习 16.23:
+### 预测在你的查询主程序中何时会执行调用运算符。如果你的预测和实际不符，确认你理解了原因。
+答：
+* TextQuery对象的shared_ptr计数为0时会调用DebugDelete对象的调用运算符。
+## 练习 16.24:
+### 为你的Blob模板添加一个构造函数,它接受两个迭代器。
+答：
+```
+template <typename T> // 类的类型参数
+template <typename It> // 构造函数的类型参数
+Blob<T>::Blob(It b, It e) : data(std::make_shared<std::vector<T>>(b, e)) {}
+```
