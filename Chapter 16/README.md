@@ -523,7 +523,7 @@ TextQuery::TextQuery(ifstream &is) : file(new vector<string>, DebugDelete()) {/*
 ## 练习 16.23:
 ### 预测在你的查询主程序中何时会执行调用运算符。如果你的预测和实际不符，确认你理解了原因。
 答：
-* TextQuery对象的shared_ptr计数为0时会调用DebugDelete对象的调用运算符。
+* TextQuery对象的shared_ptr数据成员的引用计数为0时会调用DebugDelete对象的调用运算符。
 ## 练习 16.24:
 ### 为你的Blob模板添加一个构造函数,它接受两个迭代器。
 答：
