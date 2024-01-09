@@ -516,8 +516,8 @@ private:
 ## 练习 16.22:
 ### 修改 12.3 节（第 430 页）中你的 TextQuery 程序，令 shared_ptr 成员使用DebugDelete作为它们的删除器（参见 12.1.4 节，第415 页)。
 答：
+* 初始化shared_ptr时提供DebugDelete对象即可，shared_ptr的删除器类型采用了成员模板，编译器可以根据构造函数的实参类型推导出成员模板参数的实参。
 ```
-// 初始化shared_ptr数据成员时提供DebugDelete对象即可
 TextQuery::TextQuery(ifstream &is) : file(new vector<string>, DebugDelete()) {/* . . . */}
 ```
 ## 练习 16.23:
