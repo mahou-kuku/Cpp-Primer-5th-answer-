@@ -532,3 +532,39 @@ template <typename T> // 类的类型参数
 template <typename It> // 构造函数的类型参数
 Blob<T>::Blob(It b, It e) : data(std::make_shared<std::vector<T>>(b, e)) {}
 ```
+## 练习 16.25：
+### 解释下面这些声明的含义：
+```
+extern template class vector<string>;
+template class vector<Sales_data>;
+```
+答：
+* extern template class vector<string>;是一个显式实例化声明，用于避免在当前编译单元重复实例化同一模板类，编译器不会再为 vector<string> 生成模板代码，会使用在程序其他编译单元已经生成的实例化代码。
+* template class vector<Sales_data>;是一个显式实例化定义，用于在某个编译单元为特定类型（这里是 Sales_data）生成 vector 模板类的所有相关代码。
+* 两种声明通常配合使用，以优化程序的编译时间和最终大小。
+## 练习 16.26:
+### 假设NoDefault是一个没有默认构造函数的类,我们可以显式实例化 vector<NoDefault>吗？ 如果不可以，解释为什么。
+答：
+* 不可以。当显式地实例化一个模板类，编译器会尝试生成该模板的所有实现代码。如果 vector 的实现需要默认构造函数，就会出现编译错误。而 vector 需要其元素类型具备默认构造函数，在某些操作中，如调整大小（resize）、预留空间（reserve）等，vector 需要能够默认构造其元素。
+## 练习 16.27:
+### 对下面每条带标签的语句,解释发生了什么样的实例化(如果有的话)。如果一个模板被实例化，解释为什么；如果未实例化，解释为什么没有。
+```
+template <typename T> class Stack { };
+void f1(Stack<char>); // (a)
+class Exercise {
+ Stack<double> &rsd; // (b)
+ Stack<int> si; // (c)
+};
+int main() {
+ Stack<char> *sc; // (d)
+ f1(*sc); // (e)
+ int iObj = sizeof(Stack< string >); // (f)
+}
+```
+答：
+* (a) 没有发生实例化。在函数声明中，模板类不会被实例化。实例化只发生在模板类或函数被实际使用时。
+* (b) 没有发生实例化。由于只是声明，没有实际创建 Stack<double> 对象，所以不会触发实例化。
+* (c) Stack<int> 被实例化了。因为 si 是一个 Stack<int> 类型的对象。Stack<int> 模板被实例化。
+* (d) 没有发生实例化。声明指针本身不会导致模板的实例化，因为没有创建 Stack<char> 类型的实际对象。
+* (e) Stack<char> 被实例化了。编译器需要知道 *sc 的类型，以确定这个函数调用是否合法，为了进行这种类型检查，编译器需要知道 Stack<char> 的完整定义，这就触发了模板的实例化。
+* (f) Stack< string >被实例化了。为了计算大小，编译器必须根据类模板定义产生该类型。
