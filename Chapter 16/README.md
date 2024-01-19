@@ -568,3 +568,195 @@ int main() {
 * (d) 没有发生实例化。声明指针本身不会导致模板的实例化，因为没有创建 Stack<char> 类型的实际对象。
 * (e) Stack<char> 被实例化了。编译器需要知道 *sc 的类型，以确定这个函数调用是否合法，为了进行这种类型检查，编译器需要知道 Stack<char> 的完整定义，这就触发了模板的实例化。
 * (f) Stack< string >被实例化了。为了计算大小，编译器必须根据类模板定义产生该类型。
+## 练习 16.28:
+### 编写你自己版本的shared_ptr和unique_ptr。
+答：
+```
+#include <functional> // 用于 std::function
+
+template <typename T>
+class SharedPtr {
+private:
+	T* ptr;
+	int* count;
+	std::function<void(T*)>* deleter;
+
+	void release() {
+		if (ptr && --(*count) == 0) {
+			(*deleter)(ptr);
+			delete count;
+			delete deleter;
+		}
+	}
+
+public:
+	// 构造函数，接受一个可调用对象作为删除器
+	explicit SharedPtr(T* p = nullptr, std::function<void(T*)> d = [](T* ptr) { delete ptr; })
+		: ptr(p), count(new int(1)), deleter(new std::function<void(T*)>(d)) {}
+
+	// 拷贝构造函数
+	SharedPtr(const SharedPtr& other)
+		: ptr(other.ptr), count(other.count), deleter(other.deleter) {
+		(*count)++;
+	}
+
+	// 拷贝赋值运算符
+	SharedPtr& operator=(const SharedPtr& other) {
+		if (this != &other) {
+			release();
+			ptr = other.ptr;
+			count = other.count;
+			deleter = other.deleter;
+			(*count)++;
+		}
+		return *this;
+	}
+
+	// 解引用
+	T& operator*() const { return *ptr; }
+
+	// 成员访问
+	T* operator->() const { return ptr; }
+
+	// 获取原始指针
+	T* get() const { return ptr; }
+
+	// 析构函数
+	~SharedPtr() {
+		release();
+	}
+};
+
+
+template <typename T, typename Deleter = std::default_delete<T>>
+class UniquePtr {
+private:
+	T* ptr;
+	Deleter deleter;
+
+public:
+	explicit UniquePtr(T* p = nullptr, const Deleter& d = Deleter())
+		: ptr(p), deleter(d) {}
+
+	// 禁止拷贝和赋值
+	UniquePtr(const UniquePtr&) = delete;
+	UniquePtr& operator=(const UniquePtr&) = delete;
+
+	// 移动构造函数
+	UniquePtr(UniquePtr&& other): ptr(other.ptr), deleter(std::move(other.deleter)) {
+		other.ptr = nullptr;
+	}
+
+	// 移动赋值运算符
+	UniquePtr& operator=(UniquePtr&& other) {
+		if (this != &other) {
+			deleter(ptr);
+			ptr = other.ptr;
+			deleter = std::move(other.deleter);
+			other.ptr = nullptr;
+		}
+		return *this;
+	}
+
+	// 解引用
+	T& operator*() const { return *ptr; }
+
+	// 成员访问
+	T* operator->() const { return ptr; }
+
+	// 获取原始指针
+	T* get() const { return ptr; }
+
+	// 释放所有权
+	T* release() {
+		T* temp = ptr;
+		ptr = nullptr;
+		return temp;
+	}
+
+	// 替换管理的对象
+	void reset(T* p = nullptr) {
+		deleter(ptr);
+		ptr = p;
+	}
+
+	// 析构函数
+	~UniquePtr() {
+		deleter(ptr);
+	}
+};
+```
+## 练习 16.29:
+### 修改你的Blob类,用你自己的shared_ptr代替标准库中的版本。
+答：
+```
+#include <functional> // 用于 std::function
+#include <iostream>
+#include <string>
+#include <vector>
+#include <initializer_list>
+
+using namespace std;
+
+class StrBlob {
+public:
+	typedef vector<string>::size_type size_type;
+
+	StrBlob() : data(new vector<string>()) { }
+	StrBlob(initializer_list<string> il) : data(new vector<string>(il)) { }
+	size_type size() const { return data->size(); }
+	bool empty() const { return data->empty(); }
+	// 添加和删除元素
+	void push_back(const string &t) { data->push_back(t); }
+	void pop_back() {
+		check(0, "pop_back on empty StrBlob");
+		data->pop_back();
+	}
+	// 元素访问
+	string& front() {
+		// 如果 vector 为空，check 会抛出一个异常
+		check(0, "front on empty StrBlob");
+		return data->front();
+	}
+	string& back() {
+		check(0, "back on empty StrBlob");
+		return data->back();
+	}
+	string& front()const {
+		check(0, "front on empty StrBlob");
+		return data->front();
+	}
+	string& back()const {
+		check(0, "back on empty StrBlob");
+		return data->back();
+	}
+private:
+	SharedPtr<vector<string>> data;
+	// 如果 data[i]不合法，抛出一个异常
+	void check(size_type i, const string &msg) const {
+		if (i >= data->size()) {
+			throw out_of_range(msg);
+		}
+	}
+};
+```
+## 练习 16.30:
+### 重新运行你的一些程序,验证你的shared_ptr类和修改后的Blob类。 (注意:实现weak_ptr类型超出了本书范围,因此你不能将BlobPtr类与你修改后 的 Blob 一起使用。
+答：
+```
+int main() {
+	StrBlob b1;
+	{
+		StrBlob b2 = { "a", "an", "the" };
+		b1 = b2;
+		b2.push_back("about");
+	}
+	cout << b1.back() << endl;
+
+	return 0;
+}
+```
+## 练习 16.31:
+### 如果我们将 DebugDelete 与 unique_ptr 一起使用，解释编译器将删除器处理为内联形式的可能方式。
+答：
+* 是否内联取决于编译器的决定。编译器会基于生成最高效代码的目标来做出这一决定，同时考虑到函数的大小、调用频率、上下文和其他优化目标。
