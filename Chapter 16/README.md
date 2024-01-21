@@ -760,3 +760,59 @@ int main() {
 ### 如果我们将 DebugDelete 与 unique_ptr 一起使用，解释编译器将删除器处理为内联形式的可能方式。
 答：
 * 是否内联取决于编译器的决定。编译器会基于生成最高效代码的目标来做出这一决定，同时考虑到函数的大小、调用频率、上下文和其他优化目标。
+## 练习 16.32:
+### 在模板实参推断过程中发生了什么？
+答：
+* 这个过程基于函数调用中提供的实参来推断函数模板定义中的模板参数类型。这使得程序员不必显式指定模板实参，简化了模板的使用。
+## 练习 16.33:
+### 指出在模板实参推断过程中允许对函数实参进行的两种类型转换。
+答：
+* 顶层const或引用的添加或删除：编译器会忽略实参类型的是否具有顶层const或是否是引用。
+* 数组或函数到指针的转换：如果实参是数组或函数类型，它们会被转换为相应的指针类型。
+## 练习 16.34:
+### 对下面的代码解释每个调用是否合法。如果合法，T 的类型是什么？如果不合法，为什么？
+```
+template <class T> int compare(const T&, const T&);
+(a) compare("hi", "world");
+(b) compare("bye", "dad");
+```
+答：
+* (a) compare("hi", "world"); 不合法。"hi" 和 "world" 的类型分别是 const char\[3] 和 const char\[6] ，在模板实参推断中，T 需要对两个参数都适用。
+* (b) compare("bye", "dad"); 合法。"bye" 和 "dad" 的类型都是 const char\[4] ，两个实参具有相同的类型，模板实参推断是成功的。
+## 练习 16.35:
+### 下面调用中哪些是错误的（如果有的话）？如果调用合法，T 的类型是什么？如果调用不合法，问题何在？
+```
+template <typename T> T calc(T, int);
+template <typename T> T fcn(T, T);
+double d; float f; char c;
+(a) calc(c, 'c');
+(b) calc(d, f);
+(c) fcn(c, 'c');
+(d) fcn(d, f);
+```
+答：
+* (a) calc(c, 'c'); 合法。T 被推断为 char。
+* (b) calc(d, f); 合法。T 被推断为 double。
+* (c) fcn(c, 'c'); 合法。T 被推断为 char。
+* (d) fcn(d, f); 不合法。d 是 double 类型，f 是 float 类型，无法推断出一个单一的 T 类型满足两个参数。
+## 练习 16.36:
+### 进行下面的调用会发生什么：
+```
+template <typename T> f1(T, T);
+template <typename T1, typename T2> f2(T1, T2);
+int i = 0, j = 42, *p1 = &i, *p2 = &j;
+const int *cp1 = &i, *cp2 = &j;
+(a) f1(p1, p2);
+(b) f2(p1, p2);
+(c) f1(cp1, cp2);
+(d) f2(cp1, cp2);
+(e) f1(p1, cp1);
+(f) f2(p1, cp1);
+```
+答：
+* (a) f1(p1, p2); 合法。T 被推断为 int*。
+* (b) f2(p1, p2); 合法。T1 和 T2 都被推断为 int*
+* (c) f1(cp1, cp2); 合法。T 被推断为 const int*。
+* (d) f2(cp1, cp2); 合法。T1 和 T2 都被推断为 const int*。
+* (e) f1(p1, cp1); 不合法。p1 是 int* 类型，而 cp1 是 const int* 类型。由于 f1 要求两个参数类型完全相同，所以模板实参推断失败。
+* (f) f2(p1, cp1); 合法。f2 允许两个不同类型的参数，因此 T1 被推断为 int*，T2 被推断为 const int*。
