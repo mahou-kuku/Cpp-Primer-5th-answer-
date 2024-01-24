@@ -858,3 +858,32 @@ auto sum(const T1& a, const T2& b) -> decltype(a + b) {
     return a + b;
 }
 ```
+## 练习 16.42：
+### 对下面每个调用，确定 T 和 val 的类型：
+```
+template <typename T> void g(T&& val);
+int i = 0; const int ci = i;
+(a) g(i);
+(b) g(ci);
+(c) g(i * ci);
+```
+答：
+* (a) g(i);T 被推导为 int&， val 的类型是 int&。
+* (b) g(ci);T 被推导为 const int&， val 的类型是 const int&。
+* (c) g(i * ci);T 被推导为 int，因为 i * ci 是一个右值表达式。 val 的类型是 int&&。
+## 练习 16.43：
+### 使用上一题定义的函数，如果我们调用 g(i = ci), g 的模板参数将是什么？
+答：
+* 赋值操作返回左值，T 被推导为 int& 。
+## 练习 16.44:
+### 使用与第一题中相同的三个调用,如果g的函数参数声明为T(而不是T&&),确定T的类型。如果g的函数参数是const T&呢?
+答：
+* T 都被推导为 int。
+## 练习 16.45:
+### 给定下面的模板,如果我们对一个像42这样的字面常量调用g,解释会发生什么？ 如果我们对一个 int 类型的变量调用g 呢？
+```
+template <typename T> void g(T&& val) { vector<T> v; }
+```
+答：
+* 调用 g 传递字面常量 42： 字面常量 42 是一个右值 int。 T 被推导为 int。
+* 调用 g 传递 int 类型的变量： 变量 i 是一个左值 int。T 被推导为 int&，在函数体内，尝试创建一个 vector<int&> 的实例 v。这是不合法的，因为 vector 的元素类型不能是引用。
