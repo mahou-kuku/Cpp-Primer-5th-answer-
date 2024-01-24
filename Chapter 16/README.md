@@ -836,3 +836,25 @@ const int *cp1 = &i, *cp2 = &j;
 ```
 int result = compare<std::string>("hello", "world");
 ```
+## 练习 16.40:
+### 下面的函数是否合法?如果不合法,为什么?如果合法,对可以传递的实参类型有什么限制（如果有的话)？返回类型是什么？
+```
+template <typename It>
+auto fcn3(It beg, It end) -> decltype(*beg + 0)
+{
+ // 处理序列
+ return *beg; // 返回序列中一个元素的拷贝
+}
+```
+答：
+* 合法。迭代器 It 必须支持解引用操作,解引用迭代器 It 后得到的元素类型必须支持与 int 类型的加法操作。
+* 至于函数的返回类型，由尾置返回类型 decltype(*beg + 0) 推断，即解引用迭代器后得到的元素类型与 int 相加的结果类型。
+## 练习 16.41：
+### 编写一个新的 sum 版本，它的返回类型保证足够大，足以容纳加法结果。
+答：
+```
+template <typename T1, typename T2>
+auto sum(const T1& a, const T2& b) -> decltype(a + b) {
+    return a + b;
+}
+```
