@@ -887,3 +887,11 @@ template <typename T> void g(T&& val) { vector<T> v; }
 答：
 * 调用 g 传递字面常量 42： 字面常量 42 是一个右值 int。 T 被推导为 int。
 * 调用 g 传递 int 类型的变量： 变量 i 是一个左值 int。T 被推导为 int&，在函数体内，尝试创建一个 vector<int&> 的实例 v。这是不合法的，因为 vector 的元素类型不能是引用。
+## 练习 16.46:
+### 解释下面的循环,它来自13.5节(第469页)中的strVec::reallocate:
+```
+for (size_t i = 0; i != size(); ++i)
+ alloc.construct(dest++, std::move(*elem++));
+```
+答：
+* for循环遍历每个已有元素，生成对原数组元素进行绑定的右值引用，通过该右值引用construct可以对原数组的左值元素进行移动操作。
