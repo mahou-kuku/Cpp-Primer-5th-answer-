@@ -894,4 +894,4 @@ for (size_t i = 0; i != size(); ++i)
  alloc.construct(dest++, std::move(*elem++));
 ```
 答：
-* for循环遍历每个已有元素，生成对原数组元素进行绑定的右值引用，通过该右值引用construct可以对原数组的左值元素进行移动操作。
+* for循环遍历每个已有元素，std::move生成对原数组元素进行绑定的未命名右值引用（一个右值），将该右值传递给construct允许对原数组的左值元素进行移动操作。
