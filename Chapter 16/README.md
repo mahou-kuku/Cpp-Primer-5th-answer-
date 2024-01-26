@@ -895,3 +895,27 @@ for (size_t i = 0; i != size(); ++i)
 ```
 答：
 * for循环遍历每个已有元素，std::move生成对原数组元素进行绑定的未命名右值引用（一个右值），将该右值传递给construct允许对原数组的左值元素进行移动操作。
+## 练习 16.47：
+### 编写你自己版本的翻转函数,通过调用接受左值和右值引用参数的函数来测试它。
+答：
+```
+#include <iostream>
+
+using namespace std;
+
+template <typename F, typename T1, typename T2>
+void flip(F f, T1 &&t1, T2 &&t2){
+	f(std::forward<T2>(t2), std::forward<T1>(t1));
+}
+
+void g(int &&i, int& j){
+	cout << i << " " << j << endl;
+}
+
+int main() {
+	int i = 9;
+	flip(g, i, 42);
+
+	return 0;
+}
+```
