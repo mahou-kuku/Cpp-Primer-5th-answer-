@@ -919,3 +919,74 @@ int main() {
 	return 0;
 }
 ```
+## 练习 16.48：
+### 编写你自己版本的 debug_rep 函数。
+答：
+```
+template <typename T> string debug_rep(const T &t){
+	ostringstream ret;
+	ret << t;
+	return ret.str();
+}
+
+template <typename T> string debug_rep(T *p){
+	ostringstream ret;
+	ret << "pointer: " << p;
+	if (p)
+		ret << " " << debug_rep(*p);
+	else
+		ret << " null pointer";
+	return ret.str();
+}
+```
+## 练习 16.49：
+### 解释下面每个调用会发生什么：
+```
+template <typename T> void f(T);
+template <typename T> void f(const T*);
+template <typename T> void g(T);
+template <typename T> void g(T*);
+int i = 42, *p = &i;
+const int ci = 0, *p2 = &ci;
+g(42); g(p); g(ci); g(p2);
+f(42); f(p); f(ci); f(p2);
+```
+答：
+* g(42); 调用 g(T)，因为42是一个整数字面量，匹配非指针模板。
+* g(p); 调用 g(T*)，因为p是一个指向int的指针。 而g(T*)是针对指针类型的最特例化版本。
+* g(ci); 调用 g(T)，因为ci是一个const int，匹配非指针模板。
+* g(p2); 调用 g(T*)，因为p2是一个指向const int的指针。
+* f(42); 调用 f(T)，同样因为42是一个整数字面量。
+* f(p); 调用 f(T)，这里T被推导为int*，这里不会调用f(const T*)因为p不是指向const的。
+* f(ci); 调用 f(T)，因为ci是一个const int，匹配到T。
+* f(p2); 调用 f(const T*)，因为p2是一个指向const int的指针，f(const T*)是针对const指针的最特例化版本。
+## 练习 16.50：
+### 定义上一个练习中的函数，令它们打印一条身份信息。运行该练习中的代码。如果函数调用的行为与你预期不符,确定你理解了原因。
+答：
+```
+#include <iostream>
+
+template <typename T> void f(T) {
+    std::cout << "f(T) called\n";
+}
+
+template <typename T> void f(const T*) {
+    std::cout << "f(const T*) called\n";
+}
+
+template <typename T> void g(T) {
+    std::cout << "g(T) called\n";
+}
+
+template <typename T> void g(T*) {
+    std::cout << "g(T*) called\n";
+}
+
+int main() {
+    int i = 42, *p = &i;
+    const int ci = 0, *p2 = &ci;
+    g(42); g(p); g(ci); g(p2);
+    f(42); f(p); f(ci); f(p2);
+    return 0;
+}
+```
