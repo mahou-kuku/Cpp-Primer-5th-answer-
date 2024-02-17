@@ -1019,3 +1019,42 @@ int main() {
 	return 0;
 }
 ```
+## 练习 16.53：
+### 编写你自己版本的 print 函数，并打印一个、两个及五个实参来测试它，要打印的每个实参都应有不同的类型。
+答：
+```
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+template<typename T>
+ostream &print(ostream &os, const T &t){
+	return os << t;
+}
+
+template <typename T, typename... Args>
+ostream &print(ostream &os, const T &t, const Args&... rest) {
+	os << t << ", ";
+	return print(os, rest...);
+}
+
+int main() {
+	int i = 0; double d = 3.14; string s = "how now brown cow";
+	print(cout, 9);
+	cout << endl;
+	print(cout, "AAA", 99);
+	cout << endl;
+	print(cout,i,d,s,"BBB",42);
+
+	return 0;
+}
+```
+## 练习 16.54：
+### 如果我们对一个没有<<运算符的类型调用print,会发生什么？
+答：
+* 会产生编译错误。
+## 练习 16.55：
+### 如果我们的可变参数版本print的定义之后声明非可变参数版本,解释可变参数的版本会如何执行。
+答：
+* 可变参数版本会无限递归。
