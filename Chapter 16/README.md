@@ -1058,3 +1058,34 @@ int main() {
 ### 如果我们的可变参数版本print的定义之后声明非可变参数版本,解释可变参数的版本会如何执行。
 答：
 * 可变参数版本会无限递归。
+## 练习 16.56：
+### 编写并测试可变参数版本的 errorMsg。
+答：
+```
+template <typename T>
+ostream &print(ostream &os, const T &t) {
+	return os << t;
+}
+
+template <typename T, typename... Args>
+ostream &print(ostream &os, const T &t, const Args&... rest) {
+	os << t << ", ";
+	return print(os, rest...);
+}
+
+template <typename T> 
+string debug_rep(const T &t){
+	ostringstream ret; 
+	ret << t; 
+	return ret.str(); 
+}
+
+template <typename... Args>
+ostream &errorMsg(ostream &os, const Args&... rest) {
+	return print(os, debug_rep(rest)...);
+}
+```
+## 练习 16.57：
+### 比较你的可变参数版本的errorMsg和6.2.6节(第198页)中的 error_msg 函数。两种方法的优点和缺点各是什么？
+答：
+* 可变参数版本的errorMsg可以接受不同类型的实参，但是需要通过递归来展开参数包。
