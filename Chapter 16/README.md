@@ -1089,3 +1089,32 @@ ostream &errorMsg(ostream &os, const Args&... rest) {
 ### 比较你的可变参数版本的errorMsg和6.2.6节(第198页)中的 error_msg 函数。两种方法的优点和缺点各是什么？
 答：
 * 可变参数版本的errorMsg可以接受不同类型的实参，但是需要通过递归来展开参数包。
+## 练习 16.58：
+### 为你的strVec类及你为16.1.2节(第591页)练习中编写的Vec类添加 emplace_back 函数。
+答：
+```
+template <class... Args>
+inline void StrVec::emplace_back(Args&&... args){
+	chk_n_alloc(); // 如果需要的话重新分配 StrVec 内存空间
+	alloc.construct(first_free++,
+		std::forward<Args>(args)...);
+}
+```
+## 练习 16.59：
+### 假定 s 是一个 string，解释调用 svec.emplace_back (s)会发生什么。
+答：
+* emplace_back利用了模板和完美转发，可以将任意数量和类型的参数转发给construct。
+## 练习 16.60：
+### 解释make_shared (参见12.1.1 节，第401页)是如何工作的。
+答：
+* make_shared内部使用了转发参数包的特性，可以将任意数量和类型的参数完美转发到被管理对象类型的构造函数中。并返回一个指向新创建对象的shared_ptr。
+## 练习 16.61：
+### 定义你自己版本的make_shared。
+答：
+```
+template<typename T, typename... Args>
+std::shared_ptr<T> make_shared(Args&&... args) {
+	// 使用new表达式创建一个T类型的对象，利用std::forward<Args>(args)...来完美转发参数
+	return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
+}
+```
