@@ -1118,3 +1118,193 @@ std::shared_ptr<T> make_shared(Args&&... args) {
 	return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 }
 ```
+## 练习 16.62：
+### 定义你自己版本的 hash<Sales_data>，并定义一个 Sales_data 对象 的unordered-multiset。将多条交易记录保存到容器中,并打印其内容。
+答：
+```
+#include <iostream>
+#include <unordered_set>
+#include <string>
+
+using namespace std;
+
+struct Sales_data {
+	friend std::hash<Sales_data>;
+	friend bool operator==(const Sales_data& lhs, const Sales_data& rhs);
+	friend std::ostream &operator<<(std::ostream& os, const Sales_data& item);
+
+	Sales_data() = default;
+	Sales_data(const std::string &s) :bookNo(s) {}
+	Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(p*n) {}
+	
+	std::string isbn() const {
+		return bookNo;
+	}
+	Sales_data& combine(const Sales_data& rhs) {
+		units_sold += rhs.units_sold;
+		revenue += rhs.revenue;
+		return *this;
+	}
+private:
+	double avg_price() const {
+		if (units_sold) {
+			return revenue / units_sold;
+		} else {
+			return 0;
+		}
+	}
+
+	std::string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+};
+bool operator==(const Sales_data &lhs, const Sales_data &rhs) {
+	return lhs.isbn() == rhs.isbn() &&
+		lhs.units_sold == rhs.units_sold &&
+		lhs.revenue == rhs.revenue;
+}
+ostream &operator<<(ostream &os, const Sales_data &item)
+{
+	os << item.isbn() << " " << item.units_sold << " "
+		<< item.revenue << " " << item.avg_price();
+	return os;
+}
+
+namespace std {
+	template <> 
+	struct hash<Sales_data> {
+		typedef size_t result_type;
+		typedef Sales_data argument_type;
+		size_t operator()(const Sales_data& s) const;
+	};
+	size_t hash<Sales_data>::operator()(const Sales_data& s) const{
+		return hash<string>()(s.bookNo) ^
+			hash<unsigned>()(s.units_sold) ^
+			hash<double>()(s.revenue);
+	}
+}
+
+int main() {
+	unordered_multiset<Sales_data> umset;
+	umset.emplace("Aaa", 10, 0.9);
+	umset.emplace("Bbb", 20, 0.8);
+
+	for (const auto &item : umset) {
+		cout << item << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 16.63：
+### 定义一个函数模板,统计一个给定值在一个vector中出现的次数。 测试你的函数,分别传递给它一个double的vector,一个int的vector以及一个string的vector。
+答：
+```
+#include <vector>
+#include <iostream>
+#include <string>
+
+// 函数模板定义
+template<typename T>
+size_t count_occurrences(const std::vector<T>& vec, const T& value) {
+	size_t count = 0;
+	for (const auto& item : vec) {
+		if (item == value) {
+			++count;
+		}
+	}
+	return count;
+}
+
+// 测试函数
+int main() {
+	// 测试double类型的vector
+	std::vector<double> vecDouble = { 1.1, 2.2, 3.3, 1.1, 4.4 };
+	double valDouble = 1.1;
+	std::cout << "Double vector: " << count_occurrences(vecDouble, valDouble) << " occurrences of " << valDouble << std::endl;
+
+	// 测试int类型的vector
+	std::vector<int> vecInt = { 1, 2, 3, 4, 5, 1, 1 };
+	int valInt = 1;
+	std::cout << "Int vector: " << count_occurrences(vecInt, valInt) << " occurrences of " << valInt << std::endl;
+
+	// 测试string类型的vector
+	std::vector<std::string> vecString = { "apple", "banana", "cherry", "apple", "date", "apple" };
+	std::string valString = "apple";
+	std::cout << "String vector: " << count_occurrences(vecString, valString) << " occurrences of " << valString << std::endl;
+
+	return 0;
+}
+```
+## 练习 16.64：
+### 为上一题中的模板编写特例化版本来处理 vector<const char*>。 编写程序使用这个特例化版本。
+答：
+```
+#include <vector>
+#include <iostream>
+#include <cstring>
+
+// 原始模板定义
+template<typename T>
+size_t count_occurrences(const std::vector<T>& vec, const T& value) {
+	size_t count = 0;
+	for (const auto& item : vec) {
+		if (item == value) {
+			++count;
+		}
+	}
+	return count;
+}
+
+// 针对 const char* 的特例化版本
+template<>
+size_t count_occurrences<const char*>(const std::vector<const char*>& vec, const char* const& value) {
+	size_t count = 0;
+	for (const auto& item : vec) {
+		if (strcmp(item, value) == 0) {
+			++count;
+		}
+	}
+	return count;
+}
+
+// 测试程序
+int main() {
+	// 使用特例化版本处理vector<const char*>
+	std::vector<const char*> vecCharPtr = { "apple", "banana", "cherry", "apple", "date", "apple" };
+	const char* valCharPtr = "apple";
+	std::cout << "const char* vector: " << count_occurrences(vecCharPtr, valCharPtr) <<
+		" occurrences of " << valCharPtr << std::endl;
+
+	system("pause");
+	return 0;
+}
+```
+## 练习 16.65：
+### 在16.3节(第617页)中我们定义了两个重载的debug_rep版本,一个接受const char\*参数,另一个接受char*参数。 将这两个函数重写为特例化版本。
+答：
+```
+template <typename T>
+string debug_rep(T* p) {
+	ostringstream ret;
+	ret << p;
+	return ret.str();
+}
+template <>
+string debug_rep(char *p) {
+	return string(p);
+}
+template <>
+string debug_rep(const char *p) {
+	return string(p);
+}
+```
+## 练习 16.66：
+### 重载 debug_rep 函数与特例化它相比，有何优点和缺点？
+答：
+* 优点：重载函数在类型匹配上更为直接和清晰
+* 缺点：如果需要处理多种指针类型并且对于大多数类型的处理逻辑相同，那么使用重载就需要为每一种类型写一个几乎相同的函数，这会导致代码重复。
+## 练习 16.67：
+### 定义特例化版本会影响 debug_rep 的函数匹配吗？如果不影响，为什么？
+答：
+* 特例化本身不会阻碍函数匹配过程。
