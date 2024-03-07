@@ -211,3 +211,82 @@ vector<MatchResult> findBook(const vector<vector<Sales_data>>& files, const stri
 * (a) 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00100000
 * (b) 00000000 00000000 00000000 01010101
 * (c) 如果输入bstr的字符都是0或1，则由前8个字符决定bv的位模式。
+## 练习 17.10：
+### 使用序列1、2、3、5、8、13、21初始化一个bitset,将这些位置置位。 对另一个bitset进行默认初始化,并编写一小段程序将其恰当的位置位。
+答：
+```
+#include <iostream>
+#include <bitset>
+#include <vector>
+
+using namespace std;
+
+int main() {
+	vector<int> vec = { 1, 2, 3, 5, 8, 13, 21 };
+	bitset<22> bs;
+
+	for (auto i : vec) {
+		bs.set(i);
+	}
+
+	bitset<22> bs2;
+	for (size_t i = 0; i != 22; ++i) {
+		bs2[i] = bs[i];
+	}
+		
+	cout << bs << endl;
+	cout << bs2 << endl;
+
+	return 0;
+}
+```
+## 练习 17.11：
+### 定义一个数据结构，包含一个整型对象，记录一个包含 10个问题的真/假测验的解答。如果测验包含 100 道题，你需要对数据结构做出什么改变（如果需要的话)？
+答：
+```
+struct QuizAnswers {
+    std::bitset<10> answers;
+};
+```
+* 如果测验包含100道题，只需要将bitset的大小从10改为100即可：
+```
+struct QuizAnswers {
+    std::bitset<100> answers; // 现在可以记录100个问题的答案
+};
+```
+## 练习 17.12：
+### 使用前一题中的数据结构，编写一个函数，它接受一个问题编号和一个表示真/假解答的值,函数根据这两个参数更新测验的解答。
+答：
+```
+void updateAnswer(QuizAnswers& Qa, size_t questionNumber, bool value) {
+	if (questionNumber < Qa.answers.size()) {
+		Qa.answers.set(questionNumber, value);
+	}
+}
+```
+## 练习 17.13：
+### 编写一个整型对象，包含真/假测验的正确答案。使用它来为前两题中的数据结构生成测验成绩。
+答：
+```
+// 函数用于计算学生的测验成绩
+int calculateScore(const QuizAnswers& correctAnswers, const QuizAnswers& studentAnswers) {
+	// 异或操作找出错误的答案（不同的位）
+	auto result = correctAnswers.answers ^ studentAnswers.answers;
+	// 总题数减去错误的题目数量得到分数
+	return correctAnswers.answers.size() - result.count(); // count() 返回值为1的位的数量
+}
+
+int main() {
+
+	// 假设测验有10道题
+	QuizAnswers correctAnswers{ 0b1111100000 }; // 正确答案
+	QuizAnswers studentAnswers{ 0b1111010000 }; // 学生答案
+
+
+						   // 计算分数
+	int score = calculateScore(correctAnswers, studentAnswers);
+	std::cout << "Student Score: " << score << " out of " << correctAnswers.answers.size() << std::endl;
+
+	return 0;
+}
+```
