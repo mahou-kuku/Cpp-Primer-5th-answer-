@@ -83,3 +83,120 @@ ostream &print(ostream & os, const tuple<string, shared_ptr<set<TextQuery::line_
 	return os;
 }
 ```
+## 练习 17.4：
+### 编写并测试你自己版本的findBook函数。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <tuple>
+#include <algorithm>
+#include <numeric>
+#include "Sales_data.h"
+
+using namespace std;
+
+// matches有三个成员：一家书店的索引和两个指向书店 vector 中元素的迭代器
+typedef tuple<vector<Sales_data>::size_type,
+	vector<Sales_data>::const_iterator,
+	vector<Sales_data>::const_iterator> matches;
+
+// files保存每家书店的销售记录
+// findBook返回一个vector，每家销售了给定书籍的书店在其中都有一项
+vector<matches> findBook(const vector<vector<Sales_data>> &files,const string &book){
+	vector<matches> ret; //初始化为空vector
+	// 对每家书店，查找与给定书籍匹配的记录范围（如果存在的话）
+	for (auto it = files.cbegin(); it != files.cend(); ++it){
+		// 查找具有相同ISBN的Sales_data范围
+		auto found = equal_range(it->cbegin(), it->cend(), book, compareIsbn);
+		if (found.first != found.second) {  // 此书店销售了给定书籍
+			// 记住此书店的索引及匹配的范围
+			ret.push_back(make_tuple(it - files.cbegin(), found.first, found.second));
+		}
+	}
+	return ret; //如果未找到匹配记录，ret为空
+}
+
+void reportResults(istream &in, ostream &os,const vector<vector<Sales_data> > &files) {
+	string s;  // 要查找的书
+	while (in >> s) {
+		auto trans = findBook(files, s);	// 销售了这本书的书店
+		if (trans.empty()) {
+			cout << s << " not found in any stores" << endl;
+			continue;  // 获得下一本要查找的书
+		}
+		for (const auto &store : trans)  // 对每家销售了给定书籍的书店
+		// get<n>返回store中tuple的指定的成员
+			os << "store " << get<0>(store) << " sales: "
+			<< accumulate(get<1>(store), get<2>(store), Sales_data(s))
+			<< endl;
+	}
+}
+
+int main() {
+	vector<vector<Sales_data>> vec{ {{"aaa",10,20},{"aaa",15,20}},{{"aaa",9,20},{"bbb",9,5},{"ccc",7,8}} };
+	reportResults(cin, cout, vec);
+
+	return 0;
+}
+```
+## 练习 17.5：
+### 重写 findBook，令其返回一个 pair，包含一个索引和一个迭代器 pair。
+答：
+```
+// 新的matches类型，替换原有的tuple类型
+using matches = pair<vector<Sales_data>::size_type,
+	pair<vector<Sales_data>::const_iterator,vector<Sales_data>::const_iterator >> ;
+
+// 重写findBook函数
+vector<matches> findBook(const vector<vector<Sales_data>>& files, const string& book) {
+	vector<matches> ret; // 初始化为空vector
+						 // 对每家书店，查找与给定书籍匹配的记录范围（如果存在的话）
+	for (auto it = files.cbegin(); it != files.cend(); ++it) {
+		// 查找具有相同ISBN的Sales_data范围
+		auto found = equal_range(it->cbegin(), it->cend(), Sales_data(book), compareIsbn);
+		if (found.first != found.second) { // 此书店销售了给定书籍
+										   // 使用新的matches类型构造返回项
+			ret.push_back(make_pair(it - files.cbegin(), make_pair(found.first, found.second)));
+		}
+	}
+	return ret; // 如果未找到匹配记录，ret为空
+}
+```
+## 练习 17.6：
+### 重写findBook,不使用tuple或pair。
+答：
+```
+// 定义一个适合的结构体
+struct MatchResult {
+	MatchResult(size_t idx, vector<Sales_data>::const_iterator f, vector<Sales_data>::const_iterator l)
+		: index(idx), first(f), last(l) {}
+	vector<Sales_data>::size_type index; // 存储书店的索引
+	vector<Sales_data>::const_iterator first; // 匹配范围的起始迭代器
+	vector<Sales_data>::const_iterator last; // 匹配范围的结束迭代器
+	
+};
+
+// 重写findBook函数
+vector<MatchResult> findBook(const vector<vector<Sales_data>>& files, const string& book) {
+	vector<MatchResult> ret;
+	for (auto it = files.cbegin(); it != files.cend(); ++it) {
+		auto found = equal_range(it->cbegin(), it->cend(), book, compareIsbn);
+		if (found.first != found.second) {  // 此书店销售了给定书籍
+			ret.push_back(MatchResult(it - files.cbegin(), found.first, found.second));
+		}
+	}
+	return ret;
+}
+```
+## 练习 17.7：
+### 解释你更倾向于哪个版本的 findBook，为什么。
+答：
+* 个人倾向会因情况而异。
+* 使用tuple或pair的版本： 这种方法的优点在于简洁性。它不需要额外定义结构体，代码量较少。但缺点是可读性相对较差，使用get<0>(matches)、get<1>(matches)这样的访问方式可能不够直观。
+* 使用自定义结构体的版本： 这种方法的优点在于提高了代码的可读性和易理解性。每个成员都有明确的名称，如index、first、last，使得代码更易于理解和维护。缺点是需要额外定义一个结构体，增加了代码量。
+## 练习 17.8：
+### 在本节最后一段代码中,如果我们将Sales_data()作为第三个参数传递 给accumulate,会发生什么?
+答：
+* accumulate 返回的 Sales_data 的 bookNo 会变成一个空字符串string。
