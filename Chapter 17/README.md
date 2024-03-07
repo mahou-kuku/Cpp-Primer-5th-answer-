@@ -200,3 +200,14 @@ vector<MatchResult> findBook(const vector<vector<Sales_data>>& files, const stri
 ### 在本节最后一段代码中,如果我们将Sales_data()作为第三个参数传递 给accumulate,会发生什么?
 答：
 * accumulate 返回的 Sales_data 的 bookNo 会变成一个空字符串string。
+## 练习 17.9：
+### 解释下列每个 bitset 对象所包含的位模式：
+```
+(a) bitset<64> bitvec(32);
+(b) bitset<32> bv(1010101);
+(c) string bstr; cin >> bstr; bitset<8>bv(bstr);
+```
+答：
+* (a) 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00100000
+* (b) 00000000 00000000 00000000 01010101
+* (c) 如果输入bstr的字符都是0或1，则由前8个字符决定bv的位模式。
