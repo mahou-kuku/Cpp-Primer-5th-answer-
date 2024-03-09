@@ -355,3 +355,55 @@ int main() {
 ### 如果前一题程序中的 regex 对象用"\[^c]ei"进行初始化，将会发生什么？用此模式测试你的程序，检查你的答案是否正确。
 答：
 * 会无法正确判断ei出现在单词的开头的情况。
+## 练习 17.17：
+### 更新你的程序，令它查找输入序列中所有违反“ei”语法规则的单词。
+答：
+```
+#include <iostream>
+#include <regex>
+#include <string>
+
+int main() {
+	std::string text;
+	std::cout << "Enter a sentence or paragraph: ";
+	std::getline(std::cin, text);  // 使用getline读取整行输入，包括空格
+
+	// 正则表达式，匹配违反规则的单词
+	std::regex pattern("(\\b[^c\\s]*ei[[:alpha:]]*)", std::regex::icase);
+
+	for (sregex_iterator it(text.begin(), text.end(), pattern), end_it; it != end_it; ++it) {
+		cout << it->str() << endl;
+	}
+
+	system("pause");
+	return 0;
+}
+```
+## 练习 17.18：
+### 修改你的程序,忽略包含"ei”但并非拼写错误的单词,如“albeit”和“neighbor”。
+答：
+* 正则表达式无法判断是不是所谓的“拼写错误”。
+```
+#include <iostream>
+#include <regex>
+#include <string>
+
+int main() {
+	std::string text;
+	std::cout << "Enter a sentence or paragraph: ";
+	std::getline(std::cin, text);  // 使用getline读取整行输入，包括空格
+
+	// 正则表达式，匹配违反规则的单词
+	std::regex pattern("(\\b[^c\\s]*ei[[:alpha:]]*)", std::regex::icase);
+
+	for (sregex_iterator it(text.begin(), text.end(), pattern), end_it; it != end_it; ++it) {
+		if (it->str() == "albeit" || it->str() == "neighbor") {
+			continue;	// 跳过特定单词的输出
+		}
+		cout << it->str() << endl;
+	}
+
+	system("pause");
+	return 0;
+}
+```
