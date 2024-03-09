@@ -290,3 +290,68 @@ int main() {
 	return 0;
 }
 ```
+## 练习 17.14：
+### 编写几个正则表达式，分别触发不同错误。运行你的程序，观察编译器对每个错误的输出。
+答：
+* 使用正则表达式库<regex>时，大多数错误都会在运行时而非编译时发生，因为正则表达式通常是以字符串的形式提供给std::regex构造函数的，其内容只能在运行时检查。
+```
+#include <iostream>
+#include <regex>
+
+int main() {
+	try {
+		std::regex re("[a-z");		// 缺少括号
+	}
+	catch (const std::regex_error& e) {
+		std::cout << "Regex error: " << e.what() << std::endl;
+	}
+
+
+	try {
+		std::regex re("a{2,1}");	// 无效的范围
+	}
+	catch (const std::regex_error& e) {
+		std::cout << "Regex error: " << e.what() << std::endl;
+	}
+
+
+	try {
+		std::regex re("(?<=abc)def");	// 使用不支持的正则表达式特性
+	}
+	catch (const std::regex_error& e) {
+		std::cout << "Regex error: " << e.what() << std::endl;
+	}
+
+	system("pause");
+	return 0;
+}
+```
+## 练习 17.15：
+### 编写程序，使用模式查找违反“i在e之前，除非在c之后”规则的单词。 你的程序应该提示用户输入一个单词，然后指出此单词是否符合要求。 用一些违反和未违反规则的单词测试你的程序。
+答：
+```
+#include <iostream>
+#include <regex>
+#include <string>
+
+int main() {
+	std::string word;
+	std::cout << "Enter a word: ";
+	std::cin >> word;
+
+	std::regex pattern("([^c]ei|^ei)", regex::icase);
+
+	if (std::regex_search(word, pattern)) {
+		std::cout << "The word \"" << word << "\" violates the rule." << std::endl;
+	} else {
+		std::cout << "The word \"" << word << "\" follows the rule." << std::endl;
+	}
+
+	system("pause");
+	return 0;
+}
+```
+## 练习 17.16：
+### 如果前一题程序中的 regex 对象用"\[^c]ei"进行初始化，将会发生什么？用此模式测试你的程序，检查你的答案是否正确。
+答：
+* 会无法正确判断ei出现在单词的开头的情况。
