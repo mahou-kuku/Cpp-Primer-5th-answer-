@@ -369,7 +369,7 @@ int main() {
 	std::getline(std::cin, text);  // 使用getline读取整行输入，包括空格
 
 	// 正则表达式，匹配违反规则的单词
-	std::regex pattern("(\\b[^c\\s]*ei[[:alpha:]]*)", std::regex::icase);
+	std::regex pattern("[[:alpha:]]*([^c\\s]ei|\\bei)[[:alpha:]]*", std::regex::icase);
 
 	for (sregex_iterator it(text.begin(), text.end(), pattern), end_it; it != end_it; ++it) {
 		cout << it->str() << endl;
@@ -382,7 +382,6 @@ int main() {
 ## 练习 17.18：
 ### 修改你的程序,忽略包含"ei”但并非拼写错误的单词,如“albeit”和“neighbor”。
 答：
-* 正则表达式无法判断是不是所谓的“拼写错误”。
 ```
 #include <iostream>
 #include <regex>
@@ -394,7 +393,7 @@ int main() {
 	std::getline(std::cin, text);  // 使用getline读取整行输入，包括空格
 
 	// 正则表达式，匹配违反规则的单词
-	std::regex pattern("(\\b[^c\\s]*ei[[:alpha:]]*)", std::regex::icase);
+	std::regex pattern("[[:alpha:]]*([^c\\s]ei|\\bei)[[:alpha:]]*", std::regex::icase);
 
 	for (sregex_iterator it(text.begin(), text.end(), pattern), end_it; it != end_it; ++it) {
 		if (it->str() == "albeit" || it->str() == "neighbor") {
