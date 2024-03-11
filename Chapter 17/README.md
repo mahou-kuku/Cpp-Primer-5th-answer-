@@ -504,8 +504,8 @@ int main() {
 		ostringstream formatted, badNums;
 		for (const auto &nums : entry.phones) {
 			// 对每个匹配的电话号码
-			for (sregex_iterator it(nums.begin(), nums.end(), r), end_it; it != end_it; ++it) {
-				if (!valid(*it)) {
+			if (regex_search(nums, m, r)) {
+				if (!valid(m)) {
 					badNums << " " << nums;
 				} else {
 					formatted << " " << nums;
@@ -535,4 +535,155 @@ string phone = "(\\()?(\\d{3})(\\))?([-. ])?\\s*(\\d{3})([-. ]?)\\s*(\\d{4})";
 答：
 ```
 regex r("\\d{5}(-\\d{4})?|\\d{9}");
+```
+## 练习 17.24：
+### 编写你自己版本的重排电话号码格式的程序。
+答：
+```
+#include <iostream>
+#include <regex>
+#include <string>
+
+using namespace std;
+
+int main(){
+	string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ])?(\\d{4})";
+	regex r(phone); // 寻找模式所用的 regex 对象
+	string s;
+	string fmt = "$2.$5.$7"; // 将号码格式改为ddd.ddd.dddd
+	// 从输入文件中读取每条记录
+	while (getline(cin, s)) {
+		cout << regex_replace(s, r, fmt) << endl;
+	}
+
+	return 0;
+}
+```
+## 练习 17.25：
+### 重写你的电话号码程序,使之只输出每个人的第一个电话号码。
+答：
+* 调整输出语句。
+```
+		if (badNums.str().empty()) {
+			cout << entry.name << " " << regex_replace(formatted.str(),r,"$2.$5.$7",
+				std::regex_constants::format_first_only| std::regex_constants::format_no_copy) << endl;
+		} else {
+			cerr << "input error: " << entry.name << " invalid number(s) " << badNums.str() << endl;
+		}
+
+```
+## 练习 17.26：
+### 重写你的电话号码程序，使之对多于一个电话号码的人只输出第二个和后续电话号码。
+答：
+```
+#include <iostream>
+#include <regex>
+#include <string>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+struct PersonInfo {
+	string name;
+	vector<string> phones;
+};
+
+bool valid(const smatch& m)
+{
+	// 如果区号前有一个左括号
+	if (m[1].matched) {
+		// 则区号后必须有一个右括号，之后紧跟剩余号码或一个空格
+		return m[3].matched && (m[4].matched == 0 || m[4].str() == " ");
+	} else {
+		// 否则，区号后不能有右括号
+		// 另两个组成部分间的分隔符必须匹配
+		return !m[3].matched && m[4].str() == m[6].str();
+	}
+}
+
+int main() {
+	string line, word;
+	vector<PersonInfo> people;
+	while (getline(cin, line)) {
+		PersonInfo info;
+		istringstream record(line);
+		record >> info.name;
+		while (record >> word) {
+			info.phones.push_back(word);
+		}
+		people.push_back(info);
+	}
+
+	string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ]?)(\\d{4})";
+	regex r(phone);		// regex 对象，用于查找我们的模式
+	smatch m;
+
+	for (const auto &entry : people) {
+		ostringstream formatted, badNums;
+		int validNumbersCount = 0; // 用于统计每个人的有效电话号码数量
+
+		// 首先计算有效电话号码的数量
+		for (const auto &nums : entry.phones) {
+			if (regex_search(nums, m, r) && valid(m)) {
+				++validNumbersCount;
+			}
+		}
+		// 是否跳过第一个有效电话号码
+		bool skipFirstValidNumber = validNumbersCount > 1;
+
+		for (const auto &nums : entry.phones) {
+			// 对每个匹配的电话号码
+			if (regex_search(nums, m, r)) {
+				if (!valid(m)) {
+					badNums << " " << nums;
+				} else {
+					if (!skipFirstValidNumber) {
+						formatted << " " << nums;
+					}
+					skipFirstValidNumber = false; // 确保只跳过第一个有效号码
+				}
+			}
+		}
+		if (badNums.str().empty()) {
+			cout << entry.name << " " << formatted.str() << endl;
+		} else {
+			cerr << "input error: " << entry.name << " invalid number(s) " << badNums.str() << endl;
+		}
+
+	}
+
+	return 0;
+}
+```
+## 练习 17.27：
+### 编写程序,将九位数字邮政编码的格式转换为ddddd-dddd
+答：
+```
+#include <iostream>
+#include <regex>
+#include <string>
+
+using namespace std;
+
+int main() {
+	std::string postalCode;
+	std::cout << "Enter a nine-digit postal code: ";
+	std::getline(std::cin, postalCode);
+
+	// 创建正则表达式匹配九位数字邮政编码
+	std::regex postalCodePattern("(\\d{9})");
+
+	// 检查输入是否匹配九位数字的要求
+	if (std::regex_match(postalCode, postalCodePattern)) {
+		// 转换格式为 ddddd-dddd
+		std::string formattedPostalCode = postalCode.substr(0, 5) + "-" + postalCode.substr(5, 4);
+		std::cout << "Formatted postal code: " << formattedPostalCode << std::endl;
+	} else {
+		std::cout << "The input is not a valid nine-digit postal code." << std::endl;
+	}
+
+	system("pause");
+	return 0;
+}
 ```
