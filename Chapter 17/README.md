@@ -406,3 +406,133 @@ int main() {
 	return 0;
 }
 ```
+## 练习 17.19：
+### 为什么可以不先检查m\[4]是否匹配了就直接调用 m\[4].str()?
+答：
+* m\[4].str()如果未匹配则会返回空字符串，m\[6].str()也是如此，所以未匹配的情况下两个string仍然可以进行比较。
+## 练习 17.20：
+### 编写你自己版本的验证电话号码的程序。
+答：
+```
+#include <iostream>
+#include <regex>
+#include <string>
+
+using namespace std;
+
+bool valid(const smatch& m){
+	// 如果区号前有一个左括号
+	if (m[1].matched) {
+		// 则区号后必须有一个右括号，之后紧跟剩余号码或一个空格
+		return m[3].matched && (m[4].matched == 0 || m[4].str() == " ");
+	} else {
+		// 否则，区号后不能有右括号
+		// 另两个组成部分间的分隔符必须匹配
+		return !m[3].matched && m[4].str() == m[6].str();
+	}
+}
+
+int main(){
+	string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ]?)(\\d{4})";
+	regex r(phone);		// regex 对象，用于查找我们的模式
+	smatch m;
+	string s;
+	// 从输入文件中读取每条记录
+	while (getline(cin, s)){
+		// 对每个匹配的电话号码
+		for (sregex_iterator it(s.begin(), s.end(), r), end_it; it != end_it; ++it){
+			// 检查号码的格式是否合法
+			if (valid(*it)){
+				cout << "valid : " << it->str() << endl;
+			} else {
+				cout << "not valid: " << it->str() << endl;
+			}
+		}
+	}
+
+	return 0;
+}
+```
+## 练习 17.21：
+### 使用本节中定义的valid函数重写8.3.2节(第289页)中的电话号码程序。
+答：
+```
+#include <iostream>
+#include <regex>
+#include <string>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+struct PersonInfo {
+	string name;
+	vector<string> phones;
+};
+
+bool valid(const smatch& m)
+{
+	// 如果区号前有一个左括号
+	if (m[1].matched) {
+		// 则区号后必须有一个右括号，之后紧跟剩余号码或一个空格
+		return m[3].matched && (m[4].matched == 0 || m[4].str() == " ");
+	} else {
+		// 否则，区号后不能有右括号
+		// 另两个组成部分间的分隔符必须匹配
+		return !m[3].matched && m[4].str() == m[6].str();
+	}
+}
+
+int main() {
+	string line, word;
+	vector<PersonInfo> people;
+	while (getline(cin, line)) {
+		PersonInfo info;
+		istringstream record(line);
+		record >> info.name;
+		while (record >> word) {
+			info.phones.push_back(word);
+		}
+		people.push_back(info);
+	}
+
+	string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ]?)(\\d{4})";
+	regex r(phone);		// regex 对象，用于查找我们的模式
+	smatch m;
+
+	for (const auto &entry : people) {
+		ostringstream formatted, badNums;
+		for (const auto &nums : entry.phones) {
+			// 对每个匹配的电话号码
+			for (sregex_iterator it(nums.begin(), nums.end(), r), end_it; it != end_it; ++it) {
+				if (!valid(*it)) {
+					badNums << " " << nums;
+				} else {
+					formatted << " " << nums;
+				}
+			}
+		}
+		if (badNums.str().empty()) {
+			cout << entry.name << " " << formatted.str() << endl;
+		} else {
+			cerr << "input error: " << entry.name << " invalid number(s) " << badNums.str() << endl;
+		}
+
+	}
+
+	return 0;
+}
+```
+## 练习 17.22：
+### 重写你的电话号码程序,使之允许在号码的三个部分之间放置任意多个空白符。
+答：
+* 可以通过调整正则表达式实现。
+```
+string phone = "(\\()?(\\d{3})(\\))?([-. ])?\\s*(\\d{3})([-. ]?)\\s*(\\d{4})";
+```
+## 练习 17.23：
+### 编写查找邮政编码的正则表达式。一个美国邮政编码可以由五位或九位数字组成。前五位数字和后四位数字之间可以用一个短横线分隔。
+答：
+```
+regex r("\\d{5}(-\\d{4})?|\\d{9}");
+```
