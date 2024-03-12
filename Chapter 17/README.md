@@ -687,3 +687,103 @@ int main() {
 	return 0;
 }
 ```
+## 练习 17.28：
+### 编写函数，每次调用生成并返回一个均匀分布的随机 unsigned int。
+答：
+```
+#include <random>
+#include <iostream>
+
+using namespace std;
+
+// 函数：生成并返回一个均匀分布的随机 unsigned int
+unsigned int generateRandomUnsignedInt() {
+	// 静态变量只初始化一次，确保每次调用函数时不重新初始化随机数引擎和分布
+	static default_random_engine gen;
+	static uniform_int_distribution<unsigned int> dis;
+	return dis(gen);
+}
+
+int main() {
+	// 调用函数，打印生成的随机数
+	cout << "Random unsigned int: " << generateRandomUnsignedInt() << endl;
+	cout << "Another random unsigned int: " << generateRandomUnsignedInt() << endl;
+
+	return 0;
+}
+```
+## 练习 17.29：
+### 修改上一题中编写的函数,允许用户提供一个种子作为可选参数。
+答：
+```
+#include <random>
+#include <iostream>
+
+using namespace std;
+
+// 函数：生成并返回一个均匀分布的随机 unsigned int
+unsigned int generateRandomUnsignedInt() {
+	// 静态变量只初始化一次，确保每次调用函数时不重新初始化随机数引擎和分布
+	static default_random_engine gen;
+	static uniform_int_distribution<unsigned> dis;
+	return dis(gen);
+}
+
+// 重载函数，允许用户提供种子
+unsigned int generateRandomUnsignedInt(unsigned seed) {
+	static default_random_engine gen(seed);
+	static uniform_int_distribution<unsigned> dis;
+	return dis(gen);
+}
+
+int main() {
+	// 调用函数，打印生成的随机数
+	cout << "Random unsigned int: " << generateRandomUnsignedInt() << endl;
+	cout << "Random unsigned int (with seed): " << generateRandomUnsignedInt(12345) << endl;
+
+	return 0;
+}
+```
+## 练习 17.30：
+### 再次修改你的程序，此次再增加两个参数，表示函数允许返回的最小值和最大值。
+答：
+```
+#include <random>
+#include <iostream>
+
+using namespace std;
+
+// 函数：生成并返回一个均匀分布的随机 unsigned int
+unsigned int generateRandomUnsignedInt() {
+	// 静态变量只初始化一次，确保每次调用函数时不重新初始化随机数引擎和分布
+	static default_random_engine gen;
+	static uniform_int_distribution<unsigned> dis;
+	return dis(gen);
+}
+
+// 重载函数，允许用户提供种子
+unsigned int generateRandomUnsignedInt(unsigned seed) {
+	static default_random_engine gen(seed);
+	static uniform_int_distribution<unsigned> dis;
+	return dis(gen);
+}
+
+// 重载函数，允许用户提供种子与返回的最小值和最大值
+unsigned int generateRandomUnsignedInt(unsigned seed, unsigned min, unsigned max) {
+	static default_random_engine gen(seed);
+	// 由于需要重新初始化分布并改变参数，不能将分布声明为 static
+	uniform_int_distribution<unsigned> dis(min,max);
+	return dis(gen);
+}
+
+int main() {
+	// 调用函数，打印生成的随机数
+	cout << "Random unsigned int: " << generateRandomUnsignedInt() << endl;
+	cout << "Random unsigned int (with seed): " << generateRandomUnsignedInt(12345) << endl;
+	// 提供种子，同时指定范围为100到200
+	unsigned seed = 123;
+	cout << "Random unsigned int (range 100-200): " << generateRandomUnsignedInt(seed, 100, 200) << std::endl;
+
+	return 0;
+}
+```
