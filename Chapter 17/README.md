@@ -787,3 +787,92 @@ int main() {
 	return 0;
 }
 ```
+## 练习 17.31：
+### 对于本节中的游戏程序，如果在 do 循环内定义 b 和 e，会发生什么？
+答：
+* 会使每次循环的先手判断相同。如果随机数引擎在每次迭代中都以相同的方式初始化，那么它生成的随机序列在每次迭代中也相同。
+## 练习 17.32：
+### 如果我们在循环内定义resp,会发生什么?
+答：
+* 使用resp的语句在resp的作用域外，产生编译错误。
+## 练习 17.33：
+### 修改 11.3.6 节（第 392 页）中的单词转换程序，允许对一个给定单词有多种转换方式，每次随机选择一种进行实际转换。
+答：
+```
+#include <random>
+#include <iostream>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <map>
+
+using namespace std;
+
+map<string, string> buildMap(ifstream &map_file) {
+	map<string, string> trans_map;
+	string key;
+	string value;
+	while (map_file >> key && getline(map_file, value)) {
+		if (value.size() > 1) {
+			trans_map[key] = value.substr(1);
+		} else {
+			throw runtime_error("no rule for " + key);
+		}
+	}
+	return trans_map;
+}
+
+const string &transform(const string &s, const map<string, string> &m) {
+	auto map_it = m.find(s);
+	if (map_it != m.cend()) {
+		return map_it->second;
+	} else {
+		return s;
+	}
+}
+
+void word_transform(ifstream &map_file, ifstream &input) {
+	auto trans_map = buildMap(map_file);
+	string text;
+	while (getline(input, text)) {
+		istringstream stream(text);
+		string word;
+		bool firstword = true;
+		while (stream >> word) {
+			if (firstword) {
+				firstword = false;
+			} else {
+				cout << " ";
+			}
+			cout << transform(word, trans_map);
+		}
+		cout << endl;
+	}
+}
+
+int main() {
+	ifstream mapRule("rule.txt"), mapRule2("rule2.txt"), mapRule3("rule3.txt"), strText("input.txt");
+	if (!mapRule||!mapRule2||!mapRule3||!strText) {
+		std::cerr << "Can not open the file!" << std::endl;
+		return -1;
+	}
+
+	random_device rd;
+	default_random_engine e(rd());
+	uniform_int_distribution<> b(0, 2);
+	switch (b(e)) {
+	case 0:
+		word_transform(mapRule, strText);
+		break;
+	case 1:
+		word_transform(mapRule2, strText);
+		break;
+	case 2:
+		word_transform(mapRule3, strText);
+		break;
+	}
+
+	return 0;
+}
+```
