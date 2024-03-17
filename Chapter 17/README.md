@@ -876,3 +876,115 @@ int main() {
 	return 0;
 }
 ```
+## 练习 17.34：
+### 编写一个程序,展示如何使用表17.17和表17.18中的每个操纵符。
+答：
+```
+#include <iostream>
+#include <iomanip>
+
+int main() {
+	// boolalpha and noboolalpha
+	std::cout << std::boolalpha << true << " " << false << std::endl;
+	std::cout << std::noboolalpha << true << " " << false << std::endl;
+
+	// showbase, noshowbase, dec, hex, oct
+	int num = 27;
+	std::cout << std::showbase << std::hex << num << std::endl;
+	std::cout << std::showbase << std::oct << num << std::endl;
+	std::cout << std::noshowbase << std::dec << num << std::endl;
+
+	// showpoint, noshowpoint
+	double dbl = 3.14159;
+	std::cout << std::showpoint << dbl << std::endl;
+	std::cout << std::noshowpoint << dbl << std::endl;
+
+	// showpos, noshowpos
+	std::cout << std::showpos << num << std::endl;
+	std::cout << std::noshowpos << num << std::endl;
+
+	// uppercase, nouppercase
+	std::cout << std::uppercase << std::hex << num << std::endl;
+	std::cout << std::nouppercase << std::hex << num << std::endl;
+
+	// left, right, internal
+	std::cout << std::left << std::setw(10) << num << "left aligned" << std::endl;
+	std::cout << std::right << std::setw(10) << num << "right aligned" << std::endl;
+	std::cout << std::internal << std::setw(10) << num << "internal" << std::endl;
+
+	// fixed, scientific, hexfloat, defaultfloat
+	std::cout << std::fixed << dbl << std::endl;
+	std::cout << std::scientific << dbl << std::endl;
+	std::cout << std::hexfloat << dbl << std::endl;
+	std::cout << std::defaultfloat << dbl << std::endl;
+
+	// setfill, setprecision, setw
+	std::cout << std::setfill('*') << std::setw(10) << num << std::endl;
+	std::cout << std::setprecision(5) << dbl << std::endl;
+
+	// setbase
+	std::cout << std::setbase(16) << num << std::endl;
+
+	// unitbuf, nounitbuf
+	std::cout << std::unitbuf; // Enable automatic flushing
+	std::cout << "This is an example." << std::endl;
+	std::cout << std::nounitbuf; // Disable automatic flushing
+
+	// skipws, noskipws
+	char ch;
+	std::cin >> std::noskipws >> ch; // Read including whitespace
+	std::cout << "First character read (including whitespace): " << ch << std::endl;
+	std::cin >> std::skipws; // Back to default behavior
+
+	// flush, ends, endl
+	std::cout << "Flushing..." << std::flush;
+	std::cout << "Adding null character" << std::ends;
+	std::cout << "Newline and flushing" << std::endl;
+
+	system("pause");
+	return 0;
+}
+```
+## 练习 17.35：
+### 修改第670页中的程序，打印2的平方根,但这次打印十六进制数字的大写形式。
+答：
+```
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+
+using namespace std;
+
+int main() {
+	cout << "default format: " << 100 * sqrt(2.0) << '\n' 
+		<< "scientific: " << scientific << 100 * sqrt(2.0) <<'\n'
+		<< "fixed decimal: " << fixed << 100 * sqrt(2.0) <<'\n'
+		<< "hexadecimal: " << uppercase <<hexfloat << 100 * sqrt(2.0) <<'\n'
+		<< "use defaults: " << defaultfloat << 100 * sqrt(2.0) << "\n\n";
+	
+	system("pause");
+	return 0;
+}
+```
+## 练习 17.36：
+### 修改上一题中的程序，打印不同的浮点数，使它们排成一列。
+答：
+```
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+
+using namespace std;
+
+int main() {
+	cout << left; // 将标签设置为左对齐
+	cout << setw(20) << "default format: " << 100 * sqrt(2.0) << '\n'
+		<< setw(20) << "scientific: " << scientific << 100 * sqrt(2.0) << '\n'
+		<< setw(20) << "fixed decimal: " << fixed << 100 * sqrt(2.0) << '\n'
+		<< setw(20) << "hexadecimal: " << uppercase << hexfloat << 100 * sqrt(2.0) << '\n'
+		<< setw(20) << "use defaults: " << defaultfloat << 100 * sqrt(2.0) << "\n\n";
+
+	system("pause");
+	return 0;
+}
+```
