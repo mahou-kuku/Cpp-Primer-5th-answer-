@@ -1002,6 +1002,7 @@ int main() {
 		return 1;
 	}
 
+	// 如果读取了 bufferSize-1 个字符但没有遇到定界字符（默认换行符），getline 会设置 std::ios::failbit
 	const int bufferSize = 20;
 	char line[bufferSize];
 	while (file.getline(line, bufferSize)) {
@@ -1025,10 +1026,10 @@ int main() {
 #include <vector>
 
 int main() {
-	std::ifstream inFile("input.txt"); 
-	std::ofstream outFile("rule3.txt");
+	std::ifstream inFile("input.txt");
+	std::ofstream outFile("output.txt");
 
-	if (!inFile || !outFile) {
+	if (!inFile) {
 		std::cerr << "Unable to open file." << std::endl;
 		return 1;
 	}
