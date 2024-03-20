@@ -143,3 +143,23 @@ catch(EXCPTYPE) { }
 * (a) throw new exceptionType;
 * (b) throw "an error message";
 * (c) throw EXCPTYPE(42);
+## 练习 18.7：
+### 根据第 16 章的介绍定义你自己的 Blob 和 BlobPtr，注意将构造函数写成函数try语句块。
+答：
+```
+template <typename T>
+Blob<T>::Blob() try : data(make_shared<vector<T>>()) {
+    // 构造函数体为空
+} catch (const std::bad_alloc& e) {
+    // 处理内存分配异常
+    handle_out_of_memory(e);
+}
+
+template <typename T>
+Blob<T>::Blob(initializer_list<T> il) try : data(make_shared<vector<T>>(il)) {
+    // 构造函数体为空
+} catch (const std::bad_alloc& e) {
+    // 处理内存分配异常
+    handle_out_of_memory(e);
+}
+```
