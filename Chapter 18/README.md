@@ -167,3 +167,62 @@ Blob<T>::Blob(initializer_list<T> il) try : data(make_shared<vector<T>>(il)) {
 ### 回顾你之前编写的各个类,为它们的构造函数和析构函数添加正确的异常说明。如果你认为某个析构函数可能抛出异常,尝试修改代码使得该析构函数不会抛出异常。
 答：
 * 在析构函数中抛出异常非常危险，因为析构函数通常是在对象生命周期结束时自动调用的，程序可能没有相应的机制来合理处理这种情况。并且C++ 不允许同时有多个未处理的异常，如果一个析构函数在栈展开过程中抛出一个未捕获的异常，那么程序将会调用 std::terminate() 来终止运行。如果确实需要在析构函数中执行可能抛出异常的操作，应该在析构函数中捕获所有异常，确保不会从析构函数中抛出任何异常。
+## 练习 18.9：
+### 定义本节描述的书店程序异常类,然后为Sales_data类重新编写一个复合赋值运算符并令其抛出一个异常。
+答：
+```
+// 为某个书店应用程序设定的异常类
+class out_of_stock : public std::runtime_error {
+public:
+	explicit out_of_stock(const std::string &s) : std::runtime_error(s) { }
+};
+class isbn_mismatch : public std::logic_error {
+public:
+	explicit isbn_mismatch(const std::string &s) : std::logic_error(s) { }
+	isbn_mismatch(const std::string &s, const std::string &lhs, const std::string &rhs) :
+		std::logic_error(s), left(lhs), right(rhs) { }
+	const std::string left, right;
+};
+
+// 如果参与加法的两个对象并非同一书籍，则抛出一个异常
+Sales_data& Sales_data::operator+=(const Sales_data& rhs){
+	if (isbn() != rhs.isbn()) {
+		throw isbn_mismatch("wrong isbns", isbn(), rhs.isbn());
+	}
+	units_sold += rhs.units_sold;
+	revenue += rhs.revenue;
+	return *this;
+}
+```
+## 练习 18.10：
+### 编写程序令其对两个ISBN编号不相同的对象执行Sales_data的加法运算。为该程序编写两个不同的版本:一个处理异常,另一个不处理异常。观察并比较这两个程序的行为,用心体会当出现了一个未被捕获的异常时程序会发生什么情况。
+答：
+```
+// 处理异常
+int main() {
+	Sales_data item_1("Aaa", 20, 15), item_2("Bbb", 10, 15);
+	try {
+		item_1 += item_2;
+	} catch (const isbn_mismatch &e) {
+		cerr << e.what() << ": left isbn(" << e.left <<
+			") right isbn(" << e.right << ")" << endl;
+	}
+
+	return 0;
+}
+```
+* 当在程序中遇到一个未被捕获的异常时，C++ 标准规定程序将调用 std::terminate() 函数来终止程序。
+```
+// 不处理异常
+int main() {
+	Sales_data item_1("Aaa", 20, 15), item_2("Bbb", 10, 15);
+	item_1 += item_2;
+
+	return 0;
+}
+```
+## 练习 18.11：
+### 为什么what函数不应该抛出异常？
+答：
+* 从C++11开始，what 函数被明确声明为 noexcept。这意味着标准要求 what 函数保证不抛出异常。
+* what 函数被设计为在异常处理过程中调用，作为获取异常信息的一种可靠方式。如果 what 函数可能抛出异常，那么它就不能保证总是能够提供异常信息，从而降低了异常处理代码的可靠性。
