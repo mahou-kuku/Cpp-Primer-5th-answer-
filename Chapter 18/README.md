@@ -253,3 +253,40 @@ namespace mathLib {
 mathLib::MatrixLib::matrix mathLib::MatrixLib::operator*(
 	const mathLib::MatrixLib::matrix &, const mathLib::MatrixLib::matrix &);
 ```
+## 练习 18.15：### 说明using指示与using声明的区别。
+答：
+* using指示：会将一个命名空间中的所有名称引入到当前作用域中，这可能会导致名称冲突二义性问题。
+* using声明：只引入指定的单个名称到当前作用域中，减少了发生冲突和二义性问题的可能性。
+## 练习 18.16：### 假定在下面的代码中标记为“位置1”的地方是对于命名空间Exercise中所有成员的using声明,请解释代码的含义。如果这些using声明出现在“位置2”又会怎样呢？将 using声明变为 using指示，重新回答之前的问题。
+```
+namespace Exercise {
+	int ivar = 0;
+	double dvar = 0;
+	const int limit = 1000;
+}
+int ivar = 0;
+// 位置1
+void manip() {
+	// 位置2
+	double dvar = 3.1416;
+	int iobj = limit + 1;
+	++ivar;
+	++::ivar;
+}
+```
+答：
+* using声明在“位置1”：这会使得Exercise命名空间中的ivar、dvar和limit在全局作用域中直接可用。但因为全局作用域已经有一个名为ivar的全局变量，所以这会导致ivar在全局作用域中出现二义性错误。dvar和limit可以被正确使用。
+* using声明在“位置2”：Exercise命名空间中的ivar、dvar和limit只在manip函数作用域中直接可用。在这个作用域内部，dvar会与局部变量dvar产生二义性，而ivar和limit可以被正确识别和使用。
+* using指示在“位置1”：Exercise命名空间中的所有成员都被引入到全局作用域中，导致全局作用域中的ivar与Exercise中的ivar产生二义性错误。
+* using指示在“位置2”，即在manip函数内部，也会导致全局作用域中的ivar与Exercise中的ivar产生二义性错误。
+## 练习 18.17：### 实际编写代码检验你对上一题的回答是否正确。
+答：
+* 在位置1、2放置相应using语句即可。
+```
+// using声明
+using Exercise::ivar;
+using Exercise::dvar;
+using Exercise::limit;
+// using指示
+using namespace Exercise;
+```
