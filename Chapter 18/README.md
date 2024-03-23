@@ -226,3 +226,30 @@ int main() {
 答：
 * 从C++11开始，what 函数被明确声明为 noexcept。这意味着标准要求 what 函数保证不抛出异常。
 * what 函数被设计为在异常处理过程中调用，作为获取异常信息的一种可靠方式。如果 what 函数可能抛出异常，那么它就不能保证总是能够提供异常信息，从而降低了异常处理代码的可靠性。
+## 练习 18.12：
+### 将你为之前各章练习编写的程序放置在各自的命名空间中。也就是说,命名空间chapter15包含Query程序的代码,命名空间chapter10包含TextQuery 的代码;使用这种结构重新编译Query代码示例。
+答：
+* 使用作用域运算符指出所用的名字属于哪个命名空间即可。
+## 练习 18.13：
+### 什么时候应该使用未命名的命名空间？
+答：
+* 限制访问范围：当希望某些函数、变量或类型的作用范围仅限于当前源文件时，应该使用未命名的命名空间。
+* 避免命名冲突：未命名的命名空间可以用来减少全局命名空间的污染，避免不同编译单元中定义的具有相同名称的实体之间的命名冲突。
+* 替代static关键字：与在函数外部使用static声明全局静态变量或函数相比，使用未命名的命名空间可以更清晰地表达开发者的意图，并且适用于不能使用static关键字的实体（如类、结构体、模板）。
+## 练习 18.14：
+### 假设下面的operator*声明的是嵌套的命名空间mathLib::MatrixLib 的一个成员:
+```
+namespace mathLib {
+	namespace MatrixLib {
+		class matrix { /* ... */ };
+		matrix operator* (const matrix &, const matrix &);
+		// ... 
+	}
+}
+```
+### 请问你应该如何在全局作用域中声明该运算符？
+答：
+```
+mathLib::MatrixLib::matrix mathLib::MatrixLib::operator*(
+	const mathLib::MatrixLib::matrix &, const mathLib::MatrixLib::matrix &);
+```
