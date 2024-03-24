@@ -307,3 +307,43 @@ void swap(T v1, T v2)
 ### 如果对swap的调用形如std::swap (v1.mem1, v2.mem1)将发生什么情况?
 答：
 * 当调用形式为std::swap(v1.mem1, v2.mem1)时，意味着直接请求使用标准库提供的swap函数，这绕过了名字查找的过程。
+## 练习 18.20：
+### 在下面的代码中,确定哪个函数与compute调用匹配。列出所有候选函数和可行函数,对于每个可行函数的实参与形参的匹配过程来说,发生了哪种类型转换？
+```
+namespace primerLib {
+ void compute();
+ void compute(const void *);
+}
+using primerLib::compute;
+void compute(int);
+void compute(double, double = 3.4);
+void compute(char*, char* = 0);
+void f(){
+ compute(0);
+}
+```
+答：
+* compute(int);是最佳匹配。
+* 候选函数:
+* primerLib::compute();
+* primerLib::compute(const void *);
+* compute(int);
+* compute(double, double = 3.4);
+* compute(char*, char* = 0);
+* 可行函数:
+* primerLib::compute(const void *);
+* compute(int);
+* compute(double, double = 3.4);
+* compute(char*, char* = 0);
+* 类型转换:
+* 对于primerLib::compute(const void \*); 实参0被视为nullptr，隐式转换为const void*类型。
+* 对于compute(int); 实参0无需转换，直接匹配int类型的形参。
+* 对于compute(double, double = 3.4); 实参0通过标准转换提升为double类型。
+* 对于compute(char*, char* = 0); 实参0被视为nullptr，隐式转换为char*类型。
+### 如果将 using 声明置于 main 函数中 compute 的调用点之前将发生什么情况？重新回答之前的那些问题。
+答：
+* 当using声明置于main函数内部,primerLib::compute的两个重载版本将加入到main函数的局部作用域中,compute(int);仍是最佳匹配。
+* 在这种情况下，只有全局作用域中的compute函数重载会被考虑为候选函数，即：
+* void compute(int);
+* void compute(double, double = 3.4);
+* void compute(char*, char* = 0);
