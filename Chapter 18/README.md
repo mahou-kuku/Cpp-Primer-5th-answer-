@@ -290,3 +290,20 @@ using Exercise::limit;
 // using指示
 using namespace Exercise;
 ```
+## 练习 18.18：
+### 已知有下面的swap的典型定义(参见13.3节,第457页),当mem1是一个string 时程序使用 swap的哪个版本？ 如果 mem1 是 int 呢？ 说明在这两种情况下名字查找的过程。
+```
+void swap(T v1, T v2)
+{
+	using std::swap;
+	swap(v1.mem1, v2.mem1);
+	// 交换类型 T的其他成员
+}
+```
+答：
+* 首先在当前作用域中寻找合适的函数,接着查找调用语句的外层作用域。对于类类型，将在类型定义的命名空间中寻找合适的swap函数。
+* 由于使用了using std::swap; 首先将使标准库提供的swap函数变为候选。std命名空间中有为std::string特化的swap版本，并且标准库中的swap提供了对内置类型的通用支持，当mem1是一个string或int时将调用std命名空间中相应版本的swap。
+## 练习 18.19：
+### 如果对swap的调用形如std::swap (v1.mem1, v2.mem1)将发生什么情况?
+答：
+* 当调用形式为std::swap(v1.mem1, v2.mem1)时，意味着直接请求使用标准库提供的swap函数，这绕过了名字查找的过程。
