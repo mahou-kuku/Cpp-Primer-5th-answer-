@@ -418,3 +418,74 @@ D2 *pd2 = new MI;
 ```
 答：
 * 对print的调用都是在调用MI::print(),delete语句调用析构函数的执行顺序都是：~MI()、~D2()、~Base2()、~D1()、~Base1() 。
+
+## 练习 18.26：
+```
+struct Base1 {
+ void print(int) const; // public by default
+protected:
+ int ival;
+ double dval;
+ char cval;
+private:
+ int *id;
+};
+struct Base2 {
+ void print(double) const; // public by default
+protected:
+ double fval;
+private:
+ double dval;
+};
+struct Derived : public Base1 {
+ void print(std::string) const; // public by default
+protected:
+ std::string sval;
+ double dval;
+};
+struct MI : public Derived, public Base2 {
+ void print(std::vector<double>); // public by default
+protected:
+ int *ival;
+ std::vector<double> dvec;
+};
+```
+### 已知如上所示的继承体系，下面对 print 的调用为什么是错误的？适当修改 MI，令其对 print 的调用可以编译通过并正确执行。
+```
+MI mi;
+mi.print(42);
+```
+答：
+* 因为Mi没有一个void print(int);成员函数，给MI添加void print(int);即可。
+```
+struct MI : public Derived, public Base2 {
+	void print(std::vector<double>); // public by default
+	void print(int);
+protected:
+	int *ival;
+	std::vector<double> dvec;
+};
+```
+## 练习 18.27：
+### 已知如上所示的继承体系，同时假定为 MI 添加了一个名为 foo 的函数：
+```
+int ival;
+double dval;
+void MI::foo(double cval)
+{
+ int dval;
+ // 练习中的问题发生在此处
+}
+
+(a)列出在MI::foo中可见的所有名字。
+(b)是否存在某个可见的名字是继承自多个基类的?
+(c)将Base1的dval成员与Derived的dval成员求和后赋给dval的局部实例。
+(d)将MI::dvec的最后一个元素的值赋给Base2::fval。
+(e)将从Base1继承的cval赋给从Derived继承的sval的第一个字符。
+```
+答：
+* (a) MI类中定义的名字：ival、dval、dvec、print。 Derived类中定义的名字：sval、dval、print。 Base1类中定义的名字：ival、dval、cval、print。 Base2类中定义的名字：fval、print。
+* (b) 并没有直接“可见”的继承自多个基类的名字，继承自多个基类的名字有print和dval，但它们在MI类中被相同的名字隐藏了，访问它们需要显式的作用域限定。
+* (c) dval = Derived::dval + Base1::dval;
+* (d) fval = dvec.back();
+* (e) sval\[0] = Base1::cval;
