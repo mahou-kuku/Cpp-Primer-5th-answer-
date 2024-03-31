@@ -456,7 +456,7 @@ MI mi;
 mi.print(42);
 ```
 答：
-* 因为Mi没有一个void print(int);成员函数，给MI添加void print(int);即可。
+* 因为MI没有一个void print(int);成员函数，给MI添加void print(int);即可。
 ```
 struct MI : public Derived, public Base2 {
 	void print(std::vector<double>); // public by default
