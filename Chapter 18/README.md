@@ -489,3 +489,64 @@ void MI::foo(double cval)
 * (c) dval = Derived::dval + Base1::dval;
 * (d) fval = dvec.back();
 * (e) sval\[0] = Base1::cval;
+## 练习 18.28：
+### 已知存在如下的继承体系,在VMI类的内部哪些继承而来的成员无须前缀限定符就能直接访问?哪些必须有限定符才能访问?说明你的原因。
+```
+struct Base {
+	void bar(int); // 默认情况下是公有的
+protected:
+	int ival;
+};
+struct Derived1 : virtual public Base {
+	void bar(char); // 默认情况下是公有的
+	void foo(char);
+protected:
+	char cval;
+};
+struct Derived2 : virtual public Base {
+	void foo(int); // 默认情况下是公有的
+protected:
+	int ival;
+	char cval;
+};
+class VMI : public Derived1, public Derived2 { };
+```
+答：
+* 无须前缀限定符的继承成员：
+* void Derived1::bar(char) 从Derived1直接继承而来，隐藏了Base的bar 。
+* Derived2::ival 从Derived2直接继承而来，隐藏了Base的ival 。
+* 需要限定符的继承成员：
+* void Base::bar(int) 被Derived1的bar隐藏。
+* Base::ival 被Derived2的ival隐藏.
+* void Derived1::foo(char) 和Derived2的同名成员产生了二义性。
+* Derived1::cval 和Derived2的同名成员产生了二义性。
+* void Derived2::foo(int) 和Derived1的同名成员产生了二义性。
+* Derived2 cval 和Derived1的同名成员产生了二义性。
+## 练习 18.29：
+### 已知有如下所示的类继承关系：
+```
+class Class { ... };
+class Base : public Class { ... };
+class D1 : virtual public Base { ... };
+class D2 : virtual public Base { ... };
+class MI : public D1, public D2 { ... };
+class Final : public MI, public Class { ... };
+```
+### (a)当作用于一个Final对象时,构造函数和析构函数的执行次序分别是什么?
+答：
+
+### (b)在一个Final对象中有几个Base部分?几个Class部分?
+答：
+
+### (c)下面的哪些赋值运算将造成编译错误?
+```
+Base *pb; Class *pc; MI *pmi; D2 *pd2;
+(a) pb = new Class;
+(b) pc = new Final;
+(c) pmi = pb;
+(d) pd2 = pmi;
+```
+答：
+## 练习 18.30：
+### 在 Base 中定义一个默认构造函数、一个拷贝构造函数和一个接受 int 形参的构造函数。 在每个派生类中分别定义这三种构造函数,每个构造函数应该使用它的实参初始化其 Base 部分。
+答：
