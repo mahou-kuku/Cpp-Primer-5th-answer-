@@ -534,11 +534,14 @@ class Final : public MI, public Class { ... };
 ```
 ### (a)当作用于一个Final对象时,构造函数和析构函数的执行次序分别是什么?
 答：
-
-### (b)在一个Final对象中有几个Base部分?几个Class部分?
+* 构造函数的执行顺序：
+* Class()、Base()、D1()、D2()、MI()、Class()、Final() 。
+* 析构函数的执行顺序：
+* Final()、Class()、 MI()、D2()、D1()、Base()、Class()。
+### (b)在一个Final对象中有几个Base部分?几个Class部分？
 答：
-
-### (c)下面的哪些赋值运算将造成编译错误?
+* 1个Base和两个Class。
+### (c)下面的哪些赋值运算将造成编译错误？
 ```
 Base *pb; Class *pc; MI *pmi; D2 *pd2;
 (a) pb = new Class;
@@ -547,6 +550,62 @@ Base *pb; Class *pc; MI *pmi; D2 *pd2;
 (d) pd2 = pmi;
 ```
 答：
+* (a) 编译错误。尝试将基类指针赋值给派生类指针需要向下转换，在没有显式类型转换的情况下将造成编译错误。
+* (b) 编译错误。基类Class不明确。编译器无法确定使用哪一个Class子对象进行赋值。
+* (c) 编译错误。尝试将基类指针赋值给派生类指针需要向下转换，在没有显式类型转换的情况下将造成编译错误。
+* (d) 通过编译。
 ## 练习 18.30：
 ### 在 Base 中定义一个默认构造函数、一个拷贝构造函数和一个接受 int 形参的构造函数。 在每个派生类中分别定义这三种构造函数,每个构造函数应该使用它的实参初始化其 Base 部分。
 答：
+```
+#include <iostream>
+
+class Class {
+public:
+	Class() { std::cout << "Class default constructor\n"; }
+};
+
+class Base : public Class {
+public:
+	Base() { std::cout << "Base default constructor\n"; }
+	Base(const Base&) { std::cout << "Base copy constructor\n"; }
+	Base(int) { std::cout << "Base int constructor\n"; }
+};
+
+class D1 : virtual public Base {
+public:
+	D1() : Base() { std::cout << "D1 default constructor\n"; }
+	D1(const D1& obj) : Base(obj) { std::cout << "D1 copy constructor\n"; }
+	D1(int i) : Base(i) { std::cout << "D1 int constructor\n"; }
+};
+
+class D2 : virtual public Base {
+public:
+	D2() : Base() { std::cout << "D2 default constructor\n"; }
+	D2(const D2& obj) : Base(obj) { std::cout << "D2 copy constructor\n"; }
+	D2(int i) : Base(i) { std::cout << "D2 int constructor\n"; }
+};
+
+class MI : public D1, public D2 {
+public:
+	MI() : D1(), D2() { std::cout << "MI default constructor\n"; }
+	MI(const MI& obj) : D1(obj), D2(obj), Base(obj) { std::cout << "MI copy constructor\n"; }
+	MI(int i) : D1(i), D2(i), Base(i) { std::cout << "MI int constructor\n"; }
+};
+
+class Final : public MI, public Class {
+public:
+	Final() : MI() { std::cout << "Final default constructor\n"; }
+	Final(const Final& obj) : MI(obj), Base(obj) { std::cout << "Final copy constructor\n"; }
+	Final(int i) : MI(i), Base(i) { std::cout << "Final int constructor\n"; }
+};
+
+int main() {
+	Final f(9);
+	std::cout << "===========" << std::endl;
+	Final f2 = f;
+
+	system("pause");
+	return 0;
+}
+```
