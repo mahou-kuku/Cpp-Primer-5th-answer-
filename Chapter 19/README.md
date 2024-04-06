@@ -138,3 +138,46 @@ int main() {
 	return 0;
 }
 ```
+## 练习 19.3：
+### 已知存在如下的类继承体系，其中每个类分别定义了一个公有的默认构造函数和一个虚析构函数：
+```
+class A { /* . . . */ };
+class B : public A { /* . . . */ };
+class C : public B { /* . . . */ };
+class D : public B, public A { /* . . . */ };
+```
+### 下面的哪个dynamic_cast将失败？
+```
+(a) A *pa = new C;
+ B *pb = dynamic_cast< B* >(pa);
+(b) B *pb = new B;
+ C *pc = dynamic_cast< C* >(pb);
+(c) A *pa = new D;
+ B *pb = dynamic_cast< B* >(pa);
+```
+答：
+* (a) 成功转换
+* (b) 将失败。
+* (c) dynamic_cast语句可以成功转换，但是A *pa = new D;赋值语句会因为二义性问题而导致编译错误。
+## 练习 19.4：
+### 使用上一个练习定义的类改写下面的代码,将表达式*pa转换成类型C&：
+```
+if (C *pc = dynamic_cast< C* >(pa))
+ // 使用 c 的成员
+} else {
+ // 使用 A 的成员
+}
+```
+答：
+```
+	try {
+		C& rc = dynamic_cast<C&>(*pa);
+		// 使用C的成员
+	} catch (const std::bad_cast &e) {
+		std::cout << e.what() << std::endl;
+	}
+```
+## 练习 19.5：
+### 在什么情况下你应该使用dynamic_cast替代虚函数？
+答：
+* 想使用基类对象的指针或引用执行某个派生类操作并且该操作不是虚函数时。
