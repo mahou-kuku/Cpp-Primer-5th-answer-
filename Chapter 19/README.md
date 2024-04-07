@@ -237,3 +237,36 @@ if (C *pc = dynamic_cast< C* >(pa))
 		std::cout << "refer to the same type, but the type is not AndQuery.\n";
 	}
 ```
+## 练习 19.9：
+### 编写与本节最后一个程序类似的代码,令其打印你的编译器为一些常见类型所起的名字。 如果你得到的输出结果与本书类似,尝试编写一个函数将这些字符串翻译成人们更容易读懂的形式。
+答：
+```
+int arr[10];
+	Derived d;
+	Base *p = &d;
+	std::cout << typeid(42).name() << ", "
+		<< typeid(arr).name() << ", "
+		<< typeid(Sales_data).name() << ", "
+		<< typeid(std::string).name() << ", " 
+		<< typeid(p).name() << ", " 
+		<< typeid(*p).name() << std::endl;
+```
+* 输出结果：
+* int, int \[10], struct Sales_data, class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >, class Base * __ptr64, class Derived
+## 练习 19.10：
+### 已知存在如下的类继承体系，其中每个类定义了一个默认公有的构造函数和一个虚析构函数。下面的语句将打印哪些类型名字？
+```
+class A { /* . . . */ };
+class B : public A { /* . . . */ };
+class C : public B { /* . . . */ };
+(a) A *pa = new C;
+ cout << typeid(pa).name() << endl;
+(b) C cobj;
+ A& ra = cobj; cout << typeid(&ra).name() << endl;
+(c) B *px = new B;
+ A& ra = *px; cout << typeid(ra).name() << endl;
+```
+答：
+* (a) A*
+* (b) A*
+* (c) B
