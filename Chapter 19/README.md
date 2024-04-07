@@ -181,3 +181,59 @@ if (C *pc = dynamic_cast< C* >(pa))
 ### 在什么情况下你应该使用dynamic_cast替代虚函数？
 答：
 * 想使用基类对象的指针或引用执行某个派生类操作并且该操作不是虚函数时。
+## 练习 19.6：
+### 编写一条表达式将Query_base指针动态转换为AndQuery指针(参见15.9.1节,第564页)。 分别使用AndQuery的对象以及其他类型的对象测试转换是否有效。 打印一条表示类型转换是否成功的信息,确保实际输出的结果与期望的一致。
+答：
+```
+	Query_base* Query_basePtr = new AndQuery({ "" }, { "" }); // 实际指向AndQuery对象的Query_base类型指针
+	// 尝试将基类Query_base指针转换为派生类AndQuery的指针
+	AndQuery* AndQueryPtr = dynamic_cast<AndQuery*>(Query_basePtr);
+	if (AndQueryPtr) {
+		std::cout << "Conversion to AndQuery succeed.\n";
+	} else {
+		std::cout << "Conversion to AndQuery failed.\n";
+	}
+
+	Query_base* Query_basePtr_2 = new OrQuery({ "" }, { "" }); // 实际指向OrQuery对象的Query_base类型指针
+	// 尝试将基类Query_base指针转换为派生类AndQuery的指针
+	AndQuery* AndQueryPtr_2 = dynamic_cast<AndQuery*>(Query_basePtr_2);
+	if (AndQueryPtr_2) {
+		std::cout << "Conversion to AndQuery succeed.\n";
+	} else {
+		std::cout << "Conversion to AndQuery failed.\n";
+	}
+```
+## 练习 19.7：
+### 编写与上一个练习类似的转换,这一次将Query_base对象转换为AndQuery的引用。重复上面的测试过程,确保转换能正常工作。
+答：
+```
+	Query_base* Query_basePtr = new AndQuery({ "" }, { "" }); // 实际指向AndQuery对象的Query_base类型指针
+	try {
+		AndQuery& AndQueryRef = dynamic_cast<AndQuery&>(*Query_basePtr);
+		std::cout << "Conversion to AndQuery succeed.\n";
+	} catch (const std::bad_cast&) {
+		std::cout << "Conversion to AndQuery failed.\n";
+	}
+
+	Query_base* Query_basePtr_2 = new OrQuery({ "" }, { "" }); // 实际指向OrQuery对象的Query_base类型指针
+	try {
+		AndQuery& AndQueryRef = dynamic_cast<AndQuery&>(*Query_basePtr_2);
+		std::cout << "Conversion to AndQuery succeed.\n";
+	} catch (const std::bad_cast&) {
+		std::cout << "Conversion to AndQuery failed.\n";
+	}
+```
+## 练习 19.8：
+### 编写一条typeid表达式检查两个Query_base对象是否指向同一种类型。 再检查该类型是否是 AndQuery。
+答：
+```
+	Query_base* Query_basePtr = new AndQuery({ "" }, { "" });
+	Query_base* Query_basePtr_2 = new AndQuery({ "" }, { "" });
+	if (typeid(*Query_basePtr) != typeid(*Query_basePtr_2)) {
+		std::cout << "Does not refer to the same type.\n";
+	} else if(typeid(*Query_basePtr)== typeid(AndQuery)){
+		std::cout << "The type is AndQuery.\n";
+	} else {
+		std::cout << "refer to the same type, but the type is not AndQuery.\n";
+	}
+```
