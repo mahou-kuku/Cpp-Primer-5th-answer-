@@ -299,5 +299,5 @@ int main() {
 ### 定义一个类型,使其可以表示指向Sales_data类的bookNo成员的指针。
 答：
 ```
-std::string Sales_data::* bookNo;
+std::string Sales_data::* bookNoPtr;
 ```
