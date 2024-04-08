@@ -270,3 +270,34 @@ class C : public B { /* . . . */ };
 * (a) A*
 * (b) A*
 * (c) B
+## 练习 19.11：
+### 普通的数据指针与指向数据成员的指针有何区别？
+答：
+* 普通的数据指针直接指向具体的数据，可以直接通过解引用（*ptr）访问或修改指向的数据；而指向数据成员的指针需要与特定的类对象一起使用，通过对象.*指针或对象指针->\*指针来访问或修改数据成员。
+## 练习 19.12：
+### 定义一个成员指针,令其可以指向screen类的cursor成员。通过该指针获得Screen::cursor的值。
+答：
+```
+class Screen {
+public:
+	typedef std::string::size_type pos;
+	// 添加的成员函数，用于返回指向cursor成员的指针
+	static pos Screen::* getCursorPtr() {
+		return &Screen::cursor;
+	}
+private:
+	pos cursor;
+};
+
+int main() {
+	Screen::pos Screen::* cursorPtr = Screen::getCursorPtr();
+
+	return 0;
+}
+```
+## 练习 19.13：
+### 定义一个类型,使其可以表示指向Sales_data类的bookNo成员的指针。
+答：
+```
+std::string Sales_data::* bookNo;
+```
