@@ -301,3 +301,31 @@ int main() {
 ```
 std::string Sales_data::* bookNoPtr;
 ```
+## 练习 19.14：
+### 下面的代码合法吗?如果合法,代码的含义是什么?如果不合法,解释原因。
+```
+auto pmf = &Screen::get_cursor;
+pmf = &Screen::get;
+```
+答：
+* 这段代码是合法的。这两个成员函数get_cursor和get都有相同的函数类型，代码首先使用auto关键字自动推导pmf的类型，并将其初始化为指向Screen::get_cursor的成员函数指针，然后被重新赋值为指向get。
+## 练习 19.15：
+### 普通函数指针和指向成员函数的指针有何区别？
+答：
+* 普通函数指针是指向全局函数或静态函数的指针。
+* 指向成员函数的指针是指向类的非静态成员函数的指针。
+## 练习 19.16：
+### 声明一个类型别名,令其作为指向sales_data的avg_price成员的指针的同义词。
+答：
+* using Action = double (Sales_data::*)()const;
+## 练习 19.17：
+### 为Screen的所有成员函数类型各定义一个类型别名。
+答：
+```
+	// 为get_cursor函数定义类型别名
+	using GetCursorAction = char (Screen::*)() const;
+	// 为get函数定义类型别名
+	using GetAction = char (Screen::*)() const;
+	// 为get(pos, pos)函数定义类型别名
+	using GetPosAction = char (Screen::*)(pos, pos) const;
+```
