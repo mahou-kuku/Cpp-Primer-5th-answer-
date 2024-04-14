@@ -329,3 +329,93 @@ pmf = &Screen::get;
 	// 为get(pos, pos)函数定义类型别名
 	using GetPosAction = char (Screen::*)(pos, pos) const;
 ```
+## 练习 19.18： 
+### 编写一个函数，使用 count_if 统计在给定的 vector 中有多少个空 string。
+答：
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm> // 包含 count_if
+
+// 函数：统计 vector 中空字符串的数量
+size_t countEmptyStrings(const std::vector<std::string>& vec) {
+    // 使用 lambda 表达式作为 count_if 的条件
+    return std::count_if(vec.begin(), vec.end(), 
+                         [](const std::string& s) { return s.empty(); });
+}
+
+int main() {
+    // 示例：创建一个包含空字符串的 vector
+    std::vector<std::string> strings = {"hello", "", "world", "", ""};
+
+    // 调用函数并打印结果
+    size_t count = countEmptyStrings(strings);
+    std::cout << "Number of empty strings: " << count << std::endl;
+
+    return 0;
+}
+```
+## 练习 19.19：
+### 编写一个函数,令其接受vector<Sales_data>并查找平均价格高于某个值的第一个元素。
+答：
+```
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+// Sales_data 结构的定义
+struct Sales_data {
+	Sales_data() = default;
+	Sales_data(const std::string &s) : bookNo(s) {}
+	Sales_data(const std::string &s, unsigned n, double p) : bookNo(s), units_sold(n), revenue(p * n) {}
+
+	std::string isbn() const { return bookNo; }
+	double avg_price() const {
+		if (units_sold) {
+			return revenue / units_sold;
+		} else {
+			return 0;
+		}
+	}
+
+private:
+	std::string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+};
+
+// 函数：找出第一个平均价格高于给定值的 Sales_data
+Sales_data findFirstHighPrice(const std::vector<Sales_data>& vec, double price) {
+	auto it = std::find_if(vec.begin(), vec.end(), [price](const Sales_data& data) {
+		return data.avg_price() > price;
+	});
+
+	if (it != vec.end()) {
+		return *it;  // 返回找到的元素
+	} else {
+		// 如果没有找到，返回一个默认的 Sales_data
+		return Sales_data();
+	}
+}
+
+int main() {
+	// 测试数据
+	std::vector<Sales_data> sales = {
+		Sales_data("Book1", 10, 20.5),
+		Sales_data("Book2", 5, 22.3),
+		Sales_data("Book3", 2, 50.0)
+	};
+
+	// 查找平均价格大于40的第一个 Sales_data 对象
+	Sales_data result = findFirstHighPrice(sales, 40.0);
+	if (result.isbn() != "") {
+		std::cout << "Found: " << result.isbn() << " with avg price: " << result.avg_price() << std::endl;
+	} else {
+		std::cout << "No Sales_data found with avg price > 40.0" << std::endl;
+	}
+	system("pause");
+	return 0;
+}
+```
