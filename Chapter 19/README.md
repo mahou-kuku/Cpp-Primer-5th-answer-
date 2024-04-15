@@ -520,3 +520,287 @@ int main() {
 	return 0;
 }
 ```
+## 练习 19.21：
+### 编写你自己的Token类。
+答：
+```
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Token {
+public:
+	// 因为union含有一个string成员,所以Token必须定义拷贝控制成员
+	Token() : tok(INT), ival{ 0 } { }
+	Token(const Token &t) : tok(t.tok) { copyUnion(t); }
+	Token &operator=(const Token&);
+	// 如果 union 含有一个 string成员，则我们必须销毁它
+	~Token() { if (tok == STR) sval.~string(); }
+	// 下面的赋值运算符负责设置 union 的不同成员
+	Token &operator=(const string&);
+	Token &operator=(char);
+	Token &operator=(int);
+	Token &operator=(double);
+private:
+	enum { INT, CHAR, DBL, STR } tok; // 判别式
+	union { // 匿名 union
+		char cval;
+		int ival;
+		double dval;
+		string sval;
+	}; // 每个Token对象含有一个该未命名 union类型的未命名成员
+	   // 检查判别式，然后酌情拷贝 union 成员
+	void copyUnion(const Token&);
+};
+Token &Token::operator=(const Token &t) {
+	// 如果此对象的值是 string 而t的值不是，则我们必须释放原来的 string
+	if (tok == STR && t.tok != STR) sval.~string();
+	if (tok == STR && t.tok == STR) {
+		sval = t.sval; // 无须构造一个新 string
+	} else {
+		copyUnion(t); // 如果 t.tok 是 STR，则需要构造一个 string
+	}
+	tok = t.tok;
+	return *this;
+}
+Token &Token::operator=(const string &s) {
+	if (tok == STR) { // 如果当前存储的是 string，可以直接赋值
+		sval = s;
+	} else {
+		new(&sval) string(s); // 否则需要先构造一个 string
+	}
+	tok = STR; // 更新判别式
+	return *this;
+}
+Token &Token::operator=(char c) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	cval = c;							// 为成员赋值
+	tok = CHAR;							// 更新判别式
+	return *this;
+}
+Token &Token::operator=(int i) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	ival = i;							// 为成员赋值
+	tok = INT;							// 更新判别式
+	return *this;
+}
+Token &Token::operator=(double d) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	dval = d;							// 为成员赋值
+	tok = DBL;							// 更新判别式
+	return *this;
+}
+void Token::copyUnion(const Token &t) {
+	switch (t.tok) {
+	case INT:
+		ival = t.ival;
+		break;
+	case CHAR:
+		cval = t.cval;
+		break;
+	case DBL:
+		dval = t.dval;
+		break;
+	// 要想拷贝一个 string 可以使用定位 new 表达式构造它
+	case STR:
+		new(&sval) string(t.sval);
+		break;
+	}
+}
+```
+## 练习 19.22：
+### 为你的Token类添加一个Sales_data类型的成员。
+答：
+```
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct Sales_data {
+	Sales_data() = default;
+	Sales_data(const std::string &s) :bookNo(s) {}
+	Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(p*n) {}
+	std::string isbn() const { return bookNo; }
+private:
+	std::string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+};
+
+class Token {
+public:
+	// 因为union含有一个string成员,所以Token必须定义拷贝控制成员
+	Token() : tok(INT), ival{ 0 } { }
+	Token(const Token &t) : tok(t.tok) { copyUnion(t); }
+	Token &operator=(const Token&);
+	// 如果 union 含有一个 string或Sales_data成员，则我们必须销毁它
+	~Token() { 
+		if (tok == STR) sval.~string();
+		if (tok == SALE) item.~Sales_data();
+	}
+	// 下面的赋值运算符负责设置 union 的不同成员
+	Token &operator=(const Sales_data&);
+	Token &operator=(const string&);
+	Token &operator=(char);
+	Token &operator=(int);
+	Token &operator=(double);
+private:
+	enum { INT, CHAR, DBL, STR, SALE } tok; // 判别式
+	union { // 匿名 union
+		char cval;
+		int ival;
+		double dval;
+		string sval;
+		Sales_data item;
+	}; // 每个Token对象含有一个该未命名 union类型的未命名成员
+	   // 检查判别式，然后酌情拷贝 union 成员
+	void copyUnion(const Token&);
+};
+
+Token &Token::operator=(const Token &t) {
+	if (this == &t) {
+		return *this;  // 检测自赋值并提前返回
+	}
+	// 如果此对象的值是 Sales_data 而t的值不是，则我们必须释放原来的 Sales_data
+	if (tok == SALE && t.tok != SALE) item.~Sales_data();
+	// 如果此对象的值是 string 而t的值不是，则我们必须释放原来的 string
+	if (tok == STR && t.tok != STR) sval.~string();
+
+	if (tok == SALE && t.tok == SALE) {
+		item = t.item; // 无须构造一个新 Sales_data
+	} else if (tok == STR && t.tok == STR) {
+		sval = t.sval; // 无须构造一个新 string
+	}else{
+		copyUnion(t); // 如果 t.tok 是 STR，则需要构造一个 string
+	}
+	tok = t.tok;
+	return *this;
+}
+Token &Token::operator=(const Sales_data &s) {
+	if (tok == SALE) { // 如果当前存储的是 Sales_data，可以直接赋值
+		item = s;
+	} else {
+		new(&item) Sales_data(s); // 否则需要先构造一个 Sales_data
+	}
+	tok = SALE; // 更新判别式
+	return *this;
+}
+Token &Token::operator=(const string &s) {
+	if (tok == STR) { // 如果当前存储的是 string，可以直接赋值
+		sval = s;
+	} else {
+		new(&sval) string(s); // 否则需要先构造一个 string
+	}
+	tok = STR; // 更新判别式
+	return *this;
+}
+Token &Token::operator=(char c) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	cval = c;							// 为成员赋值
+	tok = CHAR;							// 更新判别式
+	return *this;
+}
+Token &Token::operator=(int i) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	ival = i;							// 为成员赋值
+	tok = INT;							// 更新判别式
+	return *this;
+}
+Token &Token::operator=(double d) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	dval = d;							// 为成员赋值
+	tok = DBL;							// 更新判别式
+	return *this;
+}
+void Token::copyUnion(const Token &t) {
+	switch (t.tok) {
+	case INT:
+		ival = t.ival;
+		break;
+	case CHAR:
+		cval = t.cval;
+		break;
+	case DBL:
+		dval = t.dval;
+		break;
+		// 要想拷贝一个 string 可以使用定位 new 表达式构造它
+	case STR:
+		new(&sval) string(t.sval);
+		break;
+		// 要想拷贝一个 Sales_data 可以使用定位 new 表达式构造它
+	case SALE:
+		new(&item) Sales_data(t.item);
+		break;
+	}
+}
+```
+## 练习 19.23：
+### 为你的Token类添加移动构造函数和移动赋值运算符。
+答：
+```
+	// 移动构造函数
+	Token::Token(Token &&t) noexcept : tok(t.tok) {
+		switch (tok) {
+		case INT: ival = t.ival; break;
+		case CHAR: cval = t.cval; break;
+		case DBL: dval = t.dval; break;
+		case STR: new (&sval) string(std::move(t.sval)); break;  // 使用std::move来转移string
+		}
+		t.tok = INT;  // 设置t为无害状态
+	}
+	// 移动赋值运算符
+	Token &Token::operator=(Token &&t) noexcept {
+		// 自赋值检测
+		if (this != &t) {
+			// 如果当前存储的是string，需要先释放它
+			if (tok == STR) sval.~string();
+			tok = t.tok;
+			switch (tok) {
+			case INT: ival = t.ival; break;
+			case CHAR: cval = t.cval; break;
+			case DBL: dval = t.dval; break;
+			case STR: new (&sval) string(std::move(t.sval)); break;  // 转移string
+			}
+			t.tok = INT;  // 设置t为无害状态
+		}
+		return *this;
+	}
+```
+## 练习 19.24：
+### 如果我们将一个 Token 对象赋给它自己将发生什么情况？
+答：
+* 会调用拷贝赋值运算符，如果作为左侧运算对象的union的值是string但右侧运算对象的值不是,则我们必须先释放原来的string再给union成员赋一新值。如果两侧运算对象的值都是string,则我们可以使用普通的string赋值运算符完成拷贝。否则,我们调用copyUnion进行赋值。在copyUnion内部,如果右侧运算对象是string,则我们在左侧运算对象的dunion成员内构造一个新string;如果两端都不是string,则直接执行普通的赋值操作就可以了。
+## 练习 19.25：
+### 编写一系列赋值运算符,令其分别接受union中各种类型的值。
+答：
+```
+Token &Token::operator=(const string &s) {
+	if (tok == STR) { // 如果当前存储的是 string，可以直接赋值
+		sval = s;
+	} else {
+		new(&sval) string(s); // 否则需要先构造一个 string
+	}
+	tok = STR; // 更新判别式
+	return *this;
+}
+Token &Token::operator=(char c) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	cval = c;							// 为成员赋值
+	tok = CHAR;							// 更新判别式
+	return *this;
+}
+Token &Token::operator=(int i) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	ival = i;							// 为成员赋值
+	tok = INT;							// 更新判别式
+	return *this;
+}
+Token &Token::operator=(double d) {
+	if (tok == STR) sval.~string();		// 如果当前存储的是 string，释放它
+	dval = d;							// 为成员赋值
+	tok = DBL;							// 更新判别式
+	return *this;
+}
+```
