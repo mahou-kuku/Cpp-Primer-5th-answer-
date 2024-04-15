@@ -419,3 +419,104 @@ int main() {
 	return 0;
 }
 ```
+## 练习 19.20：
+### 将你的QueryResult类嵌套在TextQuery中,然后重新运行12.3.2节(第435页)中使用了TextQuery的程序。
+答：
+```
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <set>
+#include <string>
+#include <memory>
+
+using namespace std;
+
+class TextQuery {
+public:
+	class QueryResult;
+	using line_no = vector<string>::size_type;
+	TextQuery(ifstream&);
+	QueryResult query(const string&) const;
+private:
+	shared_ptr<vector<string>> file; // 输入文件
+	// 每个单词到它所在的行号的集合的映射
+	map<string, shared_ptr<set<line_no>>> wm;
+};
+
+class TextQuery::QueryResult {
+	friend std::ostream& print(std::ostream&, const QueryResult&);
+public:
+	QueryResult(string s, shared_ptr<set<line_no>> p,
+		shared_ptr<vector<string>> f) : sought(s), lines(p), file(f) { }
+private:
+	string sought; // 查询单词
+	shared_ptr<set<line_no>> lines; // 出现的行号
+	shared_ptr<vector<string>> file; // 输入文件
+};
+
+// 读取输入文件并建立单词到行号的映射
+TextQuery::TextQuery(ifstream &is) : file(new vector<string>) {
+	string text;
+	while (getline(is, text)) { // 对文件中每一行
+		file->push_back(text); // 保存此行文本
+		int n = file->size() - 1; // 当前行号
+		istringstream line(text); // 将行文本分解为单词
+		string word;
+		while (line >> word) { // 对行中每个单词
+			// 如果单词不在 wm中，以之为下标在wm中添加一项
+			auto &lines = wm[word]; // lines 是一个 shared_ptr
+			if (!lines) // 在我们第一次遇到这个单词时，此指针为空
+				lines.reset(new set<line_no>); // 分配一个新的 set
+			lines->insert(n); // 将此行号插入 set 中
+		}
+	}
+}
+
+TextQuery::QueryResult TextQuery::query(const string &sought) const {
+	// 如果未找到 sought，我们将返回一个指向此 set 的指针
+	static shared_ptr<set<line_no>> nodata(new set<line_no>);
+	// 使用 find 而不是下标运算符来查找单词，避免将单词添加到 wm 中！
+	auto loc = wm.find(sought);
+	if (loc == wm.end()) {
+		return QueryResult(sought, nodata, file); // 未找到
+	} else {
+		return QueryResult(sought, loc->second, file);
+	}
+}
+
+ostream &print(ostream & os, const TextQuery::QueryResult &qr) {
+	// 如果找到了单词,打印出现次数和所有出现的位置
+	os << qr.sought << " occurs " << qr.lines->size() << " " << "times" << endl;
+	// 打印单词出现的每一行
+	for (auto num : *qr.lines) { // 对 set 中每个单词
+		// 避免行号从 0 开始给用户带来的困惑
+		os << "\t(line " << num + 1 << ") " << *(qr.file->begin() + num) << endl;
+	}
+	return os;
+}
+
+void runQueries(ifstream &infile) {
+	// infile是一个ifstream,指向我们要处理的文件
+	TextQuery tq(infile); // 保存文件并建立查询 map
+	// 与用户交互：提示用户输入要查询的单词，完成查询并打印结果
+	while (true) {
+		cout << "enter word to look for, or q to quit: ";
+		string s;
+		// 若遇到文件尾或用户输入了'q' 时循环终止
+		if (!(cin >> s) || s == "q") break;
+		// 指向查询并打印结果
+		print(cout, tq.query(s)) << endl;
+	}
+}
+
+int main() {
+	ifstream ifs("example.txt");
+	runQueries(ifs);
+
+	system("pause");
+	return 0;
+}
+```
