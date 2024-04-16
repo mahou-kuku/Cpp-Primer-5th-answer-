@@ -804,3 +804,11 @@ Token &Token::operator=(double d) {
 	return *this;
 }
 ```
+## 练习 19.26：
+### 说明下列声明语句的含义并判断它们是否合法:
+```
+extern "C" int compute(int *, int);
+extern "C" double compute(double *, double);
+```
+答：
+* 这两条语句声明了两个名为compute的函数，两个函数都以C语言的链接规则被编译器处理。但这是非法的。因为使用extern "C"时，C++的名称改编被禁用。这意味着两个函数会被视为拥有相同的符号名compute，因此在链接时会发生冲突。
